@@ -1,0 +1,16 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+overrides:
+  '@blugrid/api-codegen': link:../../../../.local/share/pnpm/global/5/node_modules/@blugrid/api-codegen
+
+importers:
+
+  .:
+    dependencies:
+      '@blugrid/api-codegen':
+        specifier: link:../../../../.local/share/pnpm/global/5/node_modules/@blugrid/api-codegen
+        version: link:../../../../.local/share/pnpm/global/5/node_modules/@blugrid/api-codegen
