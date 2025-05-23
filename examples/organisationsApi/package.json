@@ -1,0 +1,13 @@
+{
+  "name": "organisations-api-example",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Example project using @blugrid/api-codegen to generate Core Organisation API modules from JDL",
+  "scripts": {
+    "generateOld": "node ../../dist/main.js generate",
+    "generate": "api-codegen generate"
+  },
+  "dependencies": {
+    "@blugrid/api-codegen": "file:../../"
+  }
+}

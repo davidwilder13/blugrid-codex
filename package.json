@@ -1,0 +1,29 @@
+{
+  "name": "@blugrid/api-codegen",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Code generator for Blugrid mono repo from JDL to Kotlin",
+  "main": "dist/main.js",
+  "bin": {
+    "api-codegen": "./dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "install": "pnpm run build && pnpm link --global",
+    "generate": "node --import ./ts-register.mjs ./src/generate.ts"
+  },
+  "dependencies": {
+    "commander": "^14.0.0",
+    "fs-extra": "^11.3.0",
+    "jhipster-core": "^7.3.4",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash-es": "^4.17.5",
+    "@types/mustache": "^4.2.5",
+    "lodash-es": "^4.17.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

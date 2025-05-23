@@ -1,0 +1,72 @@
+# ✨ General OS/System files
+.DS_Store
+Thumbs.db
+
+# ✨ IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# ✨ Temporary/Editor files
+.#*
+*#
+*~
+*.launch
+
+# ✨ Java/Gradle/Kotlin/Micronaut
+.gradle
+.hprof
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.micronaut/
+build/
+out/
+output/
+target/
+logs/
+docker-logs/
+
+# ✨ Gradle GUI config
+gradle-app.setting
+
+# ✨ Do NOT ignore Gradle wrapper JAR
+!gradle-wrapper.jar
+
+# ✨ Gradle task cache
+.gradletasknamecache
+
+# ✨ Node.js & TypeScript
+node_modules/
+.pnpm/
+.pnpm-debug.log
+tsconfig.tsbuildinfo
+dist/
+.ts-node/
+
+# ✨ Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ✨ Compiled source
+*.js
+*.js.map
+*.cjs
+*.mjs
+
+# ✨ Coverage/test output
+coverage/
+.nyc_output/
+
+# ✨ Env files
+.env
+.env.*
