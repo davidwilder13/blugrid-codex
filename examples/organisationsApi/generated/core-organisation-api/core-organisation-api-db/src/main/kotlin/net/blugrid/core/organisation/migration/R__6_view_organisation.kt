@@ -19,7 +19,7 @@ WITH CHECK OPTION;
 
 
 CREATE OR REPLACE FUNCTION proc_trig_organisation_insert()
-RETURNS TRIGGER AS $body$
+RETURNS TRIGGER AS $$body$$
 DECLARE
 BEGIN
     new.expiry_timestamp = 'infinity';
@@ -29,7 +29,7 @@ BEGIN
     EXECUTE 'INSERT INTO ORGANISATION VALUES ($1.*)' USING new;
     RETURN new;
 END;
-$body$ LANGUAGE 'plpgsql';
+$$body$$ LANGUAGE 'plpgsql';
 
 
 

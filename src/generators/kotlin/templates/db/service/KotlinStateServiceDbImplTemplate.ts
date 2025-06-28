@@ -11,7 +11,7 @@ const template = String.raw`package {{packageName}}.service
 
 import jakarta.inject.Singleton
 import net.blugrid.api.common.service.GenericCrudServiceImpl
-import {{packageName}}.mapper.{{entityName}}Mapper
+import {{packageName}}.mapping.{{entityName}}MappingService
 import {{packageName}}.model.{{entityName}}
 import {{packageName}}.model.{{entityName}}Create
 import {{packageName}}.model.{{entityName}}Update
@@ -21,8 +21,8 @@ import {{packageName}}.repository.model.{{entityName}}Entity
 @Singleton
 open class {{entityName}}StateServiceDbImpl(
 private val repository: {{entityName}}Repository,
-private val mapper: {{entityName}}Mapper
-) : GenericCrudServiceImpl<{{entityName}}, {{entityName}}Create, {{entityName}}Update, {{entityName}}Entity, {{entityName}}Mapper>(repository, mapper),
+private val mapper: {{entityName}}MappingService
+) : GenericCrudServiceImpl<{{entityName}}, {{entityName}}Create, {{entityName}}Update, {{entityName}}Entity, {{entityName}}MappingService>(repository, mapper),
 {{entityName}}StateService
 `
 

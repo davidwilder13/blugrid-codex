@@ -2,13 +2,11 @@ import fs from 'fs-extra'
 import path from 'path'
 import { CodegenEntityModel } from '../../../../model/index.js'
 import { toMustacheList } from '../../../../utils/index.js'
-import { KotlinModule } from '../../model/KotlinModule.js'
 import { RepeatableViewMigrationTemplate } from '../../templates/db/migrations/index.js'
 import { CreateTableSQLTemplate, CreateViewSQLTemplate } from '../../templates/db/sql/index.js'
 
 export async function generateKotlinDbMigrationFiles(
     entity: CodegenEntityModel,
-    module: KotlinModule,
     outputDir: string,
 ) {
     const name = entity.tableName;
@@ -32,7 +30,7 @@ export async function generateKotlinDbMigrationFiles(
     });
 
     const tableKt = RepeatableViewMigrationTemplate({
-        packageName: module.packageName,
+        packageName: entity.packageName,
         nameLower: name,
         createOrReplaceSql: tableSql,
     });
@@ -53,7 +51,7 @@ export async function generateKotlinDbMigrationFiles(
     });
 
     const viewKt = RepeatableViewMigrationTemplate({
-        packageName: module.packageName,
+        packageName: entity.packageName,
         nameLower: name,
         createOrReplaceSql: viewSql,
     });

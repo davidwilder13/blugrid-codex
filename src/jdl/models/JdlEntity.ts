@@ -21,7 +21,7 @@ export class JdlValidation {
 export class JdlField {
     name: string
     type: string
-    javadoc?: string
+    javadoc: string
     validations: JdlValidation[]
     annotations: JdlAnnotation[]
 

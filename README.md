@@ -78,7 +78,9 @@ core-api/
     ├── core-<domain>-api-db/              # JPA entities, repos, flyway
     ├── core-<domain>-api-client/          # REST Feign clients
     ├── core-<domain>-api-graphql/         # GraphQL schemas & resolvers
-    └── core-<domain>-api-grpc-client/     # Optional gRPC clients
+    ├── core-<domain>-api-grpc/            # gRPC server
+    ├── core-<domain>-api-grpc-client/     # gRPC clients
+    └── core-<domain>-api-grpc-proto/      # gRPC proto files
 ```
 
 ### 🧩 Layering Strategy
