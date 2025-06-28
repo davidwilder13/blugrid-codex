@@ -7,7 +7,7 @@ export class CodegenEntityFieldModel {
         public dbDataType: string,
         public required: boolean,
         public nullable: boolean,
-        public description: string,
+        public description?: string,
         public example?: string,
     ) {}
 

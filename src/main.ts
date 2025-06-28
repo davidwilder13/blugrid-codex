@@ -7,6 +7,8 @@ import {
     generateKotlinDbMigrationFiles,
     generateKotlinEntityFile,
     generateKotlinGenericCrudRepositoryFile,
+    generateKotlinMappingExtensionsFile,
+    generateKotlinMappingServiceFile,
     generateKotlinResources,
     generateKotlinServiceInterfaceFile,
     generateKotlinStateServiceDbImplFile,
@@ -46,7 +48,7 @@ program
             console.log(`🗂️ Found ${entitiesInModule.length} entities in module: ${module.name}`)
 
             const codegenEntities = entitiesInModule.map(entity =>
-                mapJdlEntityToCodegenEntity(entity, 'net.blugrid.api'),
+                mapJdlEntityToCodegenEntity(entity, 'net.blugrid.api.core'),
             )
 
             // === Generate API MODEL MODULE ===
@@ -61,7 +63,7 @@ program
             await generateCommonModuleFiles(kotlinModelModule, modelModuleOutputPath)
 
             for (const entity of codegenEntities) {
-                const resourceOutputPath = path.join(modelModuleOutputPath, 'src/main/kotlin', kotlinModelModule.packageName.replace(/\./g, '/'))
+                const resourceOutputPath = path.join(modelModuleOutputPath, 'src/main/kotlin', entity.packageName.replace(/\./g, '/'))
                 console.log(`🧱 Generating Resource Models and Interfaces for: ${entity.name}`)
                 await generateKotlinResources(entity, resourceOutputPath)
                 await generateKotlinServiceInterfaceFile(entity.name, kotlinModelModule.packageName, resourceOutputPath)
@@ -84,10 +86,12 @@ program
             for (const entity of codegenEntities) {
                 const dbPackageOutputPath = path.join(dbModuleOutputPath, 'src/main/kotlin', entity.packageName.replace(/\./g, '/'))
                 console.log(`📄 Generating DB Entity, Migration, Repository, and Service implementation for: ${entity.name}`)
-                await generateKotlinDbMigrationFiles(entity, kotlinDbModule, dbPackageOutputPath)
-                await generateKotlinEntityFile(entity, kotlinDbModule, dbPackageOutputPath)
-                await generateKotlinGenericCrudRepositoryFile(entity, kotlinDbModule, dbPackageOutputPath)
-                await generateKotlinStateServiceDbImplFile(entity.name, entity.packageName, dbPackageOutputPath)
+                await generateKotlinDbMigrationFiles(entity, dbPackageOutputPath)
+                await generateKotlinEntityFile(entity, dbPackageOutputPath)
+                await generateKotlinMappingExtensionsFile(entity, dbPackageOutputPath)
+                await generateKotlinMappingServiceFile(entity, dbPackageOutputPath)
+                await generateKotlinGenericCrudRepositoryFile(entity, dbPackageOutputPath)
+                await generateKotlinStateServiceDbImplFile(entity, dbPackageOutputPath)
             }
 
             // === Generate API REST SERVER MODULE ===

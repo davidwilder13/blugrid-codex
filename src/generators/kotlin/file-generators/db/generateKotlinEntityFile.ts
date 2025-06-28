@@ -3,12 +3,10 @@ import { capitalize } from 'lodash-es'
 import path from 'path'
 import { CodegenEntityModel } from '../../../../model/index.js'
 import { toMustacheList } from '../../../../utils/to-mustache-list.js'
-import { KotlinModule } from '../../model/KotlinModule.js'
 import { KotlinEntityTemplate } from '../../templates/db/repository/KotlinEntityTemplate.js'
 
 export async function generateKotlinEntityFile(
     entity: CodegenEntityModel,
-    module: KotlinModule,
     outputDir: string,
 ) {
     const repositoryModelDir = path.join(outputDir, 'repository', 'model')
@@ -17,7 +15,7 @@ export async function generateKotlinEntityFile(
     const entityType = toEntityType(entity.resourceType)
 
     const rendered = KotlinEntityTemplate({
-        packageName: module.packageName,
+        packageName: entity.packageName,
         entityName: capitalize(entity.name),
         tableName: `vw_${entity.tableName}`,
         sequenceName: `${entity.tableName}-sequence`,

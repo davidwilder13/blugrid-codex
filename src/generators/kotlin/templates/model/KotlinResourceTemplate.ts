@@ -13,7 +13,7 @@ export interface KotlinResourceTemplateProps {
         name: string;
         type: string;
         required: boolean;
-        description: string;
+        description?: string;
         example?: string;
     }>[];
     interfaceFields?: MustacheListItem<{
@@ -27,7 +27,6 @@ export interface KotlinResourceTemplateProps {
 const templates: Record<KotlinResourceTemplateVariant, string> = {
     model: String.raw`package {{packageName}}
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.Schema
 import net.blugrid.api.common.model.resource.Audit
 import net.blugrid.api.common.model.resource.UnscopedResource
@@ -52,7 +51,6 @@ data class {{name}}(
     override val audit: Audit? = null
 ) : UnscopedResource<{{name}}>(audit) {
 
-    @get:JsonIgnore
     override val resourceType: ResourceType
         get() = ResourceType.{{nameUpperSnake}}
 }

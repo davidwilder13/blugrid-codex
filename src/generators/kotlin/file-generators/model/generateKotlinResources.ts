@@ -1,4 +1,5 @@
 import fs from 'fs-extra'
+import { camelCase } from 'lodash-es'
 import path from 'path'
 import { CodegenEntityModel } from '../../../../model/CodegenEntityModel.js'
 import { toMustacheList } from '../../../../utils/index.js'
@@ -22,9 +23,9 @@ export async function generateKotlinResources(
 
         const rendered = KotlinResourceTemplate({
             variant,
-            packageName: entity.packageName,
+            packageName: `${entity.packageName}.model`,
             name: entity.name,
-            nameLower: entity.name.charAt(0).toLowerCase() + entity.name.slice(1),
+            nameLower: camelCase(entity.name),
             nameUpperSnake: entity.tableName.toUpperCase(),
             fields: toMustacheList(entity.fields.map(f => ({
                 name: f.name,
