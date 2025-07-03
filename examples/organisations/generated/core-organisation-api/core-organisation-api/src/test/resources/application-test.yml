@@ -3,6 +3,11 @@ micronaut:
     port: -1
 #    host: localhost
 
+jpa:
+  default:
+    entity-scan:
+      packages: 'net.blugrid.api'
+
 logger:
   levels:
     io.micronaut.web.router: TRACE

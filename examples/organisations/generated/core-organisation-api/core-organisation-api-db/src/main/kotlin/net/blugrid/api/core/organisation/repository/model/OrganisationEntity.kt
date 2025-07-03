@@ -6,6 +6,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType.SEQUENCE
 import jakarta.persistence.Id
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import net.blugrid.api.common.persistence.audit.AuditEmbeddable
 import net.blugrid.api.common.persistence.model.resource.UnscopedPersistable
@@ -34,10 +36,20 @@ class OrganisationEntity(
     @Column(name = "effective_timestamp", nullable = false, updatable = false)
     var effectiveTimestamp: LocalDateTime,
 
-) : UnscopedPersistable<OrganisationEntity> {
+    ) : UnscopedPersistable<OrganisationEntity> {
 
     @Embedded
     override var audit: AuditEmbeddable = AuditEmbeddable()
+
+    @PrePersist
+    fun prePersist() {
+        audit.prePersist()
+    }
+
+    @PreUpdate
+    fun preUpdate() {
+        audit.preUpdate()
+    }
 
     companion object {
         private val equalsProperties = arrayOf(

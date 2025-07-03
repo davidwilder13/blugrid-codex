@@ -1,7 +1,5 @@
 package net.blugrid.api.core.organisation.grpc.client
 
-import io.micronaut.http.client.LoadBalancerResolver
-import jakarta.inject.Inject
 import net.blugrid.api.core.organisation.grpc.toOrganisationCreateRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationUpdateRequest
 import net.blugrid.api.core.organisation.model.OrganisationCreate
@@ -9,6 +7,8 @@ import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.api.test.security.TestApplicationContext
 import net.blugrid.api.test.support.BaseGrpcClientIntegTest
 import net.blugrid.api.test.support.GrpcServerTestSupport
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -36,7 +36,7 @@ class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
     @Test
     fun `create and fetch Organisation by ID`() = runGrpcTest {
         val createReq = OrganisationCreate(
-            uuid = UUID.randomUUID(),
+            uuid = IdentityUUID(UUID.randomUUID()),
             parentOrganisationId = 101,
             effectiveTimestamp = LocalDateTime.parse("2025-01-01T00:00:00")
         )
@@ -51,15 +51,15 @@ class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
     @Test
     fun `update Organisation`() = runGrpcTest {
         val createReq = OrganisationCreate(
-            uuid = UUID.randomUUID(),
+            uuid = IdentityUUID(UUID.randomUUID()),
             parentOrganisationId = 500,
             effectiveTimestamp = LocalDateTime.now()
         )
         val created = client.create(createReq.toOrganisationCreateRequest())
 
         val updateReq = OrganisationUpdate(
-            id = created.id,
-            uuid = UUID.fromString(created.uuid),
+            id = IdentityID(created.id),
+            uuid = IdentityUUID(UUID.fromString(created.uuid)),
             parentOrganisationId = 777,
             effectiveTimestamp = LocalDateTime.now().plusDays(1)
         )
@@ -72,7 +72,7 @@ class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
     @Test
     fun `get Organisation by UUID`() = runGrpcTest {
         val createReq = OrganisationCreate(
-            uuid = UUID.randomUUID(),
+            uuid = IdentityUUID(UUID.randomUUID()),
             parentOrganisationId = 200,
             effectiveTimestamp = LocalDateTime.now()
         )
@@ -86,7 +86,7 @@ class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
     fun `getAll returns created Organisation`() = runGrpcTest {
         val created = client.create(
             OrganisationCreate(
-                uuid = UUID.randomUUID(),
+                uuid = IdentityUUID(UUID.randomUUID()),
                 parentOrganisationId = 321,
                 effectiveTimestamp = LocalDateTime.now()
             ).toOrganisationCreateRequest()
@@ -100,7 +100,7 @@ class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
     fun `delete Organisation`() = runGrpcTest {
         val created = client.create(
             OrganisationCreate(
-                uuid = UUID.randomUUID(),
+                uuid = IdentityUUID(UUID.randomUUID()),
                 parentOrganisationId = 404,
                 effectiveTimestamp = LocalDateTime.now()
             ).toOrganisationCreateRequest()

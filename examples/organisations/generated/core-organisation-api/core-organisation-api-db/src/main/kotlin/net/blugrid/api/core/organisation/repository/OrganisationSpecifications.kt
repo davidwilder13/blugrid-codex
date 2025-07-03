@@ -1,10 +1,10 @@
 package net.blugrid.api.core.organisation.repository
 
 import io.micronaut.data.jpa.repository.criteria.Specification
-import net.blugrid.api.common.repository.and
-import net.blugrid.api.common.repository.greaterThanOrEqualTo
-import net.blugrid.api.common.repository.`in`
-import net.blugrid.api.common.repository.lessThanOrEqualTo
+import net.blugrid.api.common.persistence.repository.and
+import net.blugrid.api.common.persistence.repository.greaterThanOrEqualTo
+import net.blugrid.api.common.persistence.repository.`in`
+import net.blugrid.api.common.persistence.repository.lessThanOrEqualTo
 import net.blugrid.api.core.organisation.model.OrganisationFilter
 import net.blugrid.api.core.organisation.repository.model.OrganisationEntity
 import java.util.UUID

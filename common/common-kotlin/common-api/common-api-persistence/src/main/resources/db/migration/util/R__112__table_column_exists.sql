@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: table_column_exists
+-- Description: Determines whether a specified column exists in a given table within the current schema.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT table_column_exists('orders', 'customer_id');  -- returns true or false
 CREATE OR REPLACE FUNCTION table_column_exists(
     IN table_name    TEXT,
     IN column_name   TEXT,

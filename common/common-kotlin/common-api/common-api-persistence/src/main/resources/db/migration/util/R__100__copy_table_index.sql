@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: copy_table_index
+-- Description: Copies all non-primary indexes from a source table to a destination table using a provided short code.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   PERFORM copy_table_index('orders','orders_000001','ord_000001');    -- copies all non-primary indexes from orders to orders_000001
 DROP FUNCTION IF EXISTS copy_table_index;
 CREATE OR REPLACE FUNCTION copy_table_index(
     source_table_name      TEXT,

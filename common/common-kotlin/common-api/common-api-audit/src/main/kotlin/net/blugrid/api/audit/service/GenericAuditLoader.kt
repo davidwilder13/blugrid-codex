@@ -1,38 +1,24 @@
-package net.blugrid.api.audit.service
+package net.blugrid.api.common.persistence.audit
 
-import net.blugrid.api.common.audit.service.AuditEventEmitterServiceImpl
+import net.blugrid.api.audit.service.AuditEventEmitterServiceImpl
+import net.blugrid.api.audit.service.AuditEventLogService
 import net.blugrid.api.common.model.audit.AuditEventType
-import net.blugrid.api.common.model.resource.GenericCreateResource
-import net.blugrid.api.common.model.resource.GenericUpdateResource
+import net.blugrid.api.common.model.resource.BaseResource
+import net.blugrid.api.common.model.resource.BaseTenantResource
 import net.blugrid.api.common.model.resource.ResourceType
-import net.blugrid.api.common.model.resource.TenantResource
-import net.blugrid.api.common.repository.model.GenericEntity
-import net.blugrid.api.common.repository.model.GenericEntityMapper
-import net.blugrid.api.common.service.GenericCrudService
+import net.blugrid.api.common.persistence.service.GenericQueryService
 import java.time.LocalDateTime
 
-abstract class GenericAuditLoader<
-    T : TenantResource<T>,
-    U : GenericCreateResource<U>,
-    V : GenericUpdateResource<V>,
-    X : GenericEntity<X>,
-    Y : GenericEntityMapper<T, U, V, X>
-    > {
+abstract class GenericAuditLoader<T : BaseResource<T>> {
     abstract fun reload(resourceType: ResourceType)
     abstract fun isEmpty(resourceType: ResourceType): Boolean
 }
 
-open class GenericAuditLoaderImpl<
-    T : TenantResource<T>,
-    U : GenericCreateResource<U>,
-    V : GenericUpdateResource<V>,
-    X : GenericEntity<X>,
-    Y : GenericEntityMapper<T, U, V, X>
-    >(
+open class GenericAuditLoaderImpl<T : BaseTenantResource<T>>(
     private val auditEventLogService: AuditEventLogService,
     private val auditEventEmitterService: AuditEventEmitterServiceImpl,
-    private val stateService: GenericCrudService<T, U, V, X, Y>
-) : GenericAuditLoader<T, U, V, X, Y>() {
+    private val stateService: GenericQueryService<*, T>
+) : GenericAuditLoader<T>() {
 
     override fun reload(resourceType: ResourceType) {
         stateService.getAll().forEach {
@@ -41,17 +27,14 @@ open class GenericAuditLoaderImpl<
                 resourceType = it.resourceType,
                 resource = it,
                 resourceId = it.id,
-                tenantId = it.permission?.tenantId!!,
-                sessionId = it.audit?.createdBySessionId!!,
-                version = 1,
-                localDateTime = LocalDateTime.now()
+                tenantId = it.scope?.tenantId ?: error("Missing tenantId"),
+                sessionId = it.audit?.created?.sessionId ?: error("Missing createdBySessionId"),
+                version = it.audit?.version ?: 0,
+                localDateTime = it.audit?.lastChanged?.timestamp ?: LocalDateTime.now()
             )
         }
     }
 
-    override fun isEmpty(resourceType: ResourceType): Boolean {
-        return this.auditEventLogService.isEmpty(resourceType)
-    }
+    override fun isEmpty(resourceType: ResourceType): Boolean =
+        auditEventLogService.isEmpty(resourceType)
 }
-
-

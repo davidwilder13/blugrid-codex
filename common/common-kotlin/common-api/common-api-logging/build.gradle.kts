@@ -1,33 +1,48 @@
 plugins {
-   alias(libs.plugins.jvm)
-   alias(libs.plugins.kapt)
-   alias(libs.plugins.allopen)
-   alias(libs.plugins.jpa)
-   alias(libs.plugins.shadow)
-   alias(libs.plugins.application)
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
 }
 
 dependencies {
+    // API dependencies - expose to consumers
     api(project(":common:common-kotlin:common-api:common-api-model"))
 
-    implementation(libs.bundles.commonLibs)
-    implementation(libs.bundles.webServiceLibs)
+    // Platform BOM
+    implementation(platform(libs.micronaut.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // Logging-specific dependencies
+    implementation(libs.logback.classic)         // Primary logging implementation
+    implementation(libs.micronaut.jackson)       // For structured logging (JSON)
+    implementation(libs.jackson.kotlin)          // Kotlin support for JSON logging
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
+
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
-}
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -40,8 +55,3 @@ micronaut {
         annotations("net.blugrid.api.*")
     }
 }
-
-application {
-    mainClass.set("net.blugrid.api.ApplicationKt")
-}
-

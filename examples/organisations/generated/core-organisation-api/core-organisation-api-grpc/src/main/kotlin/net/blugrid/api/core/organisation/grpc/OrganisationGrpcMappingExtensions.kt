@@ -4,29 +4,33 @@ import io.micronaut.data.model.Page
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
 
 fun Organisation.toOrganisationResponse(): OrganisationResponse =
     OrganisationResponse.newBuilder()
-        .setId(id)
-        .setUuid(uuid.toString())
+        .setId(id.value)
+        .setUuid(uuid.value.toString())
         .setParentOrganisationId(parentOrganisationId)
         .setEffectiveTimestamp(effectiveTimestamp.toString())
         .build()
 
 fun OrganisationCreateRequest.toDomain(): OrganisationCreate =
     OrganisationCreate(
-        uuid = UUID.randomUUID(),
+        uuid = IdentityUUID(UUID.randomUUID()),
         parentOrganisationId = parentOrganisationId,
         effectiveTimestamp = LocalDateTime.parse(effectiveTimestamp)
     )
 
 fun OrganisationUpdateRequest.toDomain(): OrganisationUpdate =
     OrganisationUpdate(
-        id = id,
-        uuid = uuid.takeIf { it.isNotBlank() }?.let(UUID::fromString) ?: UUID.randomUUID(),
+        id = IdentityID(id),
+        uuid = IdentityUUID(
+            uuid.takeIf { it.isNotBlank() }?.let(UUID::fromString) ?: UUID.randomUUID()
+        ),
         parentOrganisationId = parentOrganisationId,
         effectiveTimestamp = LocalDateTime.parse(effectiveTimestamp)
     )

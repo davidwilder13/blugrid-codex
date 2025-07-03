@@ -4,7 +4,8 @@ import io.micronaut.context.annotation.Replaces
 import io.micronaut.http.MutableHttpResponse
 import io.micronaut.security.oauth2.endpoint.token.response.IdTokenLoginHandler
 import jakarta.inject.Singleton
-import net.blugrid.api.security.authentication.model.DecoratedAuthentication
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+import net.blugrid.api.security.model.DecoratedAuthentication
 import java.util.UUID
 
 @Singleton
@@ -14,14 +15,14 @@ class EnhancedIdTokenLoginHandler(
     private val redirectService: RedirectService,
 ) {
 
-    fun tenantLoginSuccess(multitenantAuthentication: DecoratedAuthentication): MutableHttpResponse<*> {
+    fun tenantLoginSuccess(multitenantAuthentication: DecoratedAuthentication<BaseAuthenticatedSession>): MutableHttpResponse<*> {
         return cookieService.applyJwtCookie(
             response = redirectService.redirectToLoginSuccess(),
             authentication = multitenantAuthentication
         )
     }
 
-    fun invitationLoginSuccess(multitenantAuthentication: DecoratedAuthentication, partyRegistrationInvitationUuid: UUID): MutableHttpResponse<*> {
+    fun invitationLoginSuccess(multitenantAuthentication: DecoratedAuthentication<BaseAuthenticatedSession>, partyRegistrationInvitationUuid: UUID): MutableHttpResponse<*> {
         return cookieService.applyJwtCookie(
             response = redirectService.redirectToLoginRegistration(partyRegistrationInvitationUuid),
             authentication = multitenantAuthentication

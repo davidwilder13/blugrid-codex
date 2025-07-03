@@ -1,57 +1,46 @@
 plugins {
-   alias(libs.plugins.jvm)
-   alias(libs.plugins.kapt)
-   alias(libs.plugins.allopen)
-   alias(libs.plugins.shadow)
-   alias(libs.plugins.application)
-}
-
-version = "0.1.0"
-group = "net.blugrid.api"
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
 }
 
 dependencies {
-    implementation(project(":common:common-kotlin:common-api:common-api-test"))
-    implementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    // API dependencies - expose ALL to test consumers
+    api(project(":common:common-kotlin:common-api:common-api-test"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
 
-    implementation(platform("io.micronaut.platform:micronaut-platform"))
-    implementation(testLibs.bundles.testImplementationLibs) {
-        exclude(group = "org.slf4j", module = "slf4j-api")
-    }
+    // Platform BOM - exposed to test consumers
+    api(platform(libs.micronaut.bom))
 
-    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
-}
+    // Core dependencies using new bundles
+    api(libs.bundles.kotlinCore)
+    api(libs.bundles.micronautCore)
 
-application {
-    mainClass.set("net.blugrid.core.organisation.ApplicationKt")
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies for test environments
+    runtimeOnly(libs.bundles.runtimeCore)
+
+    // Testing framework - exposed as API (inherited from common-api-test)
+    // Note: common-api-test already exposes libs.bundles.testing as API
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
-}
-
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
-graalvmNative.toolchainDetection = false
-
-micronaut {
-    runtime("netty")
-    testRuntime("junit5")
-    processing {
-        incremental(true)
-        annotations("net.blugrid.core.organisation.*")
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.core.organisation.*")
     }
 }

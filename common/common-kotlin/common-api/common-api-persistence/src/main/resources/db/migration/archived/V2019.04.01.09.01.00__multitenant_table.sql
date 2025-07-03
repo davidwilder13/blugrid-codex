@@ -1,14 +1,20 @@
-CREATE TABLE _multitenant_table (
-    name                   T_NAME NOT NULL,
-    description            T_DESCRIPTION,
-    tenant_id              T_IDENTITY,
-    id_min                 T_IDENTITY,
-    id_max                 T_IDENTITY,
-    id_current_val         T_IDENTITY,
-    created_timestamp      T_TIMESTAMP DEFAULT now(),
-    last_changed_timestamp T_TIMESTAMP DEFAULT now(),
-    expiry_timestamp       T_TIMESTAMP NOT NULL DEFAULT 'infinity',
+-- -----------------------------------------------------------------------------
+-- Table: _multitenant_table
+-- Description: Tracks multi-tenant partition metadata including ID ranges, current values, and expiry timestamps.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT * FROM _multitenant_table WHERE name = 'orders';
+create table _multitenant_table
+(
+    name                   CHARACTER VARYING(128) not null,
+    description            CHARACTER VARYING,
+    tenant_id              BIGINT,
+    id_min                 BIGINT,
+    id_max                 BIGINT,
+    id_current_val         BIGINT,
+    created_timestamp      TIMESTAMP                       default now(),
+    last_changed_timestamp TIMESTAMP                       default now(),
+    expiry_timestamp       TIMESTAMP              not null default 'infinity',
 
-    CONSTRAINT pk_multitenant_table PRIMARY KEY (name)
-)
-WITHOUT OIDS;
+    constraint pk_multitenant_table primary key (name)
+) without OIDS;

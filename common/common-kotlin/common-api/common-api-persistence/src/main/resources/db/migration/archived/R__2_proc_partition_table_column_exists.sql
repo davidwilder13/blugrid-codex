@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: partition_table_column_exists
+-- Description: Determines whether a specified column exists in a partitioned table within the current schema.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT partition_table_column_exists('orders_000001', 'customer_id');
 CREATE OR REPLACE FUNCTION partition_table_column_exists(
     IN table_name    TEXT,
     IN column_name   TEXT,

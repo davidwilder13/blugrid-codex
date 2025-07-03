@@ -8,10 +8,10 @@ import io.micronaut.http.annotation.Filter
 import io.micronaut.http.filter.ClientFilterChain
 import io.micronaut.http.filter.HttpClientFilter
 import io.micronaut.http.filter.ServerFilterPhase
+import net.blugrid.api.jwt.applyCookies
+import net.blugrid.api.jwt.toCookie
 import net.blugrid.api.security.config.SecurityProps
 import net.blugrid.api.logging.logger
-import net.blugrid.api.security.jwt.applyCookies
-import net.blugrid.api.security.jwt.toCookie
 import org.reactivestreams.Publisher
 
 @Requires(env = [Environment.TEST])

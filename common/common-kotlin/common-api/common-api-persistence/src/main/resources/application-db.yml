@@ -12,6 +12,8 @@ datasources:
 #tag::jpa[]
 jpa:
   default:
+    entity-scan:
+      packages: 'net.blugrid.api'
     database: POSTGRESQL
     driverClassName: org.postgresql.Driver
     dialect: POSTGRES

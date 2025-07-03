@@ -1,60 +1,61 @@
 plugins {
-   alias(libs.plugins.jvm)
-   alias(libs.plugins.kapt)
-   alias(libs.plugins.allopen)
-   alias(libs.plugins.jpa)
-   alias(libs.plugins.shadow)
-   alias(libs.plugins.application)
-    //alias(libs.plugins.dockerCompose)
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.application)
 }
-
-repositories {
-    mavenCentral()
-}
-
-configureIntegTest()
 
 dependencies {
-    api(project(":common:common-kotlin:common-api:common-api"))
-    api(project(":common:common-kotlin:common-api:common-api-db"))
+    // API dependencies - expose to consumers
     api(project(":common:common-kotlin:common-api:common-api-json"))
     api(project(":common:common-kotlin:common-api:common-api-model"))
     api(project(":common:common-kotlin:common-api:common-api-security"))
+    api(project(":common:common-kotlin:common-api:common-api-web"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautWeb)
+    implementation(libs.bundles.micronautData)
+    implementation(libs.bundles.micronautSecurity)
+
+    // Multitenancy-specific dependencies
+    implementation(libs.micronaut.multitenancy)    // Core multitenancy support
+
+    // Reactive support for AuthenticationFetcher
+    implementation(libs.micronaut.reactor)               // Reactor core integration
+    implementation(libs.micronaut.reactor.http.client)   // HTTP reactive support
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+    runtimeOnly(libs.bundles.runtimeSecurity)
+
+    // Test dependencies
     testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
-
-    implementation(platform("io.micronaut.platform:micronaut-platform"))
-    implementation(platform("aws.sdk.kotlin:bom:1.4.92"))
-    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
-    implementation(libs.bundles.commonLibs)
-    implementation(libs.bundles.dbLibs)
-    implementation(libs.bundles.webServiceLibs)
-    implementation(libs.bundles.securityLibs)
-
-    runtimeOnly(runTimeLibs.bundles.commonRuntimeLibs)
-    runtimeOnly(runTimeLibs.bundles.securityRuntimeLibs)
-    runtimeOnly(runTimeLibs.bundles.dbRuntimeLibs)
-
-    compileOnly(libs.bundles.compileOnlyLibs)
-
-    testImplementation(testLibs.bundles.testImplementationLibs) {
+    testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 }
 
-application {
-    mainClass.set("net.blugrid.api.ApplicationKt")
-}
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
+
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
-}
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -68,7 +69,10 @@ micronaut {
     }
 }
 
-fun Project.configureIntegTest() {
+// Integration test configuration
+configureIntegrationTests()
+
+fun Project.configureIntegrationTests() {
     sourceSets {
         create("integTest") {
             compileClasspath += sourceSets.main.get().output
@@ -80,19 +84,16 @@ fun Project.configureIntegTest() {
         extendsFrom(configurations.implementation.get())
         extendsFrom(configurations.testImplementation.get())
     }
-
     configurations["integTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
-    dependencies.add("kaptIntegTest", "io.micronaut:micronaut-inject-java")
-    dependencies.add("integTestImplementation", "io.micronaut.test:micronaut-test-junit5")
+    dependencies.add("kaptIntegTest", libs.micronaut.inject.java.get())
+    dependencies.add("integTestImplementation", libs.micronaut.test.junit5.get())
 
     tasks.register<Test>("integrationTest") {
         group = "verification"
-        description = "Runs integration tests against the application."
-
+        description = "Runs integration tests"
         testClassesDirs = sourceSets["integTest"].output.classesDirs
         classpath = sourceSets["integTest"].runtimeClasspath
-
         shouldRunAfter("test")
     }
 }

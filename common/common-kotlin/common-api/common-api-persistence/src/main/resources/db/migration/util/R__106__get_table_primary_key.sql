@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_table_primary_key
+-- Description: Retrieves the primary key column(s) for a given table in the current schema.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_table_primary_key('public.orders');    -- returns 'id'
 CREATE OR REPLACE FUNCTION get_table_primary_key(
     IN table_name   TEXT,
     OUT primary_key TEXT

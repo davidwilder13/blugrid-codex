@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_session_scope
+-- Description: Retrieves the session_id from the database setting 'session.id', raising an exception if not set and returning 0 if undefined.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_session_scope();  -- returns the configured session_id or 0 if undefined
 CREATE OR REPLACE FUNCTION get_session_scope(
     OUT session_id BIGINT
 ) RETURNS BIGINT AS

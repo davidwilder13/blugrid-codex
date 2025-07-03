@@ -1,19 +1,20 @@
 package net.blugrid.api.core.organisation.repository.migration
 
-import net.blugrid.api.db.migration.RepeatableDbMigration
+import net.blugrid.api.common.persistence.repository.migration.RepeatableDbMigration
 import org.flywaydb.core.api.migration.Context
 
 class R__5_table_organisation : RepeatableDbMigration() {
     override fun migrate(context: Context) {
-        runMigration(context, """
+        runMigration(
+            context, """
 CREATE TABLE IF NOT EXISTS organisation_columns (
-    parent_organisation_id t_identity,
+    parent_organisation_id bigint,
     effective_timestamp t_datetime
 );
 
 
 CREATE TABLE IF NOT EXISTS ORGANISATION (
-type T_TABLE_NAME NOT NULL DEFAULT 'ORGANISATION',
+type VARCHAR(255) NOT NULL DEFAULT 'ORGANISATION',
 CONSTRAINT pk_organisation PRIMARY KEY (id)
 )
 INHERITS (
@@ -41,6 +42,7 @@ CREATE TRIGGER trig_organisation_update_audit
 BEFORE UPDATE ON organisation
 FOR EACH ROW
 EXECUTE PROCEDURE proc_trig_update_audit_columns();
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 }

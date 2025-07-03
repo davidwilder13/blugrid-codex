@@ -1,13 +1,13 @@
 package net.blugrid.api.test.security
 
-import net.blugrid.api.security.authentication.model.AuthenticatedBusinessUnitSession
-import net.blugrid.api.security.authentication.model.AuthenticatedOrganisation
-import net.blugrid.api.security.authentication.model.AuthenticatedUser
-import net.blugrid.api.security.authentication.model.AuthenticatedWebApplicationSession
-import net.blugrid.api.security.authentication.model.AuthenticationType
-import net.blugrid.api.security.jwt.factory.AccessTokenFactory
-import net.blugrid.api.security.jwt.model.JwtToken
-import net.blugrid.api.test.security.TestAuthFilter.Companion
+import net.blugrid.api.jwt.factory.AccessTokenFactory
+import net.blugrid.api.jwt.model.JwtToken
+import net.blugrid.api.security.model.AuthenticatedOrganisation
+import net.blugrid.api.security.model.AuthenticatedUser
+import net.blugrid.api.security.model.AuthenticationType
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+import net.blugrid.api.session.model.BusinessUnitSession
+import net.blugrid.api.session.model.TenantSession
 
 object TestApplicationContext {
 
@@ -41,10 +41,10 @@ object TestApplicationContext {
 
     private fun setupTenantJwtToken(
         organisation: AuthenticatedOrganisation,
-        session: AuthenticatedWebApplicationSession,
+        session: BaseAuthenticatedSession,
         user: AuthenticatedUser,
     ) {
-        Companion.JWT_TOKEN = AccessTokenFactory.token(
+        TestAuthFilter.Companion.JWT_TOKEN = AccessTokenFactory.token(
             JwtToken(
                 authenticationType = AuthenticationType.TENANT,
                 user = user,
@@ -56,10 +56,10 @@ object TestApplicationContext {
 
     private fun setupBusinessUnitJwtToken(
         organisation: AuthenticatedOrganisation,
-        session: AuthenticatedBusinessUnitSession,
+        session: BusinessUnitSession,
         user: AuthenticatedUser,
     ) {
-        Companion.JWT_TOKEN = AccessTokenFactory.token(
+        TestAuthFilter.Companion.JWT_TOKEN = AccessTokenFactory.token(
             JwtToken(
                 authenticationType = AuthenticationType.BUSINESS_UNIT,
                 organisation = organisation,
@@ -81,7 +81,7 @@ object TestApplicationContext {
         userIdentityId: Long,
         webApplicationId: Long,
         operatorId: Long
-    ) = AuthenticatedWebApplicationSession(
+    ) = TenantSession(
         sessionId = sessionId.toString(),
         tenantId = tenantId.toString(),
         userId = userIdentityId.toString(),
@@ -96,7 +96,7 @@ object TestApplicationContext {
         webApplicationId: Long,
         operatorId: Long,
         businessUnitId: Long
-    ) = AuthenticatedBusinessUnitSession(
+    ) = BusinessUnitSession(
         sessionId = sessionId.toString(),
         tenantId = tenantId.toString(),
         userId = userIdentityId.toString(),

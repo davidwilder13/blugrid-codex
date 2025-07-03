@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_operator_party_scope
+-- Description: Retrieves the operator_party_id from the database setting 'operator.party.id', raising an exception if not set and returning 0 if undefined.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_operator_party_scope();  -- returns the configured operator_party_id or 0 if undefined
 CREATE OR REPLACE FUNCTION get_operator_party_scope(
     OUT operator_party_id BIGINT
 ) RETURNS BIGINT AS

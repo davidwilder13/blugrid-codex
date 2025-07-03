@@ -1,70 +1,72 @@
-
 plugins {
-   alias(libs.plugins.jvm)
-   alias(libs.plugins.kapt)
-   alias(libs.plugins.allopen)
-   alias(libs.plugins.jpa)
-   alias(libs.plugins.shadow)
-   alias(libs.plugins.application)
-}
-
-version = "0.1.0"
-group = "net.blugrid.api"
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.application)
 }
 
 dependencies {
+    // API dependencies - expose to consumers
     api(project(":common:common-kotlin:common-api:common-api-model"))
     api(project(":common:common-kotlin:common-api:common-api-json"))
-    api(project(":common:common-kotlin:common-api:common-api-db"))
     api(project(":common:common-kotlin:common-api:common-api-persistence"))
-    api(project(":common:common-kotlin:common-api:common-api-multitenant"))
 
+    implementation(project(":common:common-kotlin:common-api:common-api-multitenant"))
+
+    // Domain-specific model
     api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
 
-    implementation(platform("io.micronaut.platform:micronaut-platform"))
-    implementation(platform("aws.sdk.kotlin:bom:1.4.92"))
-    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
-    implementation(libs.bundles.commonLibs)
-    implementation(libs.bundles.dbLibs)
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
 
-    runtimeOnly(runTimeLibs.bundles.commonRuntimeLibs)
-    runtimeOnly(runTimeLibs.bundles.dbRuntimeLibs)
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautData)     // Complete database stack
 
-    compileOnly(libs.bundles.compileOnlyLibs)
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+
+    // Test dependencies
+    testImplementation(project(":common:common-kotlin:common-api:common-api-multitenant"))
     testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
-}
-
-application {
-    mainClass.set("net.blugrid.core.organisation.ApplicationKt")
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.*")
     }
 }
-
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
-graalvmNative.toolchainDetection = false
 
 micronaut {
     runtime("netty")
     testRuntime("junit5")
     processing {
         incremental(true)
-        annotations("net.blugrid.core.organisation.*")
+        annotations("net.blugrid.*")
     }
 }

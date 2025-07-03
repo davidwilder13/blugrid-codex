@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: reset_request_scope
+-- Description: Resets all request-scope settings (tenant.id, session.id, operator.party.id, business_unit.id) to 0.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT reset_request_scope();  -- resets scopes and returns 1
 CREATE OR REPLACE FUNCTION reset_request_scope(
 ) RETURNS INT AS
 $body$

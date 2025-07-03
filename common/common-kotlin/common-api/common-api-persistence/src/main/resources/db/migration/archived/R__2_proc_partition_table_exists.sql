@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: partition_table_exists
+-- Description: Checks if a partitioned table exists in the current schema.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT partition_table_exists('orders_000001');
 CREATE OR REPLACE FUNCTION partition_table_exists(
     IN table_name    TEXT,
     OUT table_exists BOOLEAN

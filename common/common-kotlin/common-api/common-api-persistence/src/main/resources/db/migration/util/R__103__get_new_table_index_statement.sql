@@ -1,3 +1,13 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_new_table_index_statement
+-- Description: Produces a modified index creation statement by substituting the table name and schema with a new table name and short code.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_new_table_index_statement(
+--     'CREATE INDEX audit_event_log_resource_id_tenant_id_idx ON public.audit_event_log(resource_id, tenant_id)',
+--     'audit_event_log', 'public',
+--     'audit_event_log_000001_21', 'bustisauevlg_000001_21'
+--   );  -- returns 'CREATE INDEX bustisauevlg_000001_21_resource_id_tenant_id_idx ON public.audit_event_log_000001_21(resource_id, tenant_id)'
 DROP FUNCTION IF EXISTS get_new_table_index_statement;
 CREATE OR REPLACE FUNCTION get_new_table_index_statement(
     IN index_statement      TEXT,

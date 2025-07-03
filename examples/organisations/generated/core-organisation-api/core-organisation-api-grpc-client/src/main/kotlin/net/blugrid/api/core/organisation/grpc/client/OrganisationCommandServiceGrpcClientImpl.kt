@@ -13,6 +13,8 @@ import net.blugrid.api.core.organisation.grpc.toOrganisation
 import net.blugrid.api.core.organisation.grpc.toOrganisationCreateRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationPageRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationUpdateRequest
+import net.blugrid.api.core.organisation.model.OrganisationFilter
+import net.blugrid.api.core.organisation.service.OrganisationQueryService
 import java.util.Optional
 import java.util.UUID
 
@@ -20,7 +22,7 @@ import java.util.UUID
 @Requires(classes = [OrganisationGrpcClient::class])
 class OrganisationCommandServiceGrpcClientImpl(
     private val grpcClient: OrganisationGrpcClient
-) : OrganisationCommandService {
+) : OrganisationCommandService, OrganisationQueryService {
 
     override fun getPage(pageable: Pageable): Page<Organisation> = runBlocking {
         val response = grpcClient.getPage(pageable.toOrganisationPageRequest())
@@ -49,6 +51,10 @@ class OrganisationCommandServiceGrpcClientImpl(
         val response = grpcClient.getByUuidOptional(uuid)
         if (response.exists) Optional.of(response.organisation.toOrganisation())
         else Optional.empty()
+    }
+
+    override fun findByFilter(filter: OrganisationFilter, pageable: Pageable): Page<Organisation> {
+        TODO("Not yet implemented")
     }
 
     override fun getAll(): List<Organisation> = runBlocking {

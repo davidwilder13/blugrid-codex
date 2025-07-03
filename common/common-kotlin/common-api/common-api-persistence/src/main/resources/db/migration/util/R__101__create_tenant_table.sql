@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: create_tenant_table
+-- Description: Creates or retrieves a tenant-specific partition table inheriting from a base table, sets up constraints, indexes, and audit triggers.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT * FROM create_tenant_table('orders', 1);    -- returns table_name='orders_000001', min_id=100000000, max_id=199999999
 CREATE OR REPLACE FUNCTION create_tenant_table(
     in_table_name   TEXT,
     IN in_tenant_id BIGINT

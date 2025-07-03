@@ -1,3 +1,13 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_new_table_index_name
+-- Description: Generates a new index name by replacing the original table name in an existing index name with a new table short code.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_new_table_index_name(
+--     'audit_event_log_resource_id_tenant_id_idx',
+--     'audit_event_log',
+--     'bustisauevlg_000001_21'
+--   );  -- returns 'bustisauevlg_000001_21_resource_id_tenant_id_idx'
 CREATE OR REPLACE FUNCTION get_new_table_index_name(
     IN index_name TEXT,
     IN table_name TEXT,

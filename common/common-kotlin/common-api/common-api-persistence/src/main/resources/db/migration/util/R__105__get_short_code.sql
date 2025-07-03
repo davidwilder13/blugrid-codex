@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_short_code
+-- Description: Creates a condensed string code by aggregating the first characters of each underscore-separated word in the full name.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_short_code('customer_order');    -- returns 'cuor'
 DROP FUNCTION IF EXISTS get_short_code;
 CREATE OR REPLACE FUNCTION get_short_code(
     IN full_name   TEXT,

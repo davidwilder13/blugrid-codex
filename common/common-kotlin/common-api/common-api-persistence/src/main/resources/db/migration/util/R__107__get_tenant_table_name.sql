@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_tenant_table_name
+-- Description: Returns the table name for a tenant-specific partition, creating the table if it does not already exist.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_tenant_table_name('orders', 1);    -- returns 'orders_000001'
 CREATE OR REPLACE FUNCTION get_tenant_table_name(
     IN in_base_table TEXT,
     IN in_tenant_id  T_IDENTITY

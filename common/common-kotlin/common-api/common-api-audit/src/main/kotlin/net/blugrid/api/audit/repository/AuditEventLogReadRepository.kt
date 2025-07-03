@@ -8,12 +8,11 @@ import io.micronaut.data.jpa.repository.JpaSpecificationExecutor
 import io.micronaut.data.jpa.repository.criteria.Specification
 import io.micronaut.data.jpa.repository.criteria.Specification.where
 import net.blugrid.api.audit.model.AuditEventLogQuery
-import net.blugrid.api.audit.repository.model.AuditEventLogInsertEntity
 import net.blugrid.api.audit.repository.model.AuditEventLogReadEntity
 import net.blugrid.api.common.model.audit.AuditEventType
 import net.blugrid.api.common.model.resource.ResourceType
-import net.blugrid.api.common.repository.equal
-import net.blugrid.api.common.repository.`in`
+import net.blugrid.api.common.persistence.repository.equal
+import net.blugrid.api.common.persistence.repository.`in`
 import java.time.LocalDateTime
 import java.util.UUID
 

@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_new_table_short_code
+-- Description: Constructs a short code for a new table by replacing the source table name with a generated short code in the destination table name.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_new_table_short_code('audit_event_log', 'audit_event_log_000001_21');    -- returns 'bustisauevlg_000001_21'
 DROP FUNCTION IF EXISTS get_new_table_short_code;
 CREATE OR REPLACE FUNCTION get_new_table_short_code(
     IN source_table_name      TEXT,

@@ -1,33 +1,41 @@
 plugins {
     alias(libs.plugins.jvm)
     alias(libs.plugins.jpa)
-}
-
-version = "0.1"
-group = "net.blugrid.api"
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.application)
 }
 
 dependencies {
-    // core JPA + Hibernate types
-    implementation(libs.bundles.dbLibs)
-
-    // depends on domain primitives and scope interfaces only
+    // API dependencies - expose to consumers
     api(project(":common:common-kotlin:common-api:common-api-domain"))
     api(project(":common:common-kotlin:common-api:common-api-multitenant"))
 
-    // optional — for validation annotations
-    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+    // Platform BOM
+    implementation(platform(libs.micronaut.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // Data persistence stack using new bundles
+    implementation(libs.bundles.micronautData)
+
+    // Validation support
+    implementation(libs.jakarta.validation)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
 }
 
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.api.*")
     }
 }

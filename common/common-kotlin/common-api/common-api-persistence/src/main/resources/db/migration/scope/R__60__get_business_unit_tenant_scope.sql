@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: get_business_unit_tenant_scope
+-- Description: Retrieves the tenant_id for the current business unit scope, if the business_unit table exists.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT get_business_unit_tenant_scope();  -- returns the tenant_id of the current business unit or NULL
 CREATE OR REPLACE FUNCTION get_business_unit_tenant_scope(
     OUT business_unit_tenant_id BIGINT
 ) RETURNS BIGINT AS

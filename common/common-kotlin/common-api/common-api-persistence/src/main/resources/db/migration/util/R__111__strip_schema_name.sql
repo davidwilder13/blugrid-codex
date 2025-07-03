@@ -1,3 +1,10 @@
+-- -----------------------------------------------------------------------------
+-- Function: strip_schema_name
+-- Description: Removes a schema prefix from a table name if present, returning only the unqualified table name.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT strip_schema_name('public.orders');  -- returns 'orders'
+--   SELECT strip_schema_name('orders');         -- returns 'orders'
 CREATE OR REPLACE FUNCTION strip_schema_name(
     IN table_name      TEXT,
     OUT out_table_name TEXT

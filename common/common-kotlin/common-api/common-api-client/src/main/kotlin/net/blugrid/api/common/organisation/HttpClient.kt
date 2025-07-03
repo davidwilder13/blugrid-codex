@@ -4,11 +4,8 @@ import io.micronaut.core.type.Argument
 import io.micronaut.data.model.Page
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.MutableHttpRequest
 import io.micronaut.http.client.HttpClient
-import io.micronaut.http.cookie.Cookie
-import io.netty.handler.codec.http.cookie.DefaultCookie
-import net.blugrid.api.common.search.SearchPage
+import net.blugrid.api.common.model.search.SearchPage
 
 inline fun <T, reified U> HttpClient.post(
     path: String,
