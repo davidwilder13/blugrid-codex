@@ -1,0 +1,7 @@
+
+logger:
+  levels:
+    net.blugrid.api: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE

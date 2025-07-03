@@ -1,0 +1,11 @@
+micronaut:
+  application:
+    name: ${SERVICE_NAME:restApi}
+  config-client:
+    enabled: true
+
+consul:
+  client:
+    registration:
+      enabled: true
+    defaultZone: "${CONSUL_HOST:10.200.10.1}:${CONSUL_PORT:8500}"

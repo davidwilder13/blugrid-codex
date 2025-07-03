@@ -1,0 +1,8 @@
+micronaut:
+  server:
+    port: -1
+#    host: localhost
+
+logger:
+  levels:
+    io.micronaut.web.router: TRACE

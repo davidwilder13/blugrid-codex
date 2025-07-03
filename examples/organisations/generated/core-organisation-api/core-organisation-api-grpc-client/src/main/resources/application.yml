@@ -1,0 +1,10 @@
+grpc:
+  server:
+    enabled: false
+  client:
+    discovery:
+      enabled: true
+
+consul:
+  client:
+    defaultZone: http://${CONSUL_HOST}:${CONSUL_PORT}

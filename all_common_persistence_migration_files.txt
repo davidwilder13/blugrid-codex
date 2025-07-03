@@ -1,0 +1,1059 @@
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/commonTable/V2019.04.01.08.00.91__common_audit_columns.sql =====
+DROP TABLE IF EXISTS _common_audit_columns CASCADE;
+CREATE TABLE IF NOT EXISTS _common_audit_columns
+(
+    created_timestamp          t_timestamp   NOT NULL DEFAULT NOW(),
+    created_by_session_id      t_identity    NOT NULL,
+    last_changed_timestamp     t_timestamp   NOT NULL DEFAULT NOW(),
+    last_changed_by_session_id t_identity    NOT NULL,
+    version                    t_line_number NOT NULL DEFAULT 0,
+    expiry_timestamp           t_timestamp   NOT NULL DEFAULT 'infinity'
+)
+    WITHOUT OIDS;
+
+CREATE OR REPLACE FUNCTION proc_trig_insert_audit_columns() RETURNS TRIGGER AS
+$body$
+DECLARE
+BEGIN
+    IF (TO_JSONB(new) ? 'version') THEN new.version := 1; END IF;
+
+    RETURN new;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+
+
+CREATE OR REPLACE FUNCTION proc_trig_update_audit_columns() RETURNS TRIGGER AS
+$body$
+DECLARE
+BEGIN
+    IF (TO_JSONB(new) ? 'version') THEN new.version := new.version + 1; END IF;
+
+    RETURN new;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/commonTable/V2019.04.01.08.00.90__common_resource_columns.sql =====
+DROP TABLE IF EXISTS _common_resource_columns CASCADE;
+CREATE TABLE IF NOT EXISTS _common_resource_columns
+(
+    id   T_IDENTITY   NOT NULL,
+    uuid T_UUID       NOT NULL,
+    type T_TABLE_NAME NOT NULL
+)
+WITHOUT OIDS;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/commonTable/V2019.04.01.08.00.93__common_business_unit_columns.sql =====
+CREATE TABLE IF NOT EXISTS _common_business_unit_resource_columns
+(
+    id               t_identity   NOT NULL,
+    uuid             t_uuid       NOT NULL,
+    type             t_table_name NOT NULL,
+    tenant_id        t_identity   NOT NULL,
+    business_unit_id t_identity   NOT NULL
+)
+WITHOUT OIDS;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/commonTable/V2019.04.01.08.00.92__common_tenant_resource_columns.sql =====
+CREATE TABLE IF NOT EXISTS _common_tenant_resource_columns
+(
+    id        t_identity   NOT NULL,
+    uuid      t_uuid       NOT NULL,
+    type      t_table_name NOT NULL,
+    tenant_id t_identity   NOT NULL
+)
+WITHOUT OIDS;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/commonTable/V2019.04.01.08.00.94__common_unscoped_resource_columns.sql =====
+CREATE TABLE IF NOT EXISTS _common_unscoped_resource_columns
+(
+    id        t_identity   NOT NULL,
+    uuid      t_uuid       NOT NULL,
+    type      t_table_name NOT NULL
+)
+WITHOUT OIDS;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__3_vw_request_scope.sql =====
+DROP VIEW IF EXISTS vw_request_scope CASCADE;
+CREATE OR REPLACE VIEW vw_request_scope
+AS
+
+SELECT
+    get_tenant_scope() AS tenant_id,
+    get_session_scope() AS session_id,
+    get_operator_party_scope() AS operator_party_id,
+    get_business_unit_scope() AS business_unit_id,
+    get_business_unit_tenant_scope() AS business_unit_tenant_id
+;
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_get_client_scope.sql =====
+CREATE OR REPLACE FUNCTION get_tenant_scope(
+    OUT tenant_id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    CLIENT_ID_CONFIG         CONSTANT TEXT = 'tenant.id';
+    the_tenant_id TEXT;
+BEGIN
+    SELECT current_setting(CLIENT_ID_CONFIG) INTO the_tenant_id;
+
+    IF (the_tenant_id IS NULL) THEN
+        RAISE EXCEPTION 'The tenantId scope is not set' USING HINT = 'The database current_setting tenant.id has not been set';
+    END IF;
+
+    the_tenant_id = REPLACE(the_tenant_id, '"', '');
+
+    tenant_id = text_to_bigint(the_tenant_id :: TEXT);
+EXCEPTION
+    WHEN undefined_object THEN tenant_id = 0;
+
+END;
+$body$
+   STABLE LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_get_session_scope.sql =====
+CREATE OR REPLACE FUNCTION get_session_scope(
+    OUT session_id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    SESSION_ID_CONFIG        CONSTANT TEXT = 'session.id';
+    the_session_id TEXT;
+BEGIN
+    SELECT current_setting(SESSION_ID_CONFIG) INTO the_session_id;
+
+    IF (the_session_id IS NULL) THEN
+        RAISE EXCEPTION 'The sessionId scope is not set' USING HINT = 'The database current_setting session.id has not been set';
+    END IF;
+
+    the_session_id = REPLACE(the_session_id, '"', '');
+
+    session_id = text_to_bigint(the_session_id :: TEXT);
+EXCEPTION
+    WHEN undefined_object THEN session_id = 0;
+
+END;
+$body$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_set_request_scope.sql =====
+CREATE OR REPLACE FUNCTION set_tenant_scope(
+    IN tenant_id         TEXT
+) RETURNS INT AS
+$body$
+DECLARE
+    TENANT_ID_CONFIG         CONSTANT TEXT = 'tenant.id';
+BEGIN
+    PERFORM SET_CONFIG(TENANT_ID_CONFIG, QUOTE_IDENT(tenant_id :: TEXT), FALSE);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_session_scope(
+    IN session_id         TEXT
+) RETURNS INT AS
+$body$
+DECLARE
+    SESSION_ID_CONFIG         CONSTANT TEXT = 'session.id';
+BEGIN
+    PERFORM SET_CONFIG(SESSION_ID_CONFIG, QUOTE_IDENT(session_id :: TEXT), FALSE);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_business_unit_scope(
+    IN business_unit_id         TEXT
+) RETURNS INT AS
+$body$
+DECLARE
+    BUSINESS_UNIT_ID_CONFIG  CONSTANT TEXT = 'business_unit.id';
+BEGIN
+    PERFORM SET_CONFIG(BUSINESS_UNIT_ID_CONFIG, QUOTE_IDENT(business_unit_id :: TEXT), FALSE);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_tenant_session(
+    IN search_path       TEXT,
+    IN tenant_id         TEXT
+) RETURNS INT AS
+$body$
+BEGIN
+    PERFORM pg_catalog.set_config('search_path', search_path, false);
+    PERFORM set_tenant_scope(tenant_id);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_tenant_session(
+    IN search_path       TEXT,
+    IN tenant_id         TEXT,
+    IN session_id        TEXT
+) RETURNS INT AS
+$body$
+BEGIN
+    PERFORM pg_catalog.set_config('search_path', search_path, false);
+    PERFORM set_tenant_scope(tenant_id);
+    PERFORM set_session_scope(session_id);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_business_unit_session(
+    IN search_path       TEXT,
+    IN tenant_id         TEXT,
+    IN business_unit_id  TEXT
+) RETURNS INT AS
+$body$
+BEGIN
+    PERFORM pg_catalog.set_config('search_path', search_path, false);
+    PERFORM set_tenant_scope(tenant_id);
+    PERFORM set_business_unit_scope(business_unit_id);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_business_unit_session(
+    IN search_path       TEXT,
+    IN tenant_id         TEXT,
+    IN business_unit_id  TEXT,
+    IN session_id        TEXT
+) RETURNS INT AS
+$body$
+BEGIN
+    PERFORM pg_catalog.set_config('search_path', search_path, false);
+    PERFORM set_tenant_scope(tenant_id);
+    PERFORM set_business_unit_scope(business_unit_id);
+    PERFORM set_session_scope(session_id);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_reset_request_scope.sql =====
+CREATE OR REPLACE FUNCTION reset_request_scope(
+) RETURNS INT AS
+$body$
+DECLARE
+    CLIENT_ID_CONFIG         CONSTANT TEXT = 'tenant.id';
+    SESSION_ID_CONFIG        CONSTANT TEXT = 'session.id';
+    OPERATOR_PARTY_ID_CONFIG CONSTANT TEXT = 'operator.party.id';
+    BUSINESS_UNIT_ID_CONFIG  CONSTANT TEXT = 'business_unit.id';
+BEGIN
+    PERFORM set_config(CLIENT_ID_CONFIG, 0::TEXT, FALSE);
+    PERFORM set_config(SESSION_ID_CONFIG, 0::TEXT, FALSE);
+    PERFORM set_config(OPERATOR_PARTY_ID_CONFIG, 0::TEXT, FALSE);
+    PERFORM set_config(BUSINESS_UNIT_ID_CONFIG, 0::TEXT, FALSE);
+    RETURN 1;
+END;
+$body$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_get_business_unit_scope.sql =====
+CREATE OR REPLACE FUNCTION get_business_unit_scope(
+    OUT business_unit_id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    BUSINESS_UNIT_ID_CONFIG  CONSTANT TEXT = 'business_unit.id';
+    the_business_unit_id TEXT;
+BEGIN
+    SELECT current_setting(BUSINESS_UNIT_ID_CONFIG) INTO the_business_unit_id;
+
+    IF (the_business_unit_id IS NULL) THEN
+        RAISE EXCEPTION 'The business_unitId scope is not set' USING HINT = 'The database current_setting business_unit.id has not been set';
+    END IF;
+
+    the_business_unit_id = REPLACE(the_business_unit_id, '"', '');
+
+    business_unit_id = text_to_bigint(the_business_unit_id :: TEXT);
+EXCEPTION
+    WHEN undefined_object THEN business_unit_id = 0;
+
+END;
+$body$ LANGUAGE plpgsql;
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_get_operator_party_scope.sql =====
+CREATE OR REPLACE FUNCTION get_operator_party_scope(
+    OUT operator_party_id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    OPERATOR_PARTY_ID_CONFIG CONSTANT TEXT = 'operator.party.id';
+    the_operator_party_id TEXT;
+BEGIN
+    SELECT current_setting(OPERATOR_PARTY_ID_CONFIG) INTO the_operator_party_id;
+
+    IF (the_operator_party_id IS NULL) THEN
+        RAISE EXCEPTION 'The operator_party_id scope is not set' USING HINT = 'The database current_setting operator.party.id has not been set';
+    END IF;
+
+    the_operator_party_id = REPLACE(the_operator_party_id, '"', '');
+
+    operator_party_id = text_to_bigint(the_operator_party_id :: TEXT);
+EXCEPTION
+    WHEN undefined_object THEN operator_party_id = 0;
+
+END;
+$body$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/requestScope/R__2_proc_get_business_unit_client_scope.sql =====
+CREATE OR REPLACE FUNCTION get_business_unit_tenant_scope(
+    OUT business_unit_tenant_id BIGINT
+) RETURNS BIGINT AS
+$body$
+BEGIN
+    IF (table_exists('business_unit') IS TRUE) THEN
+        SELECT bu.tenant_id FROM business_unit bu WHERE bu.id = get_business_unit_scope()
+        INTO business_unit_tenant_id;
+    END IF;
+END
+$body$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/multitenantTable/V2019.04.01.09.01.00__multitenant_table.sql =====
+CREATE TABLE _multitenant_table (
+    name                   T_NAME NOT NULL,
+    description            T_DESCRIPTION,
+    tenant_id              T_IDENTITY,
+    id_min                 T_IDENTITY,
+    id_max                 T_IDENTITY,
+    id_current_val         T_IDENTITY,
+    created_timestamp      T_TIMESTAMP DEFAULT now(),
+    last_changed_timestamp T_TIMESTAMP DEFAULT now(),
+    expiry_timestamp       T_TIMESTAMP NOT NULL DEFAULT 'infinity',
+
+    CONSTRAINT pk_multitenant_table PRIMARY KEY (name)
+)
+WITHOUT OIDS;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/beforeMigrate.sql =====
+create schema if not exists $$$schema$$$;
+set SEARCH_PATH to $$$schema$$$;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_is_nil.sql =====
+CREATE OR REPLACE FUNCTION is_nil(
+    IN input    TEXT,
+    OUT is_nil BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    is_nil = coalesce(TRIM(input), '') = '';
+
+END;
+$body$
+IMMUTABLE
+    LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_setvar.sql =====
+DROP FUNCTION IF EXISTS setvar(text,anyelement);
+
+CREATE OR REPLACE FUNCTION setvar(
+    IN _key    text,
+    IN _val    ANYELEMENT
+) RETURNS VOID AS
+$body$
+BEGIN
+    --     DROP TABLE IF EXISTS tmp_variable;
+    CREATE TEMP TABLE IF NOT EXISTS tmp_variable (
+        key        text NOT NULL PRIMARY KEY,
+        text_val   text,
+        int_val    int,
+        bigint_val bigint,
+        uuid_val   uuid
+    );
+
+    CASE pg_typeof(_val) WHEN 'text'::regtype THEN INSERT INTO tmp_variable(key, text_val)
+                                                   VALUES (_key, _val)
+                                                       ON CONFLICT (key) DO UPDATE SET text_val = _val;
+
+                         WHEN 'integer'::regtype THEN INSERT INTO tmp_variable(key, int_val)
+                                                      VALUES (_key, _val)
+                                                          ON CONFLICT (key) DO UPDATE SET int_val = _val;
+
+                         WHEN 'bigint'::regtype THEN INSERT INTO tmp_variable(key, bigint_val)
+                                                     VALUES (_key, _val)
+                                                         ON CONFLICT (key) DO UPDATE SET bigint_val = _val;
+
+                         WHEN 'uuid'::regtype THEN INSERT INTO tmp_variable(key, uuid_val)
+                                                   VALUES (_key, _val)
+                                                       ON CONFLICT (key) DO UPDATE SET uuid_val = _val;
+
+                         ELSE RAISE EXCEPTION 'Unexpected data type: %', pg_typeof(_val)::text; END CASE;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE FUNCTION getvar(
+    IN _key    TEXT,
+    OUT result TEXT
+) AS
+$body$
+BEGIN
+    SELECT coalesce(text_val, int_val::TEXT, bigint_val::TEXT, uuid_val::TEXT) FROM tmp_variable WHERE key = _key::TEXT INTO result;
+
+    RETURN;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_is_not_nil.sql =====
+CREATE OR REPLACE FUNCTION is_not_nil(
+    IN input    TEXT,
+    OUT is_not_nil BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    is_not_nil = coalesce(TRIM(input), '') != '';
+
+END;
+$body$
+IMMUTABLE
+    LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_table_exists.sql =====
+CREATE OR REPLACE FUNCTION table_exists(
+    IN table_name    TEXT,
+    OUT table_exists BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    table_exists = FALSE;
+
+    PERFORM 1
+       FROM pg_catalog.pg_class c
+            JOIN pg_catalog.pg_namespace n
+            ON n.oid = c.relnamespace
+      WHERE (c.relkind = 'r')
+        AND (c.relname = quote_ident(table_name))
+        AND (n.nspname = '$$$schema$$$');
+
+    IF found THEN table_exists = TRUE; END IF;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__1_proc_text_to_bigint.sql =====
+CREATE OR REPLACE FUNCTION text_to_bigint(
+    v_input TEXT
+) RETURNS BIGINT AS
+$$
+DECLARE
+    v_int_value BIGINT DEFAULT NULL;
+BEGIN
+    BEGIN
+        v_int_value := v_input :: BIGINT;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Invalid integer value: "%".  Returning NULL.', v_input;
+        RETURN NULL;
+    END;
+    RETURN v_int_value;
+END;
+$$ LANGUAGE plpgsql;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_short_code.sql =====
+DROP FUNCTION IF EXISTS get_short_code;
+CREATE OR REPLACE FUNCTION get_short_code(
+    IN full_name   TEXT,
+    OUT short_code TEXT
+) RETURNS TEXT AS
+$body$
+BEGIN
+    SELECT string_agg(sub.first2letters, '')
+      FROM (
+               SELECT table_words.first2letters,
+                      regexp_matches(table_words.first2letters, '[a-z]') as match
+                 FROM (
+                          SELECT substr( -- 3. take first 2 chars
+                                         unnest( -- 2. unnest to rows
+                                                 regexp_split_to_array(full_name, '_') -- 1. split into words
+                                             ), 0, 4) AS first2letters
+                      ) table_words
+           ) sub
+      INTO short_code;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_tenant_nextval.sql =====
+CREATE OR REPLACE FUNCTION tenant_nextval(
+    IN input_name VARCHAR,
+    IN tenant_id BIGINT,
+    OUT id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    default_schema_name TEXT = '$$$schema$$$';  -- This will be replaced by Flyway
+    table_name          TEXT;
+    seq_name            TEXT;
+    the_min_id          BIGINT;
+    the_max_id          BIGINT;
+    sequence_exists     BOOLEAN;
+    is_tenant_table     BOOLEAN;
+BEGIN
+    -- 1. Since the input_name is just the table name, we use it directly
+    table_name := input_name;
+
+    -- 2. Determine if the table is tenant-specific by checking for a tenant_id column
+    SELECT table_column_exists(table_name, 'tenant_id') AND table_name != 'organisation' INTO is_tenant_table;
+
+    -- 3. Generate the sequence name based on whether the table is tenant-specific
+    IF (is_tenant_table) THEN
+        seq_name := 'seq_' || table_name || '_' || tenant_id;
+    ELSE
+        seq_name := 'seq_' || table_name;
+    END IF;
+
+    -- 4. Safely quote the sequence name
+    seq_name := quote_ident(seq_name);
+
+    -- 5. Check if the sequence already exists in the default schema
+    SELECT EXISTS(SELECT 1 FROM pg_sequences WHERE schemaname = default_schema_name AND sequencename = seq_name) INTO sequence_exists;
+
+    -- 6. If the sequence does not exist, create it with the appropriate settings
+    IF NOT sequence_exists THEN
+        IF (is_tenant_table) THEN
+            -- 7. For tenant-specific tables, create a sequence with custom min, max, and start values
+            SELECT min_id + 1 as min_id, max_id
+            INTO the_min_id, the_max_id
+            FROM tenant_sequence_details(tenant_id);
+
+            EXECUTE 'CREATE SEQUENCE ' || default_schema_name || '.' || seq_name ||
+                    ' START WITH ' || the_min_id ||
+                    ' MINVALUE ' || the_min_id ||
+                    ' MAXVALUE ' || the_max_id;
+        ELSE
+            -- 8. Create a global sequence with default values if it doesn't exist
+            EXECUTE 'CREATE SEQUENCE ' || default_schema_name || '.' || seq_name || ' START WITH 1';
+        END IF;
+    END IF;
+
+    -- 9. Use the sequence to get the next ID value
+    EXECUTE 'SELECT nextval(''' || default_schema_name || '.' || seq_name || ''')' INTO id;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_copy_table_index.sql =====
+DROP FUNCTION IF EXISTS copy_table_index;
+CREATE OR REPLACE FUNCTION copy_table_index(
+    source_table_name      TEXT,
+    destination_table_name TEXT,
+    destination_table_short_code TEXT
+) RETURNS VOID AS
+$body$
+DECLARE
+    the_source_index_statement   TEXT;
+    the_source_index_name        TEXT;
+    the_new_index_name           TEXT;
+    the_new_index_statement      TEXT;
+BEGIN
+    -- null check
+    IF ((source_table_name IS NOT NULL) AND (destination_table_name IS NOT NULL)) THEN
+        source_table_name = strip_schema_name(source_table_name);
+        destination_table_name = strip_schema_name(destination_table_name);
+
+        -- loop over any index that is not primary replacing table names
+        FOR the_source_index_statement, the_source_index_name IN SELECT pg_get_indexdef(idx.indexrelid),
+                                                                        i.relname
+                                                                   FROM pg_index AS idx
+                                                                        JOIN pg_class AS i
+                                                                        ON (i.oid = idx.indexrelid)
+                                                                  WHERE (idx.indrelid = ('$$$schema$$$.' || source_table_name) :: regclass)
+                                                                    AND (idx.indisprimary IS FALSE)
+                                                                    AND (i.relname !~ '[0-9]') LOOP -- exclude inherited tables
+
+            -- gen new index name
+            SELECT get_new_table_index_name(the_source_index_name, source_table_name, destination_table_short_code)
+              INTO the_new_index_name;
+
+            -- gen new index statement
+            SELECT get_new_table_index_statement(the_source_index_statement, source_table_name, '$$$schema$$$', destination_table_name, destination_table_short_code)
+              INTO the_new_index_statement;
+
+            -- check not exists first
+            -- IF NOT EXISTS(SELECT 1 FROM pg_indexes i WHERE (i.indexname = the_new_index_name)) THEN
+                -- create the index
+                EXECUTE the_new_index_statement || ';' ;
+            -- END IF; -- end exists
+        END LOOP; -- end loop
+    END IF; -- null check
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_unscoped_nextval.sql =====
+CREATE OR REPLACE FUNCTION unscoped_nextval(
+    IN input_name VARCHAR,
+    OUT id BIGINT
+) RETURNS BIGINT AS
+$body$
+DECLARE
+    seq_name            TEXT;
+    sequence_exists     BOOLEAN;
+BEGIN
+    -- 1. Construct the sequence name from the table name
+    seq_name := 'seq_' || input_name;
+    seq_name := quote_ident(seq_name); -- Safely quote the sequence name
+
+    -- 3. Check if the sequence already exists in the current schema
+    SELECT EXISTS(SELECT 1 FROM pg_sequences WHERE schemaname = current_schema() AND sequencename = seq_name) INTO sequence_exists;
+
+    -- 4. If the sequence does not exist, create it with the appropriate settings
+    IF NOT sequence_exists THEN
+        EXECUTE 'CREATE SEQUENCE ' || seq_name || ' START WITH 1';
+    END IF;
+
+    -- 5. Use the sequence to get the next ID value
+    EXECUTE 'SELECT nextval(''' || seq_name || ''')' INTO id;
+
+    RETURN;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_strip_schema_name.sql =====
+CREATE OR REPLACE FUNCTION strip_schema_name(
+    IN table_name      TEXT,
+    OUT out_table_name TEXT
+) RETURNS TEXT AS
+$body$
+DECLARE
+
+BEGIN
+    -- remove schema name from table name if exists
+    IF (table_name LIKE '%.%') THEN out_table_name = split_part(table_name, '.', 2); ELSE out_table_name = table_name; END IF;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_create_tenant_table.sql =====
+CREATE OR REPLACE FUNCTION create_tenant_table(
+    in_table_name   TEXT,
+    IN in_tenant_id BIGINT
+)
+    RETURNS TABLE (
+        table_name TEXT,
+        min_id     BIGINT,
+        max_id     BIGINT
+    )
+AS
+$body$
+DECLARE
+    the_table_primary_key  TEXT;
+    sql_text               TEXT;
+    table_short_code       TEXT;
+
+    v_returned_sqlstate    TEXT;
+    v_message_text         TEXT;
+    v_pg_exception_detail  TEXT;
+    v_pg_exception_hint    TEXT;
+    v_pg_exception_context TEXT;
+BEGIN
+    -- lookup statement variables
+    SELECT p.table_name, p.min_id, p.max_id FROM tenant_table_details(in_table_name, in_tenant_id) p
+    INTO table_name, min_id, max_id;
+
+    -- Create partition table if not exists
+    IF (table_exists(table_name :: TEXT) IS FALSE) THEN
+        -- gen table name short code
+        table_short_code = get_new_table_short_code(in_table_name, table_name);
+
+        -- lookup primary key
+        the_table_primary_key = get_table_primary_key(in_table_name);
+
+        -- create table
+        sql_text = 'CREATE TABLE ' || table_name || '( ' || 'CONSTRAINT ' || 'pk_' || table_short_code || ' PRIMARY KEY (' || the_table_primary_key || ') ' ||
+                   ') INHERITS (' || in_table_name || ')';
+        EXECUTE sql_text;
+
+        --copy indexes
+        PERFORM copy_table_index(in_table_name, table_name, table_short_code);
+
+        --create scoped id constraint
+        sql_text = 'ALTER TABLE ' || table_name || ' ADD CONSTRAINT CK_' || table_short_code || '_' || the_table_primary_key || ' CHECK ' || '( ' ||
+                   the_table_primary_key || ' >= ' || min_id || ' AND ' || the_table_primary_key || ' < ' || max_id || ' )';
+        EXECUTE sql_text;
+
+        --create tenant_id constraint
+        sql_text = 'ALTER TABLE ' || table_name || ' ADD CONSTRAINT CK_' || table_short_code || '_TENANT_ID CHECK ' || '( TENANT_ID = ' || in_tenant_id ||
+                   ' )';
+        EXECUTE sql_text;
+
+        sql_text = 'CREATE TRIGGER trig_' || table_short_code || '_update_audit ' || 'BEFORE UPDATE ON ' || table_name || ' FOR EACH ROW ' ||
+                   'EXECUTE PROCEDURE proc_trig_update_audit_columns() ';
+        EXECUTE sql_text;
+
+    END IF;
+
+    RETURN QUERY (
+        SELECT table_name, min_id, max_id
+    );
+EXCEPTION
+    WHEN OTHERS THEN GET STACKED DIAGNOSTICS v_returned_sqlstate = RETURNED_SQLSTATE, v_message_text = MESSAGE_TEXT, v_pg_exception_detail = PG_EXCEPTION_DETAIL, v_pg_exception_hint = PG_EXCEPTION_HINT, v_pg_exception_context = PG_EXCEPTION_CONTEXT;
+
+    RAISE NOTICE E'Got exception:
+        state  : %
+        message: %
+        detail : %
+        hint   : %
+        context: %', v_returned_sqlstate, v_message_text, v_pg_exception_detail, v_pg_exception_hint, v_pg_exception_context;
+
+    RAISE NOTICE E'Got exception:
+        SQLSTATE: %
+        SQLERRM: %', sqlstate, sqlerrm;
+
+    RAISE NOTICE '%', sql_text;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_table_column_exists.sql =====
+CREATE OR REPLACE FUNCTION table_column_exists(
+    IN table_name    TEXT,
+    IN column_name   TEXT,
+    OUT table_exists BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    table_exists = FALSE;
+
+    PERFORM 1
+       FROM pg_catalog.pg_class c
+            JOIN pg_catalog.pg_namespace n
+            ON (n.oid = c.relnamespace) AND (c.relkind = 'r') AND (c.relname = quote_ident(table_name)) AND (n.nspname = '$$$schema$$$')
+            JOIN pg_catalog.pg_attribute a
+            ON (a.attrelid = c.oid) AND (a.attname = quote_ident(column_name));
+
+    IF found THEN table_exists = TRUE; END IF;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_table_primary_key.sql =====
+CREATE OR REPLACE FUNCTION get_table_primary_key(
+    IN table_name   TEXT,
+    OUT primary_key TEXT
+) RETURNS TEXT AS
+$body$
+DECLARE
+BEGIN
+
+    SELECT
+        STRING_AGG(pg_attribute.attname, ',')
+      FROM pg_index,
+           pg_class,
+           pg_attribute,
+           pg_namespace
+     WHERE pg_class.oid = quote_ident(table_name) :: REGCLASS
+       AND indrelid = pg_class.oid
+       AND nspname = '$$$schema$$$'
+       AND pg_class.relnamespace = pg_namespace.oid
+       AND pg_attribute.attrelid = pg_class.oid
+       AND pg_attribute.attnum = ANY (pg_index.indkey)
+       AND indisprimary
+      INTO primary_key;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_tenant_table_name.sql =====
+CREATE OR REPLACE FUNCTION get_tenant_table_name(
+    IN in_base_table TEXT,
+    IN in_tenant_id  T_IDENTITY
+) RETURNS TEXT AS
+$body$
+DECLARE
+    the_table_name TEXT;
+BEGIN
+    --Create table if needed
+    SELECT p.table_name INTO the_table_name FROM create_tenant_table(in_base_table, in_tenant_id) p;
+
+    RETURN the_table_name;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_partition_table_exists.sql =====
+CREATE OR REPLACE FUNCTION partition_table_exists(
+    IN table_name    TEXT,
+    OUT table_exists BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    table_exists = FALSE;
+
+    PERFORM 1
+       FROM pg_catalog.pg_class c
+            JOIN pg_catalog.pg_namespace n
+            ON n.oid = c.relnamespace
+      WHERE (c.relkind = 'p')
+        AND (c.relname = quote_ident(table_name))
+        AND (n.nspname = '$$$schema$$$');
+
+    IF found THEN table_exists = TRUE; END IF;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_tenant_sequence_details.sql =====
+CREATE OR REPLACE FUNCTION tenant_sequence_details(
+    IN in_tenant_id BIGINT
+)
+    RETURNS TABLE
+            (
+                min_id BIGINT,
+                max_id BIGINT
+            )
+AS
+$$
+DECLARE
+    -- integer	4 bytes	-2147483648 to +2147483647
+    -- bigint	8 bytes	-9223372036854775808 to 9223372036854775807
+
+    the_shard_length    CONSTANT INT := 6; -- supports 1 million tenantIds 1 to 999,9999
+    in_tenant_id_length CONSTANT INT := 8; -- supports 100 million resourceIds 1 - 99,999,999
+BEGIN
+    -- set statement variables
+    RETURN QUERY SELECT (in_tenant_id * (10 ^ (in_tenant_id_length)))::BIGINT             AS min_id,
+                        (((in_tenant_id + 1) * (10 ^ (in_tenant_id_length))) - 1)::BIGINT AS max_id;
+END;
+$$
+    IMMUTABLE LANGUAGE plpgsql;
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_new_table_index_name.sql =====
+CREATE OR REPLACE FUNCTION get_new_table_index_name(
+    IN index_name TEXT,
+    IN table_name TEXT,
+    IN new_table_short_code TEXT,
+    OUT new_index_name TEXT
+) RETURNS TEXT AS
+$body$
+BEGIN
+    -- "With index name audit_event_log_resource_id_tenant_id_idx" for "audit_event_log"
+    -- should generate "bustisauevlg_000001_21_log_resource_id_tenant_id_idx" from new table short code "bustisauevlg_000001_21"
+    SELECT regexp_replace(index_name, table_name, new_table_short_code)
+    INTO new_index_name;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_new_table_short_code.sql =====
+DROP FUNCTION IF EXISTS get_new_table_short_code;
+CREATE OR REPLACE FUNCTION get_new_table_short_code(
+    IN source_table_name      TEXT,
+    IN destination_table_name TEXT,
+    OUT new_table_short_code TEXT
+) RETURNS TEXT AS
+$body$
+DECLARE
+    short_code TEXT;
+BEGIN
+    SELECT get_short_code(source_table_name) INTO short_code;
+
+    SELECT replace(destination_table_name, source_table_name, short_code)
+    INTO new_table_short_code;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/V2019.01.01.09.00.02__common_enums.sql =====
+CREATE DOMAIN t_status AS VARCHAR(50) CHECK (value IN ('ACTIVE', 'DELETE', 'IN_ACTIVE'));
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/V2019.01.01.09.00.03__common_domains.sql =====
+-------------------- COMMON DOMAINS ----------------------------
+CREATE DOMAIN t_boolean AS CHARACTER(1);
+CREATE DOMAIN t_flag AS BOOLEAN DEFAULT FALSE;
+
+-- Codes
+CREATE DOMAIN t_code AS CHARACTER VARYING(20);
+CREATE DOMAIN t_code1 AS CHARACTER(1);
+CREATE DOMAIN t_code2 AS CHARACTER(2);
+CREATE DOMAIN t_code3 AS CHARACTER(3);
+CREATE DOMAIN t_code4 AS CHARACTER VARYING(4);
+CREATE DOMAIN t_code6 AS CHARACTER VARYING(6);
+
+-- Dates
+CREATE DOMAIN t_datetime AS DATE;
+CREATE DOMAIN t_time AS TIME WITHOUT TIME ZONE;
+CREATE DOMAIN t_timestamp AS TIMESTAMP WITH TIME ZONE DEFAULT now();
+CREATE DOMAIN t_timestamp_effective AS TIMESTAMP WITH TIME ZONE DEFAULT now();
+CREATE DOMAIN t_timestamp_expiration AS TIMESTAMP WITH TIME ZONE;
+CREATE DOMAIN t_timestampz AS TIMESTAMP WITH TIME ZONE;
+CREATE DOMAIN t_timezone_offset AS CHARACTER VARYING(5);
+
+-- Calendar
+CREATE DOMAIN t_date_identity AS INTEGER;
+CREATE DOMAIN t_date_calendar AS DATE;
+CREATE DOMAIN t_date_calendar_day AS SMALLINT CHECK (value BETWEEN 1 AND 31);
+CREATE DOMAIN t_date_calendar_day_of_month AS SMALLINT CHECK (value BETWEEN 1 AND 31);
+CREATE DOMAIN t_date_calendar_day_of_qtr AS SMALLINT CHECK (value BETWEEN 1 AND 94);
+CREATE DOMAIN t_date_calendar_month AS SMALLINT CHECK ( value BETWEEN 1 AND 12);
+CREATE DOMAIN t_date_calendar_month_of_quarter AS SMALLINT CHECK ( value BETWEEN 1 AND 3);
+CREATE DOMAIN t_date_calendar_week AS SMALLINT CHECK ( value BETWEEN 1 AND 53);
+CREATE DOMAIN t_date_calendar_week_of_month AS SMALLINT CHECK ( value BETWEEN 1 AND 5);
+CREATE DOMAIN t_date_calendar_week_of_qtr AS SMALLINT CHECK ( value BETWEEN 1 AND 15);
+CREATE DOMAIN t_date_calendar_weekday AS SMALLINT CHECK ( value BETWEEN 1 AND 7);
+CREATE DOMAIN t_date_calendar_year AS SMALLINT CHECK ( value BETWEEN 1900 AND 2100);
+CREATE DOMAIN t_date_calendar_year_day AS SMALLINT CHECK ( value BETWEEN 1 AND 366);
+CREATE DOMAIN t_date_fiscal AS NUMERIC(7, 0);
+CREATE DOMAIN t_date_fiscal_day AS SMALLINT CHECK ( value BETWEEN 1 AND 31);
+CREATE DOMAIN t_date_fiscal_month AS SMALLINT CHECK ( value BETWEEN 1 AND 12);
+CREATE DOMAIN t_date_fiscal_quarter AS SMALLINT CHECK (value BETWEEN 1 AND 4);
+CREATE DOMAIN t_date_fiscal_week AS SMALLINT CHECK ( value BETWEEN 1 AND 53);
+
+-- Text
+CREATE DOMAIN t_table_name AS CHARACTER VARYING(63);
+CREATE DOMAIN t_description AS CHARACTER VARYING;
+CREATE DOMAIN t_description_short AS CHARACTER VARYING(255);
+CREATE DOMAIN t_password AS CHARACTER VARYING(255);
+CREATE DOMAIN t_name AS CHARACTER VARYING(128);
+CREATE DOMAIN t_text AS CHARACTER VARYING;
+
+-- Numbers
+CREATE DOMAIN t_count AS INTEGER DEFAULT 0;
+CREATE DOMAIN t_short_count AS SMALLINT DEFAULT 0;
+CREATE DOMAIN t_quantity AS NUMERIC;
+CREATE DOMAIN t_exchange_rate AS NUMERIC;
+CREATE DOMAIN t_float AS DOUBLE PRECISION;
+CREATE DOMAIN t_fraction AS DOUBLE PRECISION;
+CREATE DOMAIN t_hexint AS BIGINT DEFAULT 0;
+CREATE DOMAIN t_line_number AS SMALLINT;
+CREATE DOMAIN t_money AS NUMERIC DEFAULT 0;
+CREATE DOMAIN t_percent AS DOUBLE PRECISION;
+
+-- Ids
+CREATE DOMAIN t_identity AS BIGINT;
+CREATE DOMAIN t_identity_alphanumeric AS CHARACTER VARYING(20);
+CREATE DOMAIN t_ipaddress AS CHARACTER VARYING(15);
+CREATE DOMAIN t_isbn AS CHARACTER VARYING(13);
+CREATE DOMAIN t_issn AS CHARACTER VARYING(9);
+CREATE DOMAIN t_uuid AS UUID DEFAULT gen_random_uuid();
+
+-- json
+CREATE DOMAIN t_json AS JSONB;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/V2019.01.01.09.00.00__common_settings.sql =====
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = ON;
+SET check_function_bodies = FALSE;
+SET client_min_messages = WARNING;
+SET row_security = OFF;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_create_client_partition_table.sql =====
+CREATE OR REPLACE FUNCTION create_tenant_partition_table(
+    IN in_table_name TEXT,
+    IN in_tenant_id  BIGINT,
+    OUT table_name   TEXT,
+    OUT min_id       BIGINT,
+    OUT max_id       BIGINT
+) RETURNS RECORD AS
+$body$
+DECLARE
+    in_tenant_id          BIGINT;
+    the_table_primary_key TEXT;
+    the_shard_length      INT DEFAULT 6;
+    in_tenant_id_length   INT DEFAULT 8;
+    the_padded_tenant_id  TEXT;
+    table_short_code      TEXT;
+
+BEGIN
+    in_tenant_id = get_tenant_scope();
+
+    -- set statement variables
+    the_padded_tenant_id = lpad(in_tenant_id :: TEXT, the_shard_length, '0');
+    min_id = in_tenant_id * (10 ^ (in_tenant_id_length));
+    max_id = ((in_tenant_id + 1) * (10 ^ (in_tenant_id_length))) - 1;
+
+    table_name = in_table_name || '_' || the_padded_tenant_id;
+
+    -- Create partition table if not exists
+    IF (table_exists(table_name :: TEXT) IS FALSE) THEN
+        -- lookup primary key
+        the_table_primary_key = get_table_primary_key(in_table_name);
+        table_short_code = get_new_table_short_code(in_table_name, table_name);
+
+        -- create table
+        EXECUTE 'CREATE TABLE ' || table_name || ' PARTITION OF ' || in_table_name || ' FOR VALUES FROM (' || min_id || ') TO (' || max_id || ')';
+
+        --create tenant_id constraint
+        EXECUTE 'ALTER TABLE ' || table_name || ' ADD CONSTRAINT CK_' || table_short_code || '_TENANT_ID CHECK ' || '( TENANT_ID = ' || in_tenant_id ||
+                ' )';
+    END IF;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_new_table_index_statement.sql =====
+DROP FUNCTION IF EXISTS get_new_table_index_statement;
+CREATE OR REPLACE FUNCTION get_new_table_index_statement(
+    IN index_statement      TEXT,
+    IN table_name           TEXT,
+    IN schema               TEXT,
+    IN new_table_name       TEXT,
+    IN new_table_short_code TEXT,
+    OUT new_index_statement TEXT
+) RETURNS TEXT AS
+$body$
+DECLARE
+    statement_with_new_table_short_code TEXT;
+BEGIN
+    -- "With index name audit_event_log_resource_id_tenant_id_idx" for "audit_event_log"
+    -- should generate "bustisauevlg_000001_21_log_resource_id_tenant_id_idx" from new table short code "bustisauevlg_000001_21"
+    SELECT regexp_replace(index_statement, table_name, new_table_short_code)
+    INTO statement_with_new_table_short_code;
+
+    SELECT replace(statement_with_new_table_short_code, ' ON ' || schema || '.' || table_name, ' ON ' || schema || '.' || new_table_name)
+      INTO new_index_statement;
+END ;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_partition_table_column_exists.sql =====
+CREATE OR REPLACE FUNCTION partition_table_column_exists(
+    IN table_name    TEXT,
+    IN column_name   TEXT,
+    OUT table_exists BOOLEAN
+) RETURNS BOOLEAN AS
+$body$
+DECLARE
+BEGIN
+    table_exists = FALSE;
+
+    PERFORM 1
+       FROM pg_catalog.pg_class c
+            JOIN pg_catalog.pg_namespace n
+            ON (n.oid = c.relnamespace) AND (c.relkind = 'p') AND (c.relname = quote_ident(table_name)) AND (n.nspname = '$$$schema$$$')
+            JOIN pg_catalog.pg_attribute a
+            ON (a.attrelid = c.oid) AND (a.attname = quote_ident(column_name));
+
+    IF found THEN table_exists = TRUE; END IF;
+
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/V2019.01.01.09.00.01__common_extensions.sql =====
+---------- Extensions --------------------------------
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS citext SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA pg_catalog;
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/R__2_proc_get_tenant_partition_table_name.sql =====
+CREATE OR REPLACE FUNCTION get_tenant_partition_table_name(
+    IN in_base_table TEXT,
+    IN in_tenant_id  BIGINT,
+    OUT table_name   TEXT
+) RETURNS TEXT AS
+$body$
+DECLARE
+BEGIN
+    --Create table if needed
+    SELECT p.table_name FROM create_tenant_partition_table(in_base_table, in_tenant_id) p INTO table_name;
+END;
+$body$ LANGUAGE 'plpgsql';
+
+===== ./common/common-kotlin/common-api/common-api-persistence/src/main/resources/common/V2020.01.10.08.27.00__global_access_control_permission_type.sql =====
+CREATE DOMAIN t_global_access_control_permission_type AS VARCHAR(20) CHECK (value IN ('READ', 'WRITE', 'NONE'));
+

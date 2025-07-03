@@ -1,0 +1,138 @@
+#tag::env[]
+env:
+  name: ${SERVICE_NAME:restApi}
+  server:
+    baseUri: ${SERVICE_BASE_URI:`http://localhost:8080`}
+  web:
+    baseUri: ${WEB_BASE_URI:`http://localhost:4201`}
+  consul:
+    host: ${CONSUL_HOST:consul}
+    port: ${CONSUL_PORT:8500}
+  db:
+    dbname: bizkinetics
+    schema: ${POSTGRES_SCHEMA:common}
+    host-1:
+      name: ${POSTGRES_HOST_1:localhost}
+      port: ${POSTGRES_PORT_1:5432}
+      username: ${POSTGRES_USERNAME_1:postgres}
+      password: ${POSTGRES_PASSWORD_1:password}
+    host-2:
+      name: ${POSTGRES_HOST_2:localhost}
+      port: ${POSTGRES_PORT_2:5432}
+      username: ${POSTGRES_USERNAME_2:postgres}
+      password: ${POSTGRES_PASSWORD_2:password}
+#end::env[]
+---
+#tag::security[]
+redirect:
+  loginCallbackUrl: "${env.server.baseUri}${micronaut.server.context-path}/oauth/callback"
+  loginRedirectUri: "${env.server.baseUri}${micronaut.server.context-path}/oauth/login"
+  loginSuccessUrl: "${env.web.baseUri}/#/app/dashboard"  # ToDo: This needs to be configured
+  loginFailureUrl: "${env.web.baseUri}/#/error/login-failure"
+  logoutCallbackUrl: "${env.server.baseUri}${micronaut.server.context-path}/logout/callback"
+  logoutUrl: "${env.web.baseUri}/#/logout"  # ToDo: This needs to be configured
+  registrationUrl: "${env.server.baseUri}${micronaut.server.context-path}/party-registration/signup"
+  registrationCallbackUrl: "${redirect.registrationUrl}/callback"
+security:
+  auth0:
+    audience: "https://dev.bizkinetics.com.au/api/rest"
+    auth0Domain: "https://bizkinetics.au.auth0.com"
+    clientId: "mR4yoUpZJQ4Ttk9zLcyH7jcMwirQydZG"
+  cookies:
+    jwt: "JWT"
+    oauthPkce: "OAUTH2_PKCE"
+    oathState: "OAUTH2_STATE"
+    oathNonce: "OPENID_NONCE"
+micronaut:
+  server:
+    context-path: ""
+    cors:
+      enabled: true
+      configurations:
+        all:
+          allowed-origins:
+            - "${env.web.baseUri}"
+            - "http://localhost:4201"
+            - "http://dev.bizkinetics.com.au"
+            - "https://dev.bizkinetics.com.au"
+          allowed-methods:
+            - HEAD
+            - OPTIONS
+            - POST
+            - PUT
+            - GET
+          allowed-headers:
+            - Content-Type
+            - Authorization
+          allow-credentials: true
+  security:
+    enabled: true
+    authentication: idtoken
+    endpoints:
+      logout:
+        enabled: true
+        get-allowed: true
+        path: "/logout"
+    intercept-url-map:
+      - pattern: "/admin/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/oauth/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/swagger/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/swagger-ui/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/**"
+        http-method: OPTIONS
+        access:
+          - isAnonymous()
+      - pattern: "/**"
+        access:
+          - isAuthenticated()
+    oauth2:
+      clients:
+        auth0:
+          client-id: "${OAUTH_CLIENT_ID:mR4yoUpZJQ4Ttk9zLcyH7jcMwirQydZG}"
+          client-secret: "${OAUTH_CLIENT_SECRET:A62x6oAXb556euKq-CcNs131iFSaq71buRE7I8OobXkPAxFOYjXoBT9UJd3L6fIg}"
+          openid:
+            issuer: "https://bizkinetics.au.auth0.com/"
+            jwks-uri: "https://bizkinetics.au.auth0.com/.well-known/jwks.json/"
+            scopes: "openid profile email"
+            end-session:
+              enabled: false
+      default-provider: auth0
+    redirect:
+      login-success: "${env.web.baseUri}/#/app/dashboard"  # ToDo: This needs to be configured
+      login-failure: "${env.web.baseUri}/#/error/login-failure"
+      logout: "${env.web.baseUri}/#/logout"  # ToDo: This needs to be configured
+    token:
+      cookie:
+        enabled: true
+      jwt:
+        enabled: true
+        signatures:
+          jwks-static:
+            selfSigned:
+              path: "jwks.json"
+  multitenancy:
+    tenantresolver:
+      httpheader:
+        header-name: tenantId
+        enabled: true
+#end::security[]
+---
+#tag::endpoints[]
+endpoints:
+  all:
+    enabled: true
+    path: "/admin/"
+    sensitive: false
+#end::endpoints[]

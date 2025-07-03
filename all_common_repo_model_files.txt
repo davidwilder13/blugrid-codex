@@ -1,0 +1,119 @@
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/HasUuid.kt =====
+package net.blugrid.api.common.repository.model
+
+import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
+
+@Schema(description = "Base uuidentity interface")
+interface HasUuid {
+    var uuid: UUID
+}
+
+fun <T : HasUuid, E : PersistableResource<T>> MutableSet<E>.merge(newEntities: MutableSet<E>, updateFn: (existing: E, update: E) -> E) {
+    // delete entities
+    this.except(newEntities).takeIf { it.isNotEmpty() }
+        ?.let { existing ->
+            this.removeAll(existing.toSet())
+        }
+
+    // insert new entities
+    newEntities.except(this).takeIf { it.isNotEmpty() }
+        ?.let { this.addAll(it) }
+
+    // update existing
+    this.intersect(newEntities).takeIf { it.isNotEmpty() }
+        ?.forEach { existing ->
+            newEntities.find { it.uuid == existing.uuid }
+                ?.let { update -> updateFn(existing, update) }
+        }
+}
+
+fun <T : HasUuid> MutableSet<T>.except(otherEntities: MutableSet<T>) =
+    if (otherEntities.isEmpty())
+        this
+    else
+        filter { existing -> !otherEntities.hasAny(existing) }
+
+fun <T : HasUuid> MutableSet<T>.intersect(otherEntities: MutableSet<T>) =
+    if (otherEntities.isEmpty())
+        emptySet()
+    else
+        filter { existing -> otherEntities.hasAny(existing) }
+
+fun <T : HasUuid> MutableSet<T>.hasAny(otherEntity: T) =
+    filter { it.uuid == otherEntity.uuid }.any()
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/TenantScoped.kt =====
+package net.blugrid.api.common.repository.model
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents tenant scope metadata for a resource.")
+interface TenantScoped {
+    var tenantId: Long?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/BusinessUnitScoped.kt =====
+package net.blugrid.api.common.repository.model
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents business unit + tenant scope metadata for a resource.")
+interface BusinessUnitScoped : TenantScoped {
+    var businessUnitId: Long?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/PersistableResource.kt =====
+package net.blugrid.api.common.repository.model
+
+import java.util.UUID
+
+interface PersistableResource<T> : HasUuid {
+
+    var id: Long?
+
+    override var uuid: UUID
+
+    fun update(update: T): T
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/UnscopedPersistable.kt =====
+package net.blugrid.api.common.repository.model
+
+interface UnscopedPersistable<T> : PersistableResource<T> {
+
+    var audit: AuditEmbeddable
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/TenantScopedResource.kt =====
+package net.blugrid.api.common.repository.model
+
+interface TenantScopedResource<T> : PersistableResource<T> {
+
+    val audit: EmbeddedAuditInterface?
+
+    val permission: ITenantPermissionEntity?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/BusinessUnitScopedResource.kt =====
+package net.blugrid.api.common.repository.model
+
+interface BusinessUnitScopedResource<T> : PersistableResource<T> {
+
+    val audit: EmbeddedAuditInterface?
+
+    val permission: IBusinessUnitPermissionEntity?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/repository/model/BusinessUnitScopeEmbeddable.kt =====
+package net.blugrid.api.common.repository.model
+
+import io.micronaut.data.annotation.Embeddable
+
+@Embeddable
+data class BusinessUnitScopeEmbeddable(
+    override var tenantId: Long? = null,
+
+    override var businessUnitId: Long? = null
+) : BusinessUnitScoped
+

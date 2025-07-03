@@ -1,0 +1,25 @@
+micronaut:
+  application:
+    name: organisation-grpc
+  server:
+    port: 0  # dynamically assign REST HTTP by default
+
+grpc:
+  server:
+    port: ${GRPC_SERVER_PORT:50051}
+    instance-id: ${GRPC_SERVER_INSTANCE_ID:organisation-grpc}
+    reflection:
+      enabled: true
+
+consul:
+  client:
+    registration:
+      enabled: true
+      ip-addr: ${CONSUL_CLIENT_REGISTRATION_IP_ADDR:${DOCKER_HOST_IP}}
+    defaultZone: "http://${CONSUL_HOST:consul}:${CONSUL_PORT:8500}"
+
+logger:
+  levels:
+    io.grpc: DEBUG
+    io.micronaut.discovery: TRACE
+    io.micronaut.grpc: TRACE

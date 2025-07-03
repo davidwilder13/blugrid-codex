@@ -1,0 +1,41 @@
+#tag::datasources[]
+datasources:
+  default:
+    url: jdbc:postgresql://${POSTGRES_HOST_1:localhost}:${POSTGRES_PORT_1:5432}/${POSTGRES_DB_1:bizkinetics}?currentSchema=${env.db.schema}
+    username: ${POSTGRES_USERNAME_1:postgres}
+    password: ${POSTGRES_PASSWORD_1:password}
+    driverClassName: org.postgresql.Driver
+    schema: ${env.db.schema}
+    dialect: POSTGRES
+#end::datasources[]
+---
+#tag::jpa[]
+jpa:
+  default:
+    database: POSTGRESQL
+    driverClassName: org.postgresql.Driver
+    dialect: POSTGRES
+    generate-ddl: false
+    hibernate.ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${env.db.schema}
+        proc.param_null_passing: true
+#end::jpa[]
+---
+#tag::flyway[]
+flyway:
+  datasources:
+    default:
+      enabled: true
+      locations: classpath:db/migration,classpath:net/blugrid/api
+      default-schema: ${env.db.schema}
+      table: _${env.db.schema}_schema_version
+      username: ${POSTGRES_USERNAME_1:postgres}
+      password: ${POSTGRES_PASSWORD_1:password}
+      out-of-order: true
+      placeholder-prefix: $$$
+      placeholder-suffix: $$$
+      placeholders:
+        schema: ${env.db.schema}
+#end::flyway[]
