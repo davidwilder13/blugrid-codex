@@ -4,29 +4,31 @@ import io.micronaut.data.model.Pageable
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
 import net.blugrid.common.grpc.mapper.toProto
 import java.time.LocalDateTime
 import java.util.UUID
 
 fun OrganisationResponse.toOrganisation(): Organisation =
     Organisation(
-        id = this.id,
-        uuid = UUID.fromString(this.uuid),
+        id = IdentityID(this.id),
+        uuid = IdentityUUID(UUID.fromString(this.uuid)),
         parentOrganisationId = this.parentOrganisationId,
         effectiveTimestamp = LocalDateTime.parse(this.effectiveTimestamp)
     )
 
 fun OrganisationCreateRequest.toOrganisationCreate(): OrganisationCreate =
     OrganisationCreate(
-        uuid = UUID.randomUUID(), // or fromString if proto has uuid field
+        uuid = IdentityUUID(UUID.randomUUID()), // or fromString if proto has uuid field
         parentOrganisationId = this.parentOrganisationId,
         effectiveTimestamp = LocalDateTime.parse(this.effectiveTimestamp)
     )
 
 fun OrganisationUpdateRequest.toOrganisationUpdate(): OrganisationUpdate =
     OrganisationUpdate(
-        id = this.id,
-        uuid = UUID.fromString(this.uuid),
+        id = IdentityID(this.id),
+        uuid = IdentityUUID(UUID.fromString(this.uuid)),
         parentOrganisationId = this.parentOrganisationId,
         effectiveTimestamp = LocalDateTime.parse(this.effectiveTimestamp)
     )
@@ -43,8 +45,8 @@ fun Pageable.toOrganisationPageRequest(): OrganisationPageRequest {
 
 fun Organisation.toOrganisationResponse(): OrganisationResponse =
     OrganisationResponse.newBuilder()
-        .setId(this.id)
-        .setUuid(this.uuid.toString())
+        .setId(this.id.value)
+        .setUuid(this.uuid.value.toString())
         .setParentOrganisationId(this.parentOrganisationId)
         .setEffectiveTimestamp(this.effectiveTimestamp.toString())
         .build()
@@ -58,8 +60,8 @@ fun OrganisationCreate.toOrganisationCreateRequest(): OrganisationCreateRequest 
 
 fun OrganisationUpdate.toOrganisationUpdateRequest(): OrganisationUpdateRequest =
     OrganisationUpdateRequest.newBuilder()
-        .setId(this.id)
-        .setUuid(this.uuid.toString())
+        .setId(this.id.value)
+        .setUuid(this.uuid.value.toString())
         .setParentOrganisationId(this.parentOrganisationId)
         .setEffectiveTimestamp(this.effectiveTimestamp.toString())
         .build()

@@ -12,11 +12,11 @@ import io.micronaut.security.filters.AuthenticationFetcher
 import io.micronaut.security.filters.SecurityFilter
 import io.micronaut.security.token.TokenAuthenticationFetcher
 import jakarta.inject.Singleton
+import net.blugrid.api.jwt.model.SelfSignedJwtDecoder
+import net.blugrid.api.jwt.mapping.jwtObjectMapper
 import net.blugrid.api.logging.logger
-import net.blugrid.api.security.authentication.mapping.toMultitenantAuthentication
 import net.blugrid.api.security.config.SecurityProps
-import net.blugrid.api.security.jwt.mapping.jwtObjectMapper
-import net.blugrid.api.security.jwt.model.SelfSignedJwtDecoder
+import net.blugrid.api.security.mapping.toMultitenantAuthentication
 import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -65,7 +65,7 @@ class JwtAuthenticationFetcher(
                                         httpLocaleResolver.resolveOrDefault(request)
                                     )
                                 )
-                                Mono.just(authentication)
+                                Mono.just(authentication as Authentication)
                             }
                             ?: Flux.empty()
                     } else {

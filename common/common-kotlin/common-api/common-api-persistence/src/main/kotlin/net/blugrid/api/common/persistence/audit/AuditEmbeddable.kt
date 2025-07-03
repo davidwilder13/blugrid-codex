@@ -3,6 +3,7 @@ package net.blugrid.api.common.persistence.audit
 import io.micronaut.data.annotation.Embeddable
 import io.micronaut.data.annotation.Version
 import jakarta.persistence.Column
+import net.blugrid.api.security.context.CurrentRequestContext
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -27,13 +28,13 @@ class AuditEmbeddable : AuditableEntityFields {
     @Column(name = "version")
     override var version: Int = 0
 
-    fun applyCreateAudit(sessionId: Long?) {
-        createdBySessionId = sessionId
-        lastChangedBySessionId = sessionId
+    fun prePersist() {
+        createdBySessionId = CurrentRequestContext.currentSession?.sessionId?.toLong() ?: 0L
+        lastChangedBySessionId = CurrentRequestContext.currentSession?.sessionId?.toLong() ?: 0L
     }
 
-    fun applyUpdateAudit(sessionId: Long?) {
-        lastChangedBySessionId = sessionId
+    fun preUpdate() {
+        lastChangedBySessionId = CurrentRequestContext.currentSession?.sessionId?.toLong() ?: 0L
     }
 }
 

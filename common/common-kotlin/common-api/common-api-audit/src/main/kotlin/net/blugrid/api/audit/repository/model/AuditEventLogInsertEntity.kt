@@ -8,7 +8,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import net.blugrid.api.common.model.audit.AuditEventType
-import net.blugrid.api.common.model.resource.GenericAuditedResource
+import net.blugrid.api.common.model.resource.BaseAuditedResource
 import net.blugrid.api.common.model.resource.ResourceType
 import net.blugrid.api.util.kotlinEquals
 import org.hibernate.annotations.Immutable
@@ -39,7 +39,7 @@ class AuditEventLogInsertEntity(
 
     @Type(JsonBinaryType::class)
     @Column(name = "resource")
-    val resource: GenericAuditedResource<*>,
+    val resource: BaseAuditedResource<*>,
 
     @Column(name = "timestamp")
     val auditEventTimestamp: LocalDateTime,

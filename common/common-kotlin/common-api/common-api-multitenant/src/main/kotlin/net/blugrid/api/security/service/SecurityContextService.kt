@@ -2,13 +2,13 @@ package net.blugrid.api.security.service
 
 import jakarta.inject.Singleton
 import net.blugrid.api.logging.logger
-import net.blugrid.api.security.authentication.model.AuthenticatedOrganisation
-import net.blugrid.api.security.authentication.model.AuthenticatedSession
-import net.blugrid.api.security.authentication.model.AuthenticatedUser
 import net.blugrid.api.security.context.BusinessUnitIdOverride
 import net.blugrid.api.security.context.CurrentRequestContext
 import net.blugrid.api.security.context.IsUnscoped
 import net.blugrid.api.security.context.TenantIdOverride
+import net.blugrid.api.security.model.BaseAuthenticatedOrganisation
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+import net.blugrid.api.security.model.BaseAuthenticatedUser
 import net.blugrid.api.security.repository.RequestScopeRepository
 import java.util.concurrent.Callable
 
@@ -17,9 +17,9 @@ interface SecurityContextService {
     fun <T> runWithBusinessUnitId(tenantId: Long, businessUnitId: Long, original: Callable<T>): T
     fun <T> runUnscoped(original: Callable<T>): T
 
-    val currentTenant: AuthenticatedOrganisation?
-    val currentUser: AuthenticatedUser?
-    val currentSession: AuthenticatedSession?
+    val currentTenant: BaseAuthenticatedOrganisation?
+    val currentUser: BaseAuthenticatedUser?
+    val currentSession: BaseAuthenticatedSession?
 
     val currentBusinessUnitId: Long?
     val currentTenantId: Long?
@@ -34,13 +34,13 @@ open class SecurityContextServiceImpl(
 
     val log = logger()
 
-    override val currentSession: AuthenticatedSession?
+    override val currentSession: BaseAuthenticatedSession?
         get() = CurrentRequestContext.currentSession
 
-    override val currentTenant: AuthenticatedOrganisation?
+    override val currentTenant: BaseAuthenticatedOrganisation?
         get() = CurrentRequestContext.currentOrganisation
 
-    override val currentUser: AuthenticatedUser?
+    override val currentUser: BaseAuthenticatedUser?
         get() = CurrentRequestContext.currentUser
 
     override val currentBusinessUnitId: Long?

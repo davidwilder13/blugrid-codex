@@ -1,3 +1,13 @@
+-- -----------------------------------------------------------------------------
+-- Provides temporary session variables via functions setvar and getvar:
+--   setvar(key, value) stores a variable in a temp table for text, integer, bigint, or uuid types.
+--   getvar(key) retrieves the stored variable as text.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT setvar('key1', 'value1');
+--   SELECT getvar('key1');   -- returns 'value1'
+--   SELECT setvar('num', 123);
+--   SELECT getvar('num');    -- returns '123'
 DROP FUNCTION IF EXISTS setvar(text,anyelement);
 
 CREATE OR REPLACE FUNCTION setvar(

@@ -14,30 +14,30 @@ fun Organisation.assert(
     parentOrganisationId: Long? = null,
     effectiveTimestamp: LocalDateTime? = null
 ): Organisation = apply {
-    id?.let { assertThat(this.id, equalTo(it)) }
-    uuid?.let { assertThat(this.uuid, equalTo(it)) }
+    id?.let { assertThat(this.id.value, equalTo(it)) }
+    uuid?.let { assertThat(this.uuid.value, equalTo(it)) }
     parentOrganisationId?.let { assertThat(this.parentOrganisationId, equalTo(it)) }
     effectiveTimestamp?.let { assertThat(this.effectiveTimestamp, equalTo(it)) }
 }
 
 fun Organisation.assertEqualTo(expected: Organisation): Organisation = apply {
     assert(
-        id = expected.id,
-        uuid = expected.uuid,
+        id = expected.id.value,
+        uuid = expected.uuid.value,
         parentOrganisationId = expected.parentOrganisationId,
         effectiveTimestamp = expected.effectiveTimestamp
     )
 }
 
 fun OrganisationCreate.assertValid(): OrganisationCreate = apply {
-    requireNotNull(uuid)
-    requireNotNull(parentOrganisationId)
-    requireNotNull(effectiveTimestamp)
+    requireNotNull(uuid) { "uuid must not be null" }
+    requireNotNull(parentOrganisationId) { "parentOrganisationId must not be null" }
+    requireNotNull(effectiveTimestamp) { "effectiveTimestamp must not be null" }
 }
 
 fun OrganisationUpdate.assertValid(): OrganisationUpdate = apply {
-    requireNotNull(id)
-    requireNotNull(uuid)
-    requireNotNull(parentOrganisationId)
-    requireNotNull(effectiveTimestamp)
+    requireNotNull(id) { "id must not be null" }
+    requireNotNull(uuid) { "uuid must not be null" }
+    requireNotNull(parentOrganisationId) { "parentOrganisationId must not be null" }
+    requireNotNull(effectiveTimestamp) { "effectiveTimestamp must not be null" }
 }

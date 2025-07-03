@@ -1,12 +1,11 @@
-DROP TABLE IF EXISTS _common_audit_columns CASCADE;
 CREATE TABLE IF NOT EXISTS _common_audit_columns
 (
-    created_timestamp          t_timestamp   NOT NULL DEFAULT NOW(),
-    created_by_session_id      t_identity    NOT NULL,
-    last_changed_timestamp     t_timestamp   NOT NULL DEFAULT NOW(),
-    last_changed_by_session_id t_identity    NOT NULL,
+    created_timestamp          TIMESTAMP   NOT NULL DEFAULT NOW(),
+    created_by_session_id      bigint    NOT NULL,
+    last_changed_timestamp     TIMESTAMP   NOT NULL DEFAULT NOW(),
+    last_changed_by_session_id bigint    NOT NULL,
     version                    t_line_number NOT NULL DEFAULT 0,
-    expiry_timestamp           t_timestamp   NOT NULL DEFAULT 'infinity'
+    expiry_timestamp           TIMESTAMP   NOT NULL DEFAULT 'infinity'
 )
     WITHOUT OIDS;
 

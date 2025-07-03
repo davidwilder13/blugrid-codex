@@ -1,8 +1,8 @@
 package net.blugrid.api.security.jwt
 
 import jakarta.inject.Singleton
-import net.blugrid.api.security.jwt.factory.AccessTokenFactory
-import net.blugrid.api.security.jwt.model.JwtToken
+import net.blugrid.api.jwt.factory.AccessTokenFactory
+import net.blugrid.api.jwt.model.JwtToken
 
 @Singleton
 class SelfSignedJwtEncoder {

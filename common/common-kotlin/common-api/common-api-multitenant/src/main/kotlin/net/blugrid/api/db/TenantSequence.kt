@@ -2,7 +2,6 @@ package net.blugrid.api.db
 
 import jakarta.inject.Singleton
 import net.blugrid.api.config.DbProps
-import net.blugrid.api.db.service.DatabaseService
 import org.hibernate.engine.jdbc.spi.JdbcCoordinator
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import java.sql.SQLException

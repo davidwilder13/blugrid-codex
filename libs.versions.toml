@@ -1,0 +1,305 @@
+# =============================================================================
+# Consolidated Version Catalog - gradle/libs.versions.toml
+# Replaces: commonLibs.versions.toml, annotationProcessorLibs.versions.toml,
+#           runTimeLibs.versions.toml, testLibs.versions.toml
+# =============================================================================
+
+[versions]
+# Core Platform
+kotlin = "1.9.23"
+kotlinPlugin = "2.1.21"
+micronaut = "4.4.3"
+java = "17"
+
+# Frameworks & Libraries
+grpc = "1.62.2"
+protobuf = "4.31.1"
+jackson = "2.17.2"
+mapstruct = "1.5.3.Final"
+nimbus-jose-jwt = "9.40"
+junit = "5.10.0"
+testcontainers = "1.19.0"
+
+# Database & Persistence
+hibernate = "6.4.1.Final"
+flyway = "10.22.0"
+hypersistence = "3.8.1"
+
+# Security & Auth
+jwt = "0.11.5"
+
+# Build Tools
+shadow = "8.1.1"
+protobufPlugin = "0.9.4"
+dockerCompose = "0.17.7"
+ktlint = "0.48.1"
+
+# Utilities
+faker = "1.13.0"
+jsonpath = "2.0.1"
+zeko-sql = "1.4.0"
+aws-sdk = "1.4.92"
+builder = "1.2.2"
+
+[plugins]
+# Kotlin Plugins (matching your existing aliases)
+jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinPlugin" }
+kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlinPlugin" }
+allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlinPlugin" }
+jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlinPlugin" }
+
+# Micronaut Plugins
+application = { id = "io.micronaut.application", version.ref = "micronaut" }
+testResources = { id = "io.micronaut.test-resources", version.ref = "micronaut" }
+
+# Build & Deployment
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }
+dockerCompose = { id = "com.avast.gradle.docker-compose", version.ref = "dockerCompose" }
+
+[libraries]
+# ===== CORE KOTLIN & JVM =====
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+# ===== MICRONAUT PLATFORM =====
+micronaut-bom = { module = "io.micronaut.platform:micronaut-platform", version.ref = "micronaut" }
+
+# Core Runtime
+micronaut-core = { module = "io.micronaut:micronaut-core" }
+micronaut-inject = { module = "io.micronaut:micronaut-inject" }
+micronaut-runtime = { module = "io.micronaut:micronaut-runtime" }
+micronaut-aop = { module = "io.micronaut:micronaut-aop" }
+micronaut-context = { module = "io.micronaut:micronaut-context" }
+
+# Kotlin Integration
+micronaut-kotlin-runtime = { module = "io.micronaut.kotlin:micronaut-kotlin-runtime" }
+micronaut-kotlin-extensions = { module = "io.micronaut.kotlin:micronaut-kotlin-extension-functions" }
+
+# ===== WEB & HTTP =====
+micronaut-http-server = { module = "io.micronaut:micronaut-http-server" }
+micronaut-http-client = { module = "io.micronaut:micronaut-http-client" }
+micronaut-http-validation = { module = "io.micronaut:micronaut-http-validation" }
+micronaut-management = { module = "io.micronaut:micronaut-management" }
+micronaut-discovery = { module = "io.micronaut.discovery:micronaut-discovery-client" }
+micronaut-reactor = { module = "io.micronaut.reactor:micronaut-reactor" }
+micronaut-reactor-http-client = { module = "io.micronaut.reactor:micronaut-reactor-http-client" }
+
+# ===== SERIALIZATION & VALIDATION =====
+micronaut-jackson = { module = "io.micronaut:micronaut-jackson-databind" }
+micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-jackson" }
+micronaut-validation = { module = "io.micronaut.validation:micronaut-validation" }
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+
+# ===== DATA & PERSISTENCE =====
+micronaut-data-model = { module = "io.micronaut.data:micronaut-data-model" }
+micronaut-data-hibernate = { module = "io.micronaut.data:micronaut-data-hibernate-jpa" }
+micronaut-hibernate-jpa = { module = "io.micronaut.sql:micronaut-hibernate-jpa" }
+micronaut-jdbc-hikari = { module = "io.micronaut.sql:micronaut-jdbc-hikari" }
+micronaut-flyway = { module = "io.micronaut.flyway:micronaut-flyway" }
+hypersistence-utils = { module = "io.hypersistence:hypersistence-utils-hibernate-63", version.ref = "hypersistence" }
+zeko-sql-builder = { module = "io.zeko:zeko-sql-builder", version.ref = "zeko-sql" }
+
+# ===== SECURITY & AUTHENTICATION =====
+micronaut-security = { module = "io.micronaut.security:micronaut-security" }
+micronaut-security-jwt = { module = "io.micronaut.security:micronaut-security-jwt" }
+micronaut-security-oauth2 = { module = "io.micronaut.security:micronaut-security-oauth2" }
+micronaut-multitenancy = { module = "io.micronaut.multitenancy:micronaut-multitenancy" }
+nimbus-jose-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbus-jose-jwt" }
+jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jwt" }
+jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
+
+# ===== GRPC & PROTOBUF =====
+grpc-kotlin-stub = { module = "io.grpc:grpc-kotlin-stub", version = "1.3.0" }
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+grpc-netty = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuf" }
+protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobuf" }
+protobuf-util = { module = "com.google.protobuf:protobuf-java-util", version.ref = "protobuf" }
+proto-google-common = { module = "com.google.api.grpc:proto-google-common-protos", version = "2.31.0" }
+
+# Micronaut gRPC Integration
+micronaut-grpc-annotation = { module = "io.micronaut.grpc:micronaut-grpc-annotation" }
+micronaut-grpc-server = { module = "io.micronaut.grpc:micronaut-grpc-server-runtime" }
+micronaut-grpc-client = { module = "io.micronaut.grpc:micronaut-grpc-client-runtime" }
+
+# ===== ANNOTATION PROCESSING =====
+micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
+micronaut-data-processor = { module = "io.micronaut.data:micronaut-data-processor" }
+micronaut-validation-processor = { module = "io.micronaut.validation:micronaut-validation-processor" }
+micronaut-serde-processor = { module = "io.micronaut.serde:micronaut-serde-processor" }
+micronaut-openapi = { module = "io.micronaut.openapi:micronaut-openapi", version = "4.8.1" }
+micronaut-openapi-annotations = { module = "io.micronaut.openapi:micronaut-openapi-annotations", version = "4.8.1" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+kotlin-builder-annotation = { module = "com.thinkinglogic.builder:kotlin-builder-annotation", version.ref = "builder" }
+kotlin-builder-processor = { module = "com.thinkinglogic.builder:kotlin-builder-processor", version.ref = "builder" }
+
+# ===== DATABASE DRIVERS & MIGRATION =====
+postgresql = { module = "org.postgresql:postgresql" }
+flyway-postgres = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+
+# ===== JAKARTA EE & JAVAX =====
+jakarta-annotation = { module = "jakarta.annotation:jakarta.annotation-api" }
+jakarta-persistence = { module = "jakarta.persistence:jakarta.persistence-api" }
+jakarta-validation = { module = "jakarta.validation:jakarta.validation-api", version = "3.0.2" }
+javax-annotation = { module = "javax.annotation:javax.annotation-api", version = "1.3.2" }
+
+# ===== TESTING =====
+micronaut-test-junit5 = { module = "io.micronaut.test:micronaut-test-junit5" }
+testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+kotlin-faker = { module = "io.github.serpro69:kotlin-faker", version.ref = "faker" }
+
+# ===== RUNTIME DEPENDENCIES =====
+logback-classic = { module = "ch.qos.logback:logback-classic" }
+snakeyaml = { module = "org.yaml:snakeyaml" }
+
+# ===== UTILITIES =====
+jsonpath-kt = { module = "com.nfeld.jsonpathkt:jsonpathkt", version.ref = "jsonpath" }
+
+# ===== AWS SDK =====
+aws-bom = { module = "aws.sdk.kotlin:bom", version.ref = "aws-sdk" }
+aws-sdk-ecr = { module = "aws.sdk.kotlin:ecr" }
+
+[bundles]
+# ===== CORE PLATFORM BUNDLES =====
+kotlinCore = [
+    "kotlin-stdlib",
+    "kotlin-reflect"
+]
+
+micronautCore = [
+    "micronaut-core",
+    "micronaut-inject",
+    "micronaut-runtime",
+    "micronaut-kotlin-runtime",
+    "micronaut-kotlin-extensions"
+]
+
+# ===== FEATURE BUNDLES =====
+micronautWeb = [
+    "micronaut-http-server",
+    "micronaut-http-client",
+    "micronaut-management",
+    "micronaut-discovery",
+    "micronaut-jackson",
+    "micronaut-validation",
+    "jackson-kotlin",
+    "jsonpath-kt"
+]
+
+micronautData = [
+    "micronaut-data-model",
+    "micronaut-data-hibernate",
+    "micronaut-hibernate-jpa",
+    "micronaut-jdbc-hikari",
+    "micronaut-flyway",
+    "hypersistence-utils",
+    "jakarta-persistence",
+    "jakarta-annotation",
+    "zeko-sql-builder"
+]
+
+micronautSecurity = [
+    "micronaut-security",
+    "micronaut-security-jwt",
+    "micronaut-security-oauth2",
+    "micronaut-multitenancy",
+    "jjwt-api"
+]
+
+grpcCore = [
+    "grpc-kotlin-stub",
+    "grpc-protobuf",
+    "grpc-stub",
+    "protobuf-java",
+    "protobuf-kotlin",
+    "protobuf-util",
+    "proto-google-common",
+    "javax-annotation",
+    "jakarta-validation"
+]
+
+grpcServer = [
+    "grpc-netty",
+    "grpc-services",
+    "micronaut-grpc-annotation",
+    "micronaut-grpc-server"
+]
+
+grpcClient = [
+    "micronaut-discovery",
+    "micronaut-grpc-client"
+]
+
+# ===== ANNOTATION PROCESSING BUNDLES =====
+annotationProcessors = [
+    "micronaut-inject-java",
+    "micronaut-data-processor",
+    "micronaut-http-validation",
+    "micronaut-serde-processor",
+    "micronaut-openapi",
+    "mapstruct-processor",
+    "kotlin-builder-processor"
+]
+
+# Separate bundle for validation processor (if needed)
+validationProcessors = [
+    "micronaut-validation-processor"
+]
+
+# ===== RUNTIME BUNDLES =====
+runtimeCore = [
+    "logback-classic",
+    "jackson-kotlin",
+    "snakeyaml"
+]
+
+runtimeDatabase = [
+    "postgresql",
+    "flyway-postgres"
+]
+
+runtimeSecurity = [
+    "jjwt-impl",
+    "jjwt-jackson"
+]
+
+# ===== TESTING BUNDLES =====
+testing = [
+    "micronaut-test-junit5",
+    "testcontainers",
+    "testcontainers-postgresql",
+    "testcontainers-junit",
+    "kotlin-faker"
+]
+
+# ===== COMPILE-ONLY BUNDLES =====
+compileOnly = [
+    "micronaut-aop",
+    "micronaut-openapi-annotations"
+]
+
+# ===== UTILITY BUNDLES =====
+jacksonLibs = [
+    "jackson-kotlin",
+    "micronaut-jackson"
+]
+
+jsonLibs = [
+    "jackson-kotlin",
+    "micronaut-jackson",
+    "jsonpath-kt"
+]
+
+validationLibs = [
+    "micronaut-validation",
+    "jakarta-validation"
+]

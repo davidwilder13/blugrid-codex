@@ -1,3 +1,9 @@
+-- -----------------------------------------------------------------------------
+-- Function: table_exists
+-- Description: Checks if a table exists in the current schema.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT table_exists('orders');  -- returns true or false
 CREATE OR REPLACE FUNCTION table_exists(
     IN table_name    TEXT,
     OUT table_exists BOOLEAN

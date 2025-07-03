@@ -13,6 +13,8 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.proto.google.common)
+
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 

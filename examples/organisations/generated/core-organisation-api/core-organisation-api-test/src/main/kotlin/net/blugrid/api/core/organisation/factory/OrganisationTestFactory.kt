@@ -3,6 +3,8 @@ package net.blugrid.api.core.organisation.factory
 import io.github.serpro69.kfaker.faker
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,7 +17,7 @@ fun organisationUpdate(block: OrganisationUpdateBuilder.() -> Unit): Organisatio
     OrganisationUpdateBuilder().apply(block).build()
 
 class OrganisationCreateBuilder {
-    var uuid: UUID = UUID.randomUUID()
+    var uuid: IdentityUUID = IdentityUUID(UUID.randomUUID())
     var parentOrganisationId: Long = fake.random.nextLong()
     var effectiveTimestamp: LocalDateTime = LocalDateTime.now()
 
@@ -27,8 +29,8 @@ class OrganisationCreateBuilder {
 }
 
 class OrganisationUpdateBuilder {
-    var id: Long = fake.random.nextLong()
-    var uuid: UUID = UUID.randomUUID()
+    var id: IdentityID = IdentityID(fake.random.nextLong())
+    var uuid: IdentityUUID = IdentityUUID(UUID.randomUUID())
     var parentOrganisationId: Long = fake.random.nextLong()
     var effectiveTimestamp: LocalDateTime = LocalDateTime.now().plusDays(1)
 

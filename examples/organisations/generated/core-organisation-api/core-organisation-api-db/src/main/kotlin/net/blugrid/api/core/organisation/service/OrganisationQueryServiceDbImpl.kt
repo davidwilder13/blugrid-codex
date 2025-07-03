@@ -1,7 +1,7 @@
 package net.blugrid.api.core.organisation.service
 
 import jakarta.inject.Singleton
-import net.blugrid.api.common.service.GenericQueryServiceImpl
+import net.blugrid.api.common.persistence.service.GenericQueryServiceImpl
 import net.blugrid.api.core.organisation.mapping.OrganisationMappingService
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationFilter

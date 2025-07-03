@@ -1,3 +1,12 @@
+-- -----------------------------------------------------------------------------
+-- Functions: set_tenant_scope, set_session_scope, set_business_unit_scope,
+--            set_tenant_session (overloads), set_business_unit_session (overloads)
+-- Description: Configures database session settings for tenant, session, and business unit scope variables
+--              and optionally adjusts search_path for combined scope settings.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT set_tenant_scope('1');                    -- returns 1 and sets tenant.id
+--   SELECT set_tenant_session('public', '1', '123'); -- sets search_path, tenant.id, session.id
 CREATE OR REPLACE FUNCTION set_tenant_scope(
     IN tenant_id         TEXT
 ) RETURNS INT AS

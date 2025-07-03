@@ -8,9 +8,9 @@ import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.netty.handler.codec.http.HttpResponseStatus
-import net.blugrid.api.common.model.resource.GenericCreateResource
-import net.blugrid.api.common.model.resource.GenericResource
-import net.blugrid.api.common.model.resource.GenericUpdateResource
+import net.blugrid.api.common.model.resource.BaseCreateResource
+import net.blugrid.api.common.model.resource.BaseResource
+import net.blugrid.api.common.model.resource.BaseUpdateResource
 import net.blugrid.api.common.organisation.pageOf
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
@@ -22,11 +22,11 @@ open class CommonControllerIntegTest(
 
     protected val faker = faker {}
 
-    fun <T : GenericResource<out Any>> assertCreate(createPayload: GenericCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
+    fun <T : BaseResource<out Any>> assertCreate(createPayload: BaseCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
         return create(createPayload = createPayload, responseType = responseType, uri = uri)
     }
 
-    fun <T : GenericResource<out Any>> create(createPayload: GenericCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
+    fun <T : BaseResource<out Any>> create(createPayload: BaseCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
         return with(
             client.toBlocking()
                 .exchange(
@@ -39,11 +39,11 @@ open class CommonControllerIntegTest(
         }
     }
 
-    fun <T : GenericResource<out Any>> assertUpdate(updatePayload: GenericUpdateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
+    fun <T : BaseResource<out Any>> assertUpdate(updatePayload: BaseUpdateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
         return update(updatePayload = updatePayload, responseType = responseType, uri = uri)
     }
 
-    fun <T : GenericResource<out Any>> update(updatePayload: GenericUpdateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
+    fun <T : BaseResource<out Any>> update(updatePayload: BaseUpdateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
         return with(
             receiver = client.toBlocking()
                 .exchange(
@@ -56,16 +56,16 @@ open class CommonControllerIntegTest(
         }
     }
 
-    fun <T : GenericResource<out Any>> assertGetById(
-        createPayload: GenericCreateResource<out Any>,
+    fun <T : BaseResource<out Any>> assertGetById(
+        createPayload: BaseCreateResource<out Any>,
         responseType: Class<T>,
         uri: String = baseUri
     ): T {
         val newResource = create(createPayload, responseType)
-        return getById(id = newResource.id, responseType = responseType, uri = uri)
+        return getById(id = newResource.id.value, responseType = responseType, uri = uri)
     }
 
-    fun <T : GenericResource<out Any>> getById(id: Long, responseType: Class<T>, uri: String = baseUri): T {
+    fun <T : BaseResource<out Any>> getById(id: Long, responseType: Class<T>, uri: String = baseUri): T {
         return with(
             receiver = client.toBlocking()
                 .exchange(
@@ -78,8 +78,8 @@ open class CommonControllerIntegTest(
         }
     }
 
-    fun <T : GenericResource<out Any>> assertGetPage(
-        resources: List<GenericCreateResource<out Any>>,
+    fun <T : BaseResource<out Any>> assertGetPage(
+        resources: List<BaseCreateResource<out Any>>,
         pageable: Pageable,
         responseType: Class<T>,
         uri: String = baseUri
@@ -90,7 +90,7 @@ open class CommonControllerIntegTest(
         return getPage(pageable = pageable, responseType = responseType, uri = uri)
     }
 
-    fun <T : GenericResource<out Any>> getPage(pageable: Pageable, responseType: Class<T>, uri: String = baseUri): Page<T> {
+    fun <T : BaseResource<out Any>> getPage(pageable: Pageable, responseType: Class<T>, uri: String = baseUri): Page<T> {
         return with(
             receiver = client.toBlocking()
                 .exchange(
@@ -103,9 +103,9 @@ open class CommonControllerIntegTest(
         }
     }
 
-    fun <T : GenericResource<out Any>> assertDelete(createPayload: GenericCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri) {
+    fun <T : BaseResource<out Any>> assertDelete(createPayload: BaseCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri) {
         val newResource = assertCreate(createPayload, responseType)
-        delete(id = newResource.id, uri = uri)
+        delete(id = newResource.id.value, uri = uri)
     }
 
     fun delete(id: Long, uri: String = baseUri) {

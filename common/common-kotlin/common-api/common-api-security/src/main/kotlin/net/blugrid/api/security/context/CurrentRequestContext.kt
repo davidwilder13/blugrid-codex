@@ -1,71 +1,59 @@
 package net.blugrid.api.security.context
 
-import io.micronaut.http.HttpRequest
 import io.micronaut.http.context.ServerRequestContext
-import net.blugrid.api.common.security.context.RequestContextProvider
-import net.blugrid.api.security.authentication.mapping.toMultitenantAuthentication
-import net.blugrid.api.security.authentication.model.AuthenticatedBusinessUnitSession
-import net.blugrid.api.security.authentication.model.AuthenticatedOrganisation
-import net.blugrid.api.security.authentication.model.AuthenticatedSession
-import net.blugrid.api.security.authentication.model.AuthenticatedUser
-import net.blugrid.api.security.authentication.model.AuthenticatedWebApplicationSession
-import net.blugrid.api.security.authentication.model.BusinessUnitAuthentication
-import net.blugrid.api.security.authentication.model.DecoratedAuthentication
-import net.blugrid.api.security.authentication.model.GuestAuthentication
-import net.blugrid.api.security.authentication.model.TenantAuthentication
+import net.blugrid.api.security.model.BaseAuthenticatedOrganisation
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+import net.blugrid.api.security.model.BaseAuthenticatedUser
+import net.blugrid.api.security.model.BusinessUnitAuthentication
+import net.blugrid.api.security.model.DecoratedAuthentication
+import net.blugrid.api.security.model.GuestAuthentication
+import net.blugrid.api.security.model.TenantAuthentication
+import toMultitenantAuthentication
 import java.util.Optional
 
 object CurrentRequestContext : RequestContextProvider {
 
     override val currentSessionId: Long?
-        get() = currentSession?.sessionId?.toLong()
+        get() = authentication?.session?.sessionId?.toLongOrNull()
 
     override val currentBusinessUnitId: Long?
-        get() = if (BusinessUnitIdOverride.hasOverride()) {
-            BusinessUnitIdOverride.value.toLong()
-        } else {
-            when (currentSession) {
-                is AuthenticatedWebApplicationSession -> null
-                is AuthenticatedBusinessUnitSession -> (currentSession as AuthenticatedBusinessUnitSession)
-                    .businessUnitId
-                    .toLong()
+        get() = when {
+            BusinessUnitIdOverride.hasOverride() -> BusinessUnitIdOverride.value.toLong()
+            authentication is BusinessUnitAuthentication -> (authentication as BusinessUnitAuthentication)
+                .session
+                .businessUnitId
+                .toLongOrNull()
 
-                else -> null
-            }
+            else -> null
         }
 
     override val currentTenantId: Long?
-        get() = if (TenantIdOverride.hasOverride()) {
-            TenantIdOverride.value.toLong()
-        } else {
-            when (currentSession) {
-                is AuthenticatedWebApplicationSession -> (currentSession as AuthenticatedWebApplicationSession)
-                    .tenantId
-                    .toLong()
+        get() = when {
+            TenantIdOverride.hasOverride() -> TenantIdOverride.value.toLong()
+            authentication is TenantAuthentication -> (authentication as TenantAuthentication)
+                .session
+                .tenantId
+                .toLongOrNull()
 
-                is AuthenticatedBusinessUnitSession -> (currentSession as AuthenticatedBusinessUnitSession)
-                    .tenantId.toLong()
+            authentication is BusinessUnitAuthentication -> (authentication as BusinessUnitAuthentication)
+                .session
+                .tenantId
+                .toLongOrNull()
 
-                else -> null
-            }
+            else -> null
         }
 
     override val currentIsUnscoped: Boolean
-        get() = if (IsUnscoped.isSet()) {
-            IsUnscoped.value
-        } else {
-            false
-        }
+        get() = IsUnscoped.isSet() && IsUnscoped.value
 
-    val currentOrganisation: AuthenticatedOrganisation?
+    override val currentOrganisation: BaseAuthenticatedOrganisation?
         get() = when (authentication) {
             is TenantAuthentication -> (authentication as TenantAuthentication).organisation
             is BusinessUnitAuthentication -> (authentication as BusinessUnitAuthentication).organisation
             else -> null
         }
 
-
-    val currentSession: AuthenticatedSession?
+    override val currentSession: BaseAuthenticatedSession?
         get() = when (authentication) {
             is GuestAuthentication -> (authentication as GuestAuthentication).session
             is TenantAuthentication -> (authentication as TenantAuthentication).session
@@ -73,7 +61,7 @@ object CurrentRequestContext : RequestContextProvider {
             else -> null
         }
 
-    val currentUser: AuthenticatedUser?
+    override val currentUser: BaseAuthenticatedUser?
         get() = when (authentication) {
             is GuestAuthentication -> (authentication as GuestAuthentication).user
             is TenantAuthentication -> (authentication as TenantAuthentication).user
@@ -81,13 +69,10 @@ object CurrentRequestContext : RequestContextProvider {
             else -> null
         }
 
-    val authentication: DecoratedAuthentication?
+    val authentication: DecoratedAuthentication<out BaseAuthenticatedSession>?
         get() = authenticationOpt.orElse(null)
 
-
-    val authenticationOpt: Optional<DecoratedAuthentication>
+    val authenticationOpt: Optional<DecoratedAuthentication<out BaseAuthenticatedSession>>
         get() = ServerRequestContext.currentRequest<Any>()
-            .flatMap { request: HttpRequest<Any> ->
-                request.toMultitenantAuthentication()
-            }
+            .flatMap { it.toMultitenantAuthentication() }
 }

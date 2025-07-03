@@ -1,3 +1,10 @@
+-- -----------------------------------------------------------------------------
+-- View: vw_request_scope
+-- Description: Consolidates current request-scoped values into a single view, including tenant, session,
+--              operator_party, business_unit, and business_unit_tenant.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT * FROM vw_request_scope;  -- returns a row with all current scope identifiers
 DROP VIEW IF EXISTS vw_request_scope CASCADE;
 CREATE OR REPLACE VIEW vw_request_scope
 AS

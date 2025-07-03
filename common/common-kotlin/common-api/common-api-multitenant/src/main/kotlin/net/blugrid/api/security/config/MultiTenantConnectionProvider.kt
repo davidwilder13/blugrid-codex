@@ -2,9 +2,9 @@ package net.blugrid.api.security.config
 
 import jakarta.inject.Singleton
 import net.blugrid.api.logging.logger
-import net.blugrid.api.security.authentication.model.AuthenticatedBusinessUnitSession
-import net.blugrid.api.security.authentication.model.AuthenticatedWebApplicationSession
 import net.blugrid.api.security.service.SecurityContextService
+import net.blugrid.api.session.model.BusinessUnitSession
+import net.blugrid.api.session.model.TenantSession
 import org.hibernate.HibernateException
 import org.hibernate.cfg.AvailableSettings
 import org.hibernate.engine.config.spi.ConfigurationService
@@ -65,12 +65,12 @@ open class MultiTenantConnectionProvider(
                     connection.configureUnscoped(schema)
                 }
 
-                currentSession is AuthenticatedWebApplicationSession && currentTenantId != null -> {
+                currentSession is TenantSession && currentTenantId != null -> {
                     log.debug("Configuring connection - WebApplication session found in SecurityContext - scoping to TenantId: $currentTenantId")
                     connection.configureTenantSessionScope(schema, currentTenantId.toString(), currentSession.sessionId)
                 }
 
-                currentSession is AuthenticatedBusinessUnitSession && currentTenantId != null && currentBusinessUnitId != null -> {
+                currentSession is BusinessUnitSession && currentTenantId != null && currentBusinessUnitId != null -> {
                     log.debug("Configuring connection - Business unit session found in SecurityContext - scoping to TenantId: $currentTenantId, BusinessUnitId: $currentBusinessUnitId")
                     connection.configureBusinessUnitSessionScope(schema, currentTenantId.toString(), currentBusinessUnitId.toString(), currentSession.sessionId)
                 }
@@ -133,7 +133,7 @@ open class MultiTenantConnectionProvider(
 }
 
 private fun Connection.configureUnscoped(schema: String) {
-    prepareCall("SELECT pg_catalog.set_config('search_path', ?, false)")
+    prepareCall("select pg_catalog.set_config('search_path', ?, false)")
         .use { statement ->
             statement.setString(1, schema)
             statement.execute()

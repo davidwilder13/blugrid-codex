@@ -1,3 +1,10 @@
+-- -----------------------------------------------------------------------------
+-- Function: create_tenant_partition_table
+-- Description: Creates a tenant-specific partition for a base table by computing ID range boundaries and setting up constraints.
+-- -----------------------------------------------------------------------------
+-- Examples:
+--   SELECT * FROM create_tenant_partition_table('orders', 1);
+--   -- returns table_name, min_id, max_id and creates partition if missing
 CREATE OR REPLACE FUNCTION create_tenant_partition_table(
     IN in_table_name TEXT,
     IN in_tenant_id  BIGINT,

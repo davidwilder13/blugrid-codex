@@ -1,50 +1,59 @@
 plugins {
-   alias(libs.plugins.jvm)
-   alias(libs.plugins.kapt)
-   alias(libs.plugins.allopen)
-   alias(libs.plugins.jpa)
-   alias(libs.plugins.shadow)
-   alias(libs.plugins.application)
-}
-
-repositories {
-    mavenCentral()
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.application)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-    api(project(":common:common-kotlin:common-api:common-api-db"))
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common-api:common-api-persistence"))
+    api(project(":common:common-kotlin:common-api:common-api-logging"))
     api(project(":common:common-kotlin:common-api:common-api-model"))
     api(project(":common:common-kotlin:common-api:common-api-multitenant"))
+
+    // Platform BOM
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautWeb)
+    implementation(libs.bundles.micronautData)
+    implementation(libs.bundles.micronautSecurity)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+    runtimeOnly(libs.bundles.runtimeSecurity)
+
+    // Test dependencies
     testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
-
-    annotationProcessor("io.micronaut:micronaut-inject-java")
-    compileOnly("io.micronaut:micronaut-aop")
-
-    implementation(platform("io.micronaut.platform:micronaut-platform"))
-    implementation(platform("aws.sdk.kotlin:bom:1.4.92"))
-    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
-    implementation(libs.bundles.commonLibs)
-    implementation(libs.bundles.dbLibs)
-    implementation(libs.bundles.webServiceLibs)
-    implementation(libs.bundles.securityLibs)
-
-    compileOnly(libs.bundles.compileOnlyLibs)
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
 }
 
 application {
     mainClass.set("net.blugrid.api.ApplicationKt")
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
 }
+
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
-}
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
