@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package net.blugrid.api.common.grpc;
+
+option java_multiple_files = true;
+
+// Used in paged queries, maps to Micronaut's Sort
+message Sort {
+  repeated Order orderBy = 1;
+
+  // If no orderBy entries exist, it's UNSORTED
+  bool sorted = 2;
+}
+
+// Matches Micronaut's Sort.Order
+message Order {
+  string property = 1;
+  Direction direction = 2;
+  bool ignoreCase = 3;
+}
+
+// Enum for ASC/DESC
+enum Direction {
+  ASC = 0;
+  DESC = 1;
+}

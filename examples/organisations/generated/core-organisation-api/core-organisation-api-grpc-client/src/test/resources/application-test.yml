@@ -1,0 +1,13 @@
+grpc:
+  client:
+    discovery:
+      enabled: false
+
+consul:
+  client:
+    defaultZone: http://${CONSUL_HOST}:${CONSUL_PORT}
+
+logger:
+  levels:
+    io.micronaut.discovery: TRACE
+    io.micronaut.grpc: TRACE

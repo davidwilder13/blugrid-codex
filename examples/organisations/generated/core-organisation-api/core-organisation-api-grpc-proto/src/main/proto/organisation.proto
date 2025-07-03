@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "common/PageRequest.proto";
+
+package net.blugrid.api.core.organisation.grpc;
+
+option java_multiple_files = true;
+option java_package = "net.blugrid.api.core.organisation.grpc";
+option java_outer_classname = "OrganisationStateServiceProto";
+
+service OrganisationStateService {
+  rpc GetById (OrganisationRequestById) returns (OrganisationResponse);
+  rpc GetByIdOptional (OrganisationRequestById) returns (OrganisationOptionalResponse);
+  rpc GetByUuid (OrganisationRequestByUuid) returns (OrganisationResponse);
+  rpc GetByUuidOptional (OrganisationRequestByUuid) returns (OrganisationOptionalResponse);
+  rpc GetAll (google.protobuf.Empty) returns (OrganisationListResponse);
+  rpc Create (OrganisationCreateRequest) returns (OrganisationResponse);
+  rpc Update (OrganisationUpdateRequest) returns (OrganisationResponse);
+  rpc Delete (OrganisationDeleteRequest) returns (google.protobuf.Empty);
+  rpc GetPage (OrganisationPageRequest) returns (OrganisationPageResponse);
+  rpc Query (OrganisationFilterRequest) returns (OrganisationPageResponse);
+}
+
+
+message OrganisationRequestById {
+  int64 id = 1;
+}
+
+message OrganisationRequestByUuid {
+  string uuid = 1;
+}
+
+message OrganisationCreateRequest {
+  string uuid = 1;
+  int64 parentOrganisationId = 2;
+  string effectiveTimestamp = 3;
+}
+
+message OrganisationUpdateRequest {
+  int64 id = 1;
+  string uuid = 2;
+  int64 parentOrganisationId = 3;
+  string effectiveTimestamp = 4;
+}
+
+message OrganisationDeleteRequest {
+  int64 id = 1;
+}
+
+message OrganisationResponse {
+  int64 id = 1;
+  string uuid = 2;
+  int64 parentOrganisationId = 3;
+  string effectiveTimestamp = 4;
+}
+
+message OrganisationOptionalResponse {
+  bool exists = 1;
+  OrganisationResponse organisation = 2;
+}
+
+message OrganisationListResponse {
+  repeated OrganisationResponse organisations = 1;
+}
+
+message OrganisationPageRequest {
+  int32 page = 1;
+  int32 size = 2;
+  net.blugrid.api.common.grpc.Sort sort = 3;
+}
+
+message OrganisationFilterRequest {
+  repeated int64 ids = 1;
+  repeated string uuids = 2;
+  repeated int64 parentOrganisationIds = 3;
+  string effectiveFrom = 4;
+  string effectiveTo = 5;
+
+  int32 page = 6;
+  int32 size = 7;
+  net.blugrid.api.common.grpc.Sort sort = 8;
+}
+
+message OrganisationPageResponse {
+  repeated OrganisationResponse organisations = 1;
+  int32 totalElements = 2;
+  int32 totalPages = 3;
+  int32 page = 4;
+  int32 size = 5;
+}

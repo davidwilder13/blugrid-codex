@@ -8,9 +8,10 @@
     "api-codegen": "./dist/main.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project codegen/tsconfig.json",
     "install": "pnpm run build && pnpm link --global",
-    "generate": "node --import ./ts-register.mjs ./src/generate.ts"
+    "generate": "node --import ./ts-register.mjs ./codegen/src/generate.ts",
+    "generate:all": "pnpm run generate && ./scripts/link-generated-kotlin.sh"
   },
   "dependencies": {
     "commander": "^14.0.0",
@@ -25,5 +26,9 @@
     "lodash-es": "^4.17.21",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=8"
   }
 }

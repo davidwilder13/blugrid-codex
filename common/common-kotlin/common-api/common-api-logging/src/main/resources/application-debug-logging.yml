@@ -1,0 +1,14 @@
+
+logger:
+  levels:
+    net.blugrid.api: DEBUG
+#    org.hibernate: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG
+    io.micronaut.http.client: TRACE
+    io.micronaut.discovery: INFO
+    io.micronaut.http.server: TRACE
+    io.micronaut.json: INFO
+    io.micronaut.security: DEBUG

@@ -1,0 +1,26 @@
+[versions]
+openapi = "4.8.1"
+mapstructProcessor = "1.5.5.Final"
+builderProcessor = "1.2.2"
+
+[libraries]
+micronaut-data = { module = "io.micronaut.data:micronaut-data-processor" }
+micronaut-http-validation = { module = "io.micronaut:micronaut-http-validation" }
+micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
+micronaut-openapi = { module = "io.micronaut.openapi:micronaut-openapi" }
+micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-processor" }
+micronaut-validation = { module = "io.micronaut.validation:micronaut-validation-processor" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstructProcessor" }
+kotlin-builder-processor = { module = "com.thinkinglogic.builder:kotlin-builder-processor", version.ref = "builderProcessor" }
+
+[bundles]
+commonAnnotationProcessors = [
+    "micronaut-data",
+    "micronaut-http-validation",
+    "micronaut-inject-java",
+    "micronaut-serde",
+    "micronaut-openapi",
+    "micronaut-validation",
+    "mapstruct-processor",
+    "kotlin-builder-processor"
+]

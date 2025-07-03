@@ -1,0 +1,6 @@
+
+logger:
+  levels:
+    net.blugrid.api.security: TRACE
+    com.fasterxml.jackson: TRACE
+    io.micronaut.security: TRACE

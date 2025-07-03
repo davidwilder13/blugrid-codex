@@ -1,0 +1,11 @@
+jackson:
+  serialization:
+    write-bigdecimal-as-plain: true
+    write-date-timestamps-as-nanoseconds: false
+    write-dates-as-timestamps: false
+    write-enums-using-to-string: true
+    write_numbers_as_strings: true
+
+  deserialization:
+    read-date-timestamps-as-nanoseconds: false
+    read-enums-using-to-string: true

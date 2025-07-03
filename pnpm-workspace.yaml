@@ -1,2 +1,7 @@
+packages:
+  - 'codegen'
+  - 'common-ts'
+  - 'common-react'
+  - 'examples/**'
 overrides:
   '@blugrid/api-codegen': link:../../.local/share/pnpm/global/5/node_modules/@blugrid/api-codegen
