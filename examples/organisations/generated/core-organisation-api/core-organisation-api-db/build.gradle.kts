@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.allopen)
     alias(libs.plugins.jpa)
-    alias(libs.plugins.shadow)
     alias(libs.plugins.application)
 }
 

@@ -1,0 +1,746 @@
+# Multi-Platform Framework Restructure - Detailed Task List
+
+## 📋 OVERVIEW
+This task list restructures the Kotlin common framework from API-centric to platform-first architecture, preparing it for multi-platform development including Android. The restructure moves from `common/common-kotlin/common-api/*` modules to domain-driven modules under `common/common-kotlin/` with clear separation of concerns.
+
+### Current Structure Issues:
+- Mixed concerns in single modules (e.g., `common-api-multitenant` contains web, data, and security code)
+- API-centric naming that doesn't reflect multi-platform usage
+- Static factories and objects instead of proper dependency injection
+- Unclear boundaries between platform-agnostic and server-specific code
+
+### Target Structure:
+```
+common/common-kotlin/
+├── platform/          # Platform-agnostic utilities (logging, config, serialization)
+├── security/          # Security domain (tokens, authentication, authorization)
+├── data/              # Data models and validation
+└── server/            # Server-specific implementations (REST, persistence, multitenancy)
+```
+
+## 🎯 EXPECTED FINAL RESULT
+Upon completion, the framework will have:
+- **Clear domain boundaries** with platform-agnostic and server-specific modules
+- **Proper dependency injection** replacing static factories and objects
+- **Multi-platform readiness** with shared models and platform-specific implementations
+- **Consistent package structure** following `net.blugrid.{domain}.{module}.{layer}` pattern
+- **Clean module dependencies** flowing from platform → security/data → server
+- **Updated examples and codegen** referencing the new structure
+- **Comprehensive documentation** for each module's purpose and usage
+
+---
+
+## PHASE_1: Create New Module Structure
+**Purpose**: Establish the new module hierarchy and gradle configuration
+**Expected Result**: New empty modules with proper gradle dependencies, old modules still functional
+
+- PHASE_1.1: Create Platform-Agnostic Modules
+  - PHASE_1.1.1: Create directory `common/common-kotlin/platform/platform-logging`
+  - PHASE_1.1.2: Create `common/common-kotlin/platform/platform-logging/build.gradle.kts` with kotlin plugin and logging dependencies
+  - PHASE_1.1.3: Create directory `common/common-kotlin/platform/platform-config`
+  - PHASE_1.1.4: Create `common/common-kotlin/platform/platform-config/build.gradle.kts` with kotlin plugin and micronaut-configuration dependencies
+  - PHASE_1.1.5: Create directory `common/common-kotlin/platform/platform-validation`
+  - PHASE_1.1.6: Create `common/common-kotlin/platform/platform-validation/build.gradle.kts` with kotlin plugin and validation dependencies
+  - PHASE_1.1.7: Create directory `common/common-kotlin/platform/platform-serialization`
+  - PHASE_1.1.8: Create `common/common-kotlin/platform/platform-serialization/build.gradle.kts` with kotlin plugin and jackson dependencies
+  - PHASE_1.1.9: Create directory `common/common-kotlin/platform/platform-testing`
+  - PHASE_1.1.10: Create `common/common-kotlin/platform/platform-testing/build.gradle.kts` with kotlin plugin and testing dependencies
+
+- PHASE_1.2: Create Security Domain Modules
+  - PHASE_1.2.1: Create directory `common/common-kotlin/security/security-core`
+  - PHASE_1.2.2: Create `common/common-kotlin/security/security-core/build.gradle.kts` with dependency on platform-logging
+  - PHASE_1.2.3: Create directory `common/common-kotlin/security/security-tokens`
+  - PHASE_1.2.4: Create `common/common-kotlin/security/security-tokens/build.gradle.kts` with dependencies on security-core and nimbus-jose-jwt
+  - PHASE_1.2.5: Create directory `common/common-kotlin/security/security-authentication`
+  - PHASE_1.2.6: Create `common/common-kotlin/security/security-authentication/build.gradle.kts` with dependency on security-core
+  - PHASE_1.2.7: Create directory `common/common-kotlin/security/security-authorization`
+  - PHASE_1.2.8: Create `common/common-kotlin/security/security-authorization/build.gradle.kts` with dependency on security-core
+  - PHASE_1.2.9: Create directory `common/common-kotlin/security/security-crypto`
+  - PHASE_1.2.10: Create `common/common-kotlin/security/security-crypto/build.gradle.kts` with crypto and keystore dependencies
+
+- PHASE_1.3: Create Data Domain Modules
+  - PHASE_1.3.1: Create directory `common/common-kotlin/data/data-models`
+  - PHASE_1.3.2: Create `common/common-kotlin/data/data-models/build.gradle.kts` with jackson and validation dependencies
+  - PHASE_1.3.3: Create directory `common/common-kotlin/data/data-validation`
+  - PHASE_1.3.4: Create `common/common-kotlin/data/data-validation/build.gradle.kts` with jakarta-validation dependencies
+  - PHASE_1.3.5: Create directory `common/common-kotlin/data/data-sync`
+  - PHASE_1.3.6: Create `common/common-kotlin/data/data-sync/build.gradle.kts` with platform-logging dependency
+
+- PHASE_1.4: Create Server Platform Modules
+  - PHASE_1.4.1: Create directory `common/common-kotlin/server/server-rest`
+  - PHASE_1.4.2: Create `common/common-kotlin/server/server-rest/build.gradle.kts` with micronaut-http dependencies
+  - PHASE_1.4.3: Create directory `common/common-kotlin/server/server-persistence`
+  - PHASE_1.4.4: Create `common/common-kotlin/server/server-persistence/build.gradle.kts` with hibernate-jpa and micronaut-data dependencies
+  - PHASE_1.4.5: Create directory `common/common-kotlin/server/server-multitenancy`
+  - PHASE_1.4.6: Create `common/common-kotlin/server/server-multitenancy/build.gradle.kts` with micronaut-multitenancy dependencies
+  - PHASE_1.4.7: Create directory `common/common-kotlin/server/server-services`
+  - PHASE_1.4.8: Create `common/common-kotlin/server/server-services/build.gradle.kts` with micronaut-inject dependencies
+
+- PHASE_1.5: Update Root Gradle Configuration
+  - PHASE_1.5.1: Update `settings.gradle.kts` to include all new platform modules under `common:common-kotlin:platform`
+  - PHASE_1.5.2: Update `settings.gradle.kts` to include all new security modules under `common:common-kotlin:security`
+  - PHASE_1.5.3: Update `settings.gradle.kts` to include all new data modules under `common:common-kotlin:data`
+  - PHASE_1.5.4: Update `settings.gradle.kts` to include all new server modules under `common:common-kotlin:server`
+
+**✅ PHASE_1 COMPLETE RESULT**: New module structure exists alongside old modules, gradle builds successfully, ready for code migration
+
+**🔍 PHASE_1 VERIFICATION COMMANDS**:
+- `./gradlew projects` - Verify all new modules are listed
+- `./gradlew :common:common-kotlin:platform:platform-logging:dependencies` - Verify platform module dependencies
+- `./gradlew :common:common-kotlin:security:security-core:dependencies` - Verify security module dependencies
+- `./gradlew build --dry-run` - Verify build configuration is valid
+
+---
+
+## PHASE_2: Migrate Platform-Agnostic Components
+**Purpose**: Move shared utilities that work across all platforms (server, Android, web)
+**Expected Result**: Platform modules contain shared utilities, imports updated throughout codebase
+
+- PHASE_2.1: Migrate Logging Components
+  - PHASE_2.1.1: Create `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/api/Logger.kt` interface
+  - PHASE_2.1.2: Move `logger()` extension function from existing code to `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/LoggerExt.kt`
+  - PHASE_2.1.3: Create `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/config/LoggingConfig.kt` for logging configuration
+  - PHASE_2.1.4: Update all existing `import net.blugrid.api.logging.logger` to `import net.blugrid.platform.logging.logger`
+
+- PHASE_2.2: Migrate Configuration Components
+  - PHASE_2.2.1: Move `EnvProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/EnvProps.kt`
+  - PHASE_2.2.2: Move `ServerProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/ServerProps.kt`
+  - PHASE_2.2.3: Move `WebProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/WebProps.kt`
+  - PHASE_2.2.4: Move `DbProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/DbProps.kt`
+  - PHASE_2.2.5: Update all imports of these config classes to use new package paths
+
+- PHASE_2.3: Migrate Serialization Components
+  - PHASE_2.3.1: Move `jwtObjectMapper` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/platform/platform-serialization/src/main/kotlin/net/blugrid/platform/serialization/ObjectMappers.kt`
+  - PHASE_2.3.2: Rename `jwtObjectMapper` to `platformObjectMapper` in the moved file
+  - PHASE_2.3.3: Update all references to `jwtObjectMapper` to use `platformObjectMapper`
+  - PHASE_2.3.4: Create `common/common-kotlin/platform/platform-serialization/src/main/kotlin/net/blugrid/platform/serialization/config/SerializationConfig.kt` for JSON configuration
+
+**✅ PHASE_2 COMPLETE RESULT**: Platform-agnostic utilities moved to platform modules, all imports updated, old modules still contain remaining code
+
+**🔍 PHASE_2 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:platform:platform-logging:compileKotlin` - Verify logging module compiles
+- `./gradlew :common:common-kotlin:platform:platform-config:compileKotlin` - Verify config module compiles
+- `./gradlew :common:common-kotlin:platform:platform-serialization:compileKotlin` - Verify serialization module compiles
+- `grep -r "net.blugrid.api.logging" --include="*.kt" .` - Verify no old logging imports remain
+- `grep -r "net.blugrid.platform.logging" --include="*.kt" .` - Verify new logging imports are used
+
+---
+
+## PHASE_3: Migrate Security Domain Components
+**Purpose**: Separate security concerns into domain-specific modules with clear interfaces
+**Expected Result**: Security modules contain domain models and interfaces, static factories converted to services
+
+- PHASE_3.1: Migrate Core Security Models
+  - PHASE_3.1.1: Move `AuthenticationType` enum from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticationType.kt`
+  - PHASE_3.1.2: Move `BaseAuthenticatedUser` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedUser.kt`
+  - PHASE_3.1.3: Move `BaseAuthenticatedOrganisation` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedOrganisation.kt`
+  - PHASE_3.1.4: Move `BaseAuthenticatedSession` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedSession.kt`
+  - PHASE_3.1.5: Update all imports of these models to use new package paths
+
+- PHASE_3.2: Migrate Token Components
+  - PHASE_3.2.1: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenService.kt` interface
+  - PHASE_3.2.2: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenFactory.kt` interface
+  - PHASE_3.2.3: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenValidator.kt` interface
+  - PHASE_3.2.4: Move `JwtToken` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/model/AccessToken.kt`
+  - PHASE_3.2.5: Rename `JwtToken` class to `AccessToken` in the moved file
+  - PHASE_3.2.6: Move `toJWTRawMap` extension from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/model/TokenExt.kt`
+  - PHASE_3.2.7: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/JwtTokenService.kt` implementing TokenService
+  - PHASE_3.2.8: Convert `AccessTokenFactory` object to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/JwtTokenFactory.kt` class implementing TokenFactory
+  - PHASE_3.2.9: Remove static methods from JwtTokenFactory and add @Singleton annotation
+  - PHASE_3.2.10: Move `AbstractJwtGenerator` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/AbstractJwtGenerator.kt`
+  - PHASE_3.2.11: Update all imports and references to use new token classes and interfaces
+
+- PHASE_3.3: Migrate Authentication Components
+  - PHASE_3.3.1: Create `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/api/AuthenticationService.kt` interface
+  - PHASE_3.3.2: Move `DecoratedAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/DecoratedAuthentication.kt`
+  - PHASE_3.3.3: Move `GuestAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/GuestAuthentication.kt`
+  - PHASE_3.3.4: Move `TenantAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/TenantAuthentication.kt`
+  - PHASE_3.3.5: Move `BusinessUnitAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/BusinessUnitAuthentication.kt`
+  - PHASE_3.3.6: Update all imports of authentication models to use new package paths
+
+- PHASE_3.4: Migrate JWT Decoder Components
+  - PHASE_3.4.1: Move `JwtDecoder` interface from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/JwtDecoder.kt`
+  - PHASE_3.4.2: Move `SelfSignedJwtDecoder` interface from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/SelfSignedJwtDecoder.kt`
+  - PHASE_3.4.3: Update all imports and references to JWT decoder interfaces
+
+- PHASE_3.5: Migrate Configuration Components
+  - PHASE_3.5.1: Move `SecurityProps` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/config/SecurityProps.kt`
+  - PHASE_3.5.2: Move `RedirectProps` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/config/RedirectProps.kt`
+  - PHASE_3.5.3: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/config/TokenConfig.kt` for token-specific configuration
+  - PHASE_3.5.4: Update all imports of security configuration classes
+
+**✅ PHASE_3 COMPLETE RESULT**: Security domain properly separated, static factories converted to injectable services, clear interfaces defined, all imports updated
+
+**🔍 PHASE_3 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:security:security-core:compileKotlin` - Verify security core compiles
+- `./gradlew :common:common-kotlin:security:security-tokens:compileKotlin` - Verify token module compiles
+- `./gradlew :common:common-kotlin:security:security-authentication:compileKotlin` - Verify authentication module compiles
+- `grep -r "AccessTokenFactory" --include="*.kt" .` - Verify no static factory references remain
+- `grep -r "@Singleton" --include="*.kt" common/common-kotlin/security/` - Verify services are properly annotated
+- `grep -r "net.blugrid.api.jwt" --include="*.kt" .` - Verify no old JWT imports remain
+
+---
+
+## PHASE_4: Migrate Server-Specific Components
+**Purpose**: Move server-only components (multitenancy, persistence, database) to server modules
+**Expected Result**: Server modules contain platform-specific implementations, clear separation from shared code
+
+- PHASE_4.1: Migrate Multitenancy Components
+  - PHASE_4.1.1: Move `TenantSequence` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/api/TenantSequence.kt`
+  - PHASE_4.1.2: Move `TenantSequenceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/impl/TenantSequenceImpl.kt`
+  - PHASE_4.1.3: Move `GlobalTenantSequenceGenerator` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/generators/GlobalTenantSequenceGenerator.kt`
+  - PHASE_4.1.4: Move `DatabaseService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/api/DatabaseService.kt`
+  - PHASE_4.1.5: Move `DatabaseServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/impl/DatabaseServiceImpl.kt`
+  - PHASE_4.1.6: Update all imports of multitenancy and database service classes
+
+- PHASE_4.2: Migrate Connection Provider Components
+  - PHASE_4.2.1: Move `MultiTenantConnectionProvider` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/connection/MultiTenantConnectionProvider.kt`
+  - PHASE_4.2.2: Move `MultiTenantResolver` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/connection/MultiTenantResolver.kt`
+  - PHASE_4.2.3: Move `CustomJdbcStatementInspector` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/inspection/CustomJdbcStatementInspector.kt`
+  - PHASE_4.2.4: Update all imports of connection provider classes
+
+- PHASE_4.3: Migrate JPA Configuration Components
+  - PHASE_4.3.1: Move `JpaConfigurationCreatedEventListener` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/config/JpaConfigurationCreatedEventListener.kt`
+  - PHASE_4.3.2: Move `ApplicationConfiguration` and `ApplicationConfigurationProperties` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/config/ApplicationConfiguration.kt`
+  - PHASE_4.3.3: Update all imports of JPA and application configuration classes
+
+- PHASE_4.4: Migrate Exception Handling Components
+  - PHASE_4.4.1: Move `GlobalExceptionHandler` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/exceptions/GlobalExceptionHandler.kt`
+  - PHASE_4.4.2: Update imports in GlobalExceptionHandler to use new platform and security package paths
+
+- PHASE_4.5: Migrate Repository Components
+  - PHASE_4.5.1: Move `RequestScopeEntity` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/entities/RequestScopeEntity.kt`
+  - PHASE_4.5.2: Move `RequestScopeRepository` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/repositories/RequestScopeRepository.kt`
+  - PHASE_4.5.3: Update all imports of repository classes
+
+**✅ PHASE_4 COMPLETE RESULT**: Server-specific components moved to server modules, clear separation between platform-agnostic and server-specific code
+
+**🔍 PHASE_4 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:server:server-multitenancy:compileKotlin` - Verify multitenancy module compiles
+- `./gradlew :common:common-kotlin:server:server-persistence:compileKotlin` - Verify persistence module compiles
+- `./gradlew :common:common-kotlin:server:server-rest:compileKotlin` - Verify REST module compiles
+- `grep -r "net.blugrid.api.db" --include="*.kt" .` - Verify no old database imports remain
+- `grep -r "net.blugrid.server" --include="*.kt" .` - Verify new server imports are used
+
+---
+
+## PHASE_5: Migrate Server Authentication Components
+**Purpose**: Move server-specific authentication implementations to server modules
+**Expected Result**: Server authentication components separated from shared security models
+
+- PHASE_5.1: Migrate JWT Components for Server
+  - PHASE_5.1.1: Move `JwksLoader` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/JwksLoader.kt`
+  - PHASE_5.1.2: Move `JwtDecoderImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/JwtDecoderImpl.kt`
+  - PHASE_5.1.3: Move `FakeJwtDecoder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/FakeJwtDecoder.kt`
+  - PHASE_5.1.4: Move `SelfSignedJwtDecoderImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/SelfSignedJwtDecoderImpl.kt`
+  - PHASE_5.1.5: Move `SelfSignedJwtEncoder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/SelfSignedJwtEncoder.kt`
+  - PHASE_5.1.6: Update all imports of JWT server components
+
+- PHASE_5.2: Migrate Authentication Filter Components
+  - PHASE_5.2.1: Move `JwtAuthenticationFetcher` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/filters/JwtAuthenticationFetcher.kt`
+  - PHASE_5.2.2: Update imports in JwtAuthenticationFetcher to use new security and platform packages
+
+- PHASE_5.3: Migrate Security Service Components
+  - PHASE_5.3.1: Move `SecurityContextService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-services/src/main/kotlin/net/blugrid/server/services/security/api/SecurityContextService.kt`
+  - PHASE_5.3.2: Move `SecurityContextServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-services/src/main/kotlin/net/blugrid/server/services/security/impl/SecurityContextServiceImpl.kt`
+  - PHASE_5.3.3: Update all imports of security context service classes
+
+- PHASE_5.4: Migrate Web Service Components
+  - PHASE_5.4.1: Move `CookieService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/api/CookieService.kt`
+  - PHASE_5.4.2: Move `CookieServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/impl/CookieServiceImpl.kt`
+  - PHASE_5.4.3: Move `RedirectService` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/impl/RedirectService.kt`
+  - PHASE_5.4.4: Move `CustomOauthRouteUrlBuilder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/oauth/CustomOauthRouteUrlBuilder.kt`
+  - PHASE_5.4.5: Move `EnhancedIdTokenLoginHandler` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/handlers/EnhancedIdTokenLoginHandler.kt`
+  - PHASE_5.4.6: Update all imports of web service classes
+
+**✅ PHASE_5 COMPLETE RESULT**: Server authentication implementations moved to server modules, clear separation between shared interfaces and server-specific implementations
+
+**🔍 PHASE_5 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:server:server-rest:compileKotlin` - Verify REST module compiles with JWT components
+- `./gradlew :common:common-kotlin:server:server-services:compileKotlin` - Verify services module compiles
+- `grep -r "JwtAuthenticationFetcher" --include="*.kt" .` - Verify authentication fetcher moved correctly
+- `grep -r "SecurityContextService" --include="*.kt" .` - Verify security context service moved correctly
+
+---
+
+## PHASE_6: Migrate Controller Components
+**Purpose**: Move REST controllers and utilities to server-rest module
+**Expected Result**: All web controllers in server-rest module, proper package structure
+
+- PHASE_6.1: Migrate Authentication Controllers
+  - PHASE_6.1.1: Move `EnhancedLogoutController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/EnhancedLogoutController.kt`
+  - PHASE_6.1.2: Move `RedirectController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/RedirectController.kt`
+  - PHASE_6.1.3: Move `CheckSessionController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/CheckSessionController.kt`
+  - PHASE_6.1.4: Update all imports in controller classes to use new package paths
+
+- PHASE_6.2: Migrate Utility Components
+  - PHASE_6.2.1: Move `PkceUtil` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/pkce/PkceUtil.kt`
+  - PHASE_6.2.2: Update all imports of PKCE utilities
+
+**✅ PHASE_6 COMPLETE RESULT**: All REST controllers and utilities moved to server-rest module, proper separation of web concerns
+
+**🔍 PHASE_6 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:server:server-rest:compileKotlin` - Verify REST module compiles with controllers
+- `grep -r "@Controller" --include="*.kt" common/common-kotlin/server/server-rest/` - Verify controllers are in correct location
+- `grep -r "EnhancedLogoutController" --include="*.kt" .` - Verify logout controller moved correctly
+
+---
+
+## PHASE_7: Migrate Context and Mapping Components
+**Purpose**: Move context and mapping utilities to appropriate security modules
+**Expected Result**: Context and mapping components in security modules, proper package structure
+
+- PHASE_7.1: Migrate Context Components
+  - PHASE_7.1.1: Move `CurrentRequestContext` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/CurrentRequestContext.kt`
+  - PHASE_7.1.2: Move `RequestContextProvider` interface to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/RequestContextProvider.kt`
+  - PHASE_7.1.3: Move `RequestContextOverride` components from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/RequestContextOverride.kt`
+  - PHASE_7.1.4: Update all imports of context components
+
+- PHASE_7.2: Migrate Mapping Components
+  - PHASE_7.2.1: Move authentication mapping files from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/mapping/`
+  - PHASE_7.2.2: Move JWT mapping files from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/mapping/`
+  - PHASE_7.2.3: Update all imports in mapping files to use new package paths
+  - PHASE_7.2.4: Update all usages of mapping functions to use new package paths
+
+**✅ PHASE_7 COMPLETE RESULT**: Context and mapping components properly organized in security modules, all imports updated
+
+**🔍 PHASE_7 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:security:security-core:compileKotlin` - Verify security core compiles with context components
+- `./gradlew :common:common-kotlin:security:security-authentication:compileKotlin` - Verify authentication module compiles with mapping
+- `./gradlew :common:common-kotlin:security:security-tokens:compileKotlin` - Verify token module compiles with mapping
+- `grep -r "CurrentRequestContext" --include="*.kt" .` - Verify context moved to security-core
+- `grep -r "toMultitenantAuthentication" --include="*.kt" .` - Verify mapping functions moved correctly
+
+---
+
+## PHASE_8: Update Dependencies and Remove Old Modules
+**Purpose**: Update module dependencies and remove old API modules
+**Expected Result**: Clean module dependencies, old modules removed, build system updated
+
+- PHASE_8.1: Update Module Dependencies
+  - PHASE_8.1.1: Update `common/common-kotlin/security/security-tokens/build.gradle.kts` to depend on `common:common-kotlin:security:security-core` and `common:common-kotlin:platform:platform-logging`
+  - PHASE_8.1.2: Update `common/common-kotlin/security/security-authentication/build.gradle.kts` to depend on `common:common-kotlin:security:security-core` and `common:common-kotlin:security:security-tokens`
+  - PHASE_8.1.3: Update `common/common-kotlin/server/server-rest/build.gradle.kts` to depend on security and platform modules
+  - PHASE_8.1.4: Update `common/common-kotlin/server/server-persistence/build.gradle.kts` to depend on data and platform modules
+  - PHASE_8.1.5: Update `common/common-kotlin/server/server-multitenancy/build.gradle.kts` to depend on server-persistence and security-core
+  - PHASE_8.1.6: Update `common/common-kotlin/server/server-services/build.gradle.kts` to depend on security and data modules
+
+- PHASE_8.2: Verify All Imports Updated
+  - PHASE_8.2.1: Search and replace all `import net.blugrid.api.logging` with `import net.blugrid.platform.logging`
+  - PHASE_8.2.2: Search and replace all `import net.blugrid.api.jwt` with `import net.blugrid.security.tokens`
+  - PHASE_8.2.3: Search and replace all `import net.blugrid.api.security` with appropriate new security package imports
+  - PHASE_8.2.4: Search and replace all `import net.blugrid.api.db` with `import net.blugrid.server.persistence` or `import net.blugrid.server.multitenancy`
+  - PHASE_8.2.5: Search and replace all `import net.blugrid.api.config` with `import net.blugrid.platform.config`
+
+- PHASE_8.3: Remove Old Modules
+  - PHASE_8.3.1: Remove `common/common-kotlin/common-api/common-api-jwt` directory and all its contents
+  - PHASE_8.3.2: Remove `common/common-kotlin/common-api/common-api-security` directory and all its contents
+  - PHASE_8.3.3: Remove `common/common-kotlin/common-api/common-api-multitenant` directory and all its contents
+  - PHASE_8.3.4: Remove references to old modules from root `settings.gradle.kts`
+  - PHASE_8.3.5: Remove old module dependencies from any remaining build.gradle.kts files
+
+**✅ PHASE_8 COMPLETE RESULT**: Clean module dependencies, old API modules removed, build system updated to use new structure
+
+**🔍 PHASE_8 VERIFICATION COMMANDS**:
+- `./gradlew clean build` - Verify entire project builds successfully
+- `./gradlew dependencies` - Verify module dependencies are clean
+- `./gradlew projects` - Verify old modules are not listed
+- `grep -r "net.blugrid.api" --include="*.kt" .` - Verify no old API imports remain
+- `grep -r "common-api-" --include="*.kts" .` - Verify no old module references in build files
+- `find . -name "common-api-*" -type d` - Verify old module directories are deleted
+
+---
+
+## PHASE_9: Update Configuration Files
+**Purpose**: Move configuration files to appropriate modules and update references
+**Expected Result**: Configuration files in correct modules, all references updated
+
+- PHASE_9.1: Update Application Configuration
+  - PHASE_9.1.1: Move `application-security.yml` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/resources/application-security.yml`
+  - PHASE_9.1.2: Move `application-multitenant-test.yml` to `common/common-kotlin/server/server-multitenancy/src/test/resources/application-multitenant-test.yml`
+  - PHASE_9.1.3: Move `logback.xml` to `common/common-kotlin/platform/platform-logging/src/main/resources/logback.xml`
+  - PHASE_9.1.4: Update package references in configuration files to use new package paths
+
+- PHASE_9.2: Update Resource Files
+  - PHASE_9.2.1: Move `jwks.json` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/resources/jwks.json`
+  - PHASE_9.2.2: Move `keystore.jks` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/resources/keystore.jks`
+  - PHASE_9.2.3: Update any configuration references to these resource files
+
+**✅ PHASE_9 COMPLETE RESULT**: Configuration files moved to appropriate modules, all references updated
+
+**🔍 PHASE_9 VERIFICATION COMMANDS**:
+- `./gradlew :common:common-kotlin:server:server-rest:processResources` - Verify REST resources processed correctly
+- `./gradlew :common:common-kotlin:security:security-tokens:processResources` - Verify token resources processed correctly
+- `find . -name "application-*.yml" -type f` - Verify configuration files are in correct locations
+- `find . -name "keystore.jks" -type f` - Verify keystore file location
+- `find . -name "jwks.json" -type f` - Verify JWKS file location
+
+---
+
+## PHASE_10: Create Documentation and Finalize
+**Purpose**: Create comprehensive documentation and update examples/codegen to use new structure
+**Expected Result**: Complete documentation, examples and codegen updated, full build verification
+
+- PHASE_10.1: Create Module Documentation
+  - PHASE_10.1.1: Create `common/common-kotlin/platform/platform-logging/README.md` with module purpose and usage
+  - PHASE_10.1.2: Create `common/common-kotlin/security/security-core/README.md` with security domain overview
+  - PHASE_10.1.3: Create `common/common-kotlin/security/security-tokens/README.md` with JWT token handling documentation
+  - PHASE_10.1.4: Create `common/common-kotlin/server/server-rest/README.md` with REST API module documentation
+  - PHASE_10.1.5: Create `common/common-kotlin/server/server-multitenancy/README.md` with multitenancy implementation details
+
+- PHASE_10.2: Update Root Documentation
+  - PHASE_10.2.1: Update root `README.md` to reflect new module structure
+  - PHASE_10.2.2: Update architecture diagrams to show new platform-first design
+  - PHASE_10.2.3: Create developer onboarding guide with new package structure
+  - PHASE_10.2.4: Create module dependency diagram showing clear separation of concerns
+
+- PHASE_10.3: Update Example Projects
+  - PHASE_10.3.1: Update all `examples/` project imports to use new package paths
+  - PHASE_10.3.2: Update example build.gradle.kts files to reference new module structure
+  - PHASE_10.3.3: Update example code to use new service interfaces instead of static factories
+  - PHASE_10.3.4: Update example application.yml files to use new configuration properties
+
+- PHASE_10.4: Update Code Generation
+  - PHASE_10.4.1: Update TypeScript codegen templates in `codegen/` to generate new package structure
+  - PHASE_10.4.2: Update import statements in generated code templates
+  - PHASE_10.4.3: Update generated service references to use new dependency injection patterns
+  - PHASE_10.4.4: Update generated configuration files to use new config structure
+
+- PHASE_10.5: Verify Build and Tests
+  - PHASE_10.5.1: Run `./gradlew clean build` to verify all modules compile
+  - PHASE_10.5.2: Run all existing tests to ensure functionality preserved
+  - PHASE_10.5.3: Verify example projects compile and run with new structure
+  - PHASE_10.5.4: Verify code generation produces valid output in `dist/` directory
+  - PHASE_10.5.5: Fix any remaining import or dependency issues
+  - PHASE_10.5.6: Update test imports to use new package paths
+
+**✅ PHASE_10 COMPLETE RESULT**: Complete documentation, examples and codegen updated to use new structure, all builds passing, framework ready for multi-platform development
+
+**🔍 PHASE_10 VERIFICATION COMMANDS**:
+- `./gradlew clean build` - Verify all modules compile successfully
+- `./gradlew test` - Verify all existing tests pass
+- `./gradlew :examples:build` - Verify example projects compile
+- `cd codegen && npm test` - Verify code generation produces valid output
+- `./gradlew build --parallel` - Verify parallel builds work
+- `./gradlew publishToMavenLocal` - Verify modules can be published
+- `grep -r "net.blugrid.api" --include="*.kt" examples/` - Verify examples use new packages
+- `grep -r "net.blugrid.platform\|net.blugrid.security\|net.blugrid.server" --include="*.kt" examples/` - Verify examples use new structure
+
+---
+
+## 🎯 FINAL VERIFICATION CHECKLIST
+- [ ] All modules compile successfully with `./gradlew clean build`
+- [ ] All existing tests pass with `./gradlew test`
+- [ ] Example projects compile and run with `./gradlew :examples:build`
+- [ ] Code generation produces valid output with `cd codegen && npm test`
+- [ ] No references to old `net.blugrid.api.*` packages remain: `grep -r "net.blugrid.api" --include="*.kt" .`
+- [ ] All static factories converted to injectable services: `grep -r "object.*Factory" --include="*.kt" .`
+- [ ] Module dependencies follow platform → security/data → server pattern: `./gradlew dependencies`
+- [ ] Documentation is complete and accurate: `find . -name "README.md" -path "*/common/common-kotlin/*"`
+- [ ] Framework is ready for Android development: `./gradlew projects | grep -E "(platform|security|data)"`
+
+**🔍 COMPREHENSIVE VERIFICATION COMMANDS**:
+```bash
+# Full build verification
+./gradlew clean build test
+
+# Module structure verification
+./gradlew projects | grep "common-kotlin"
+
+# Import verification
+grep -r "net.blugrid.api" --include="*.kt" . || echo "✅ No old API imports found"
+grep -r "net.blugrid.platform\|net.blugrid.security\|net.blugrid.server" --include="*.kt" . | wc -l
+
+# Dependency verification
+./gradlew dependencies > dependencies.txt && echo "✅ Dependencies exported for review"
+
+# Examples verification
+./gradlew :examples:build && echo "✅ Examples build successfully"
+
+# Code generation verification
+cd codegen && npm test && echo "✅ Code generation works correctly"
+
+# Resource verification
+find . -name "*.yml" -o -name "*.jks" -o -name "*.json" | grep -E "(security|platform|server)" && echo "✅ Resources in correct locations"
+```
+- PHASE_1.1: Create Platform-Agnostic Modules
+  - PHASE_1.1.1: Create directory `common/common-kotlin/platform/platform-logging`
+  - PHASE_1.1.2: Create `common/common-kotlin/platform/platform-logging/build.gradle.kts` with kotlin plugin and logging dependencies
+  - PHASE_1.1.3: Create directory `common/common-kotlin/platform/platform-config`
+  - PHASE_1.1.4: Create `common/common-kotlin/platform/platform-config/build.gradle.kts` with kotlin plugin and micronaut-configuration dependencies
+  - PHASE_1.1.5: Create directory `common/common-kotlin/platform/platform-validation`
+  - PHASE_1.1.6: Create `common/common-kotlin/platform/platform-validation/build.gradle.kts` with kotlin plugin and validation dependencies
+  - PHASE_1.1.7: Create directory `common/common-kotlin/platform/platform-serialization`
+  - PHASE_1.1.8: Create `common/common-kotlin/platform/platform-serialization/build.gradle.kts` with kotlin plugin and jackson dependencies
+  - PHASE_1.1.9: Create directory `common/common-kotlin/platform/platform-testing`
+  - PHASE_1.1.10: Create `common/common-kotlin/platform/platform-testing/build.gradle.kts` with kotlin plugin and testing dependencies
+
+- PHASE_1.2: Create Security Domain Modules
+  - PHASE_1.2.1: Create directory `common/common-kotlin/security/security-core`
+  - PHASE_1.2.2: Create `common/common-kotlin/security/security-core/build.gradle.kts` with dependency on platform-logging
+  - PHASE_1.2.3: Create directory `common/common-kotlin/security/security-tokens`
+  - PHASE_1.2.4: Create `common/common-kotlin/security/security-tokens/build.gradle.kts` with dependencies on security-core and nimbus-jose-jwt
+  - PHASE_1.2.5: Create directory `common/common-kotlin/security/security-authentication`
+  - PHASE_1.2.6: Create `common/common-kotlin/security/security-authentication/build.gradle.kts` with dependency on security-core
+  - PHASE_1.2.7: Create directory `common/common-kotlin/security/security-authorization`
+  - PHASE_1.2.8: Create `common/common-kotlin/security/security-authorization/build.gradle.kts` with dependency on security-core
+  - PHASE_1.2.9: Create directory `common/common-kotlin/security/security-crypto`
+  - PHASE_1.2.10: Create `common/common-kotlin/security/security-crypto/build.gradle.kts` with crypto and keystore dependencies
+
+- PHASE_1.3: Create Data Domain Modules
+  - PHASE_1.3.1: Create directory `common/common-kotlin/data/data-models`
+  - PHASE_1.3.2: Create `common/common-kotlin/data/data-models/build.gradle.kts` with jackson and validation dependencies
+  - PHASE_1.3.3: Create directory `common/common-kotlin/data/data-validation`
+  - PHASE_1.3.4: Create `common/common-kotlin/data/data-validation/build.gradle.kts` with jakarta-validation dependencies
+  - PHASE_1.3.5: Create directory `common/common-kotlin/data/data-sync`
+  - PHASE_1.3.6: Create `common/common-kotlin/data/data-sync/build.gradle.kts` with platform-logging dependency
+
+- PHASE_1.4: Create Server Platform Modules
+  - PHASE_1.4.1: Create directory `common/common-kotlin/server/server-rest`
+  - PHASE_1.4.2: Create `common/common-kotlin/server/server-rest/build.gradle.kts` with micronaut-http dependencies
+  - PHASE_1.4.3: Create directory `common/common-kotlin/server/server-persistence`
+  - PHASE_1.4.4: Create `common/common-kotlin/server/server-persistence/build.gradle.kts` with hibernate-jpa and micronaut-data dependencies
+  - PHASE_1.4.5: Create directory `common/common-kotlin/server/server-multitenancy`
+  - PHASE_1.4.6: Create `common/common-kotlin/server/server-multitenancy/build.gradle.kts` with micronaut-multitenancy dependencies
+  - PHASE_1.4.7: Create directory `common/common-kotlin/server/server-services`
+  - PHASE_1.4.8: Create `common/common-kotlin/server/server-services/build.gradle.kts` with micronaut-inject dependencies
+
+- PHASE_1.5: Update Root Gradle Configuration
+  - PHASE_1.5.1: Update `settings.gradle.kts` to include all new platform modules under `common:common-kotlin:platform`
+  - PHASE_1.5.2: Update `settings.gradle.kts` to include all new security modules under `common:common-kotlin:security`
+  - PHASE_1.5.3: Update `settings.gradle.kts` to include all new data modules under `common:common-kotlin:data`
+  - PHASE_1.5.4: Update `settings.gradle.kts` to include all new server modules under `common:common-kotlin:server`
+
+## PHASE_2: Migrate Platform-Agnostic Components
+- PHASE_2.1: Migrate Logging Components
+  - PHASE_2.1.1: Create `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/api/Logger.kt` interface
+  - PHASE_2.1.2: Move `logger()` extension function from existing code to `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/LoggerExt.kt`
+  - PHASE_2.1.3: Create `common/common-kotlin/platform/platform-logging/src/main/kotlin/net/blugrid/platform/logging/config/LoggingConfig.kt` for logging configuration
+  - PHASE_2.1.4: Update all existing `import net.blugrid.api.logging.logger` to `import net.blugrid.platform.logging.logger`
+
+- PHASE_2.2: Migrate Configuration Components
+  - PHASE_2.2.1: Move `EnvProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/EnvProps.kt`
+  - PHASE_2.2.2: Move `ServerProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/ServerProps.kt`
+  - PHASE_2.2.3: Move `WebProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/WebProps.kt`
+  - PHASE_2.2.4: Move `DbProps` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/platform/platform-config/src/main/kotlin/net/blugrid/platform/config/DbProps.kt`
+  - PHASE_2.2.5: Update all imports of these config classes to use new package paths
+
+- PHASE_2.3: Migrate Serialization Components
+  - PHASE_2.3.1: Move `jwtObjectMapper` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/platform/platform-serialization/src/main/kotlin/net/blugrid/platform/serialization/ObjectMappers.kt`
+  - PHASE_2.3.2: Rename `jwtObjectMapper` to `platformObjectMapper` in the moved file
+  - PHASE_2.3.3: Update all references to `jwtObjectMapper` to use `platformObjectMapper`
+  - PHASE_2.3.4: Create `common/common-kotlin/platform/platform-serialization/src/main/kotlin/net/blugrid/platform/serialization/config/SerializationConfig.kt` for JSON configuration
+
+## PHASE_3: Migrate Security Domain Components
+- PHASE_3.1: Migrate Core Security Models
+  - PHASE_3.1.1: Move `AuthenticationType` enum from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticationType.kt`
+  - PHASE_3.1.2: Move `BaseAuthenticatedUser` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedUser.kt`
+  - PHASE_3.1.3: Move `BaseAuthenticatedOrganisation` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedOrganisation.kt`
+  - PHASE_3.1.4: Move `BaseAuthenticatedSession` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/model/AuthenticatedSession.kt`
+  - PHASE_3.1.5: Update all imports of these models to use new package paths
+
+- PHASE_3.2: Migrate Token Components
+  - PHASE_3.2.1: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenService.kt` interface
+  - PHASE_3.2.2: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenFactory.kt` interface
+  - PHASE_3.2.3: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/TokenValidator.kt` interface
+  - PHASE_3.2.4: Move `JwtToken` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/model/AccessToken.kt`
+  - PHASE_3.2.5: Rename `JwtToken` class to `AccessToken` in the moved file
+  - PHASE_3.2.6: Move `toJWTRawMap` extension from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/model/TokenExt.kt`
+  - PHASE_3.2.7: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/JwtTokenService.kt` implementing TokenService
+  - PHASE_3.2.8: Convert `AccessTokenFactory` object to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/JwtTokenFactory.kt` class implementing TokenFactory
+  - PHASE_3.2.9: Remove static methods from JwtTokenFactory and add @Singleton annotation
+  - PHASE_3.2.10: Move `AbstractJwtGenerator` from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/impl/AbstractJwtGenerator.kt`
+  - PHASE_3.2.11: Update all imports and references to use new token classes and interfaces
+
+- PHASE_3.3: Migrate Authentication Components
+  - PHASE_3.3.1: Create `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/api/AuthenticationService.kt` interface
+  - PHASE_3.3.2: Move `DecoratedAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/DecoratedAuthentication.kt`
+  - PHASE_3.3.3: Move `GuestAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/GuestAuthentication.kt`
+  - PHASE_3.3.4: Move `TenantAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/TenantAuthentication.kt`
+  - PHASE_3.3.5: Move `BusinessUnitAuthentication` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/model/BusinessUnitAuthentication.kt`
+  - PHASE_3.3.6: Update all imports of authentication models to use new package paths
+
+- PHASE_3.4: Migrate JWT Decoder Components
+  - PHASE_3.4.1: Move `JwtDecoder` interface from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/JwtDecoder.kt`
+  - PHASE_3.4.2: Move `SelfSignedJwtDecoder` interface from `common/common-kotlin/common-api/common-api-jwt` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/api/SelfSignedJwtDecoder.kt`
+  - PHASE_3.4.3: Update all imports and references to JWT decoder interfaces
+
+- PHASE_3.5: Migrate Configuration Components
+  - PHASE_3.5.1: Move `SecurityProps` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/config/SecurityProps.kt`
+  - PHASE_3.5.2: Move `RedirectProps` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/config/RedirectProps.kt`
+  - PHASE_3.5.3: Create `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/config/TokenConfig.kt` for token-specific configuration
+  - PHASE_3.5.4: Update all imports of security configuration classes
+
+## PHASE_4: Migrate Server-Specific Components
+- PHASE_4.1: Migrate Multitenancy Components
+  - PHASE_4.1.1: Move `TenantSequence` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/api/TenantSequence.kt`
+  - PHASE_4.1.2: Move `TenantSequenceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/impl/TenantSequenceImpl.kt`
+  - PHASE_4.1.3: Move `GlobalTenantSequenceGenerator` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/generators/GlobalTenantSequenceGenerator.kt`
+  - PHASE_4.1.4: Move `DatabaseService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/api/DatabaseService.kt`
+  - PHASE_4.1.5: Move `DatabaseServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/impl/DatabaseServiceImpl.kt`
+  - PHASE_4.1.6: Update all imports of multitenancy and database service classes
+
+- PHASE_4.2: Migrate Connection Provider Components
+  - PHASE_4.2.1: Move `MultiTenantConnectionProvider` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/connection/MultiTenantConnectionProvider.kt`
+  - PHASE_4.2.2: Move `MultiTenantResolver` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/connection/MultiTenantResolver.kt`
+  - PHASE_4.2.3: Move `CustomJdbcStatementInspector` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-multitenancy/src/main/kotlin/net/blugrid/server/multitenancy/inspection/CustomJdbcStatementInspector.kt`
+  - PHASE_4.2.4: Update all imports of connection provider classes
+
+- PHASE_4.3: Migrate JPA Configuration Components
+  - PHASE_4.3.1: Move `JpaConfigurationCreatedEventListener` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/config/JpaConfigurationCreatedEventListener.kt`
+  - PHASE_4.3.2: Move `ApplicationConfiguration` and `ApplicationConfigurationProperties` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/config/ApplicationConfiguration.kt`
+  - PHASE_4.3.3: Update all imports of JPA and application configuration classes
+
+- PHASE_4.4: Migrate Exception Handling Components
+  - PHASE_4.4.1: Move `GlobalExceptionHandler` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/exceptions/GlobalExceptionHandler.kt`
+  - PHASE_4.4.2: Update imports in GlobalExceptionHandler to use new platform and security package paths
+
+- PHASE_4.5: Migrate Repository Components
+  - PHASE_4.5.1: Move `RequestScopeEntity` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/entities/RequestScopeEntity.kt`
+  - PHASE_4.5.2: Move `RequestScopeRepository` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-persistence/src/main/kotlin/net/blugrid/server/persistence/repositories/RequestScopeRepository.kt`
+  - PHASE_4.5.3: Update all imports of repository classes
+
+## PHASE_5: Migrate Server Authentication Components
+- PHASE_5.1: Migrate JWT Components for Server
+  - PHASE_5.1.1: Move `JwksLoader` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/JwksLoader.kt`
+  - PHASE_5.1.2: Move `JwtDecoderImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/JwtDecoderImpl.kt`
+  - PHASE_5.1.3: Move `FakeJwtDecoder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/FakeJwtDecoder.kt`
+  - PHASE_5.1.4: Move `SelfSignedJwtDecoderImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/SelfSignedJwtDecoderImpl.kt`
+  - PHASE_5.1.5: Move `SelfSignedJwtEncoder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/jwt/SelfSignedJwtEncoder.kt`
+  - PHASE_5.1.6: Update all imports of JWT server components
+
+- PHASE_5.2: Migrate Authentication Filter Components
+  - PHASE_5.2.1: Move `JwtAuthenticationFetcher` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/filters/JwtAuthenticationFetcher.kt`
+  - PHASE_5.2.2: Update imports in JwtAuthenticationFetcher to use new security and platform packages
+
+- PHASE_5.3: Migrate Security Service Components
+  - PHASE_5.3.1: Move `SecurityContextService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-services/src/main/kotlin/net/blugrid/server/services/security/api/SecurityContextService.kt`
+  - PHASE_5.3.2: Move `SecurityContextServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-services/src/main/kotlin/net/blugrid/server/services/security/impl/SecurityContextServiceImpl.kt`
+  - PHASE_5.3.3: Update all imports of security context service classes
+
+- PHASE_5.4: Migrate Web Service Components
+  - PHASE_5.4.1: Move `CookieService` interface from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/api/CookieService.kt`
+  - PHASE_5.4.2: Move `CookieServiceImpl` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/impl/CookieServiceImpl.kt`
+  - PHASE_5.4.3: Move `RedirectService` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/services/impl/RedirectService.kt`
+  - PHASE_5.4.4: Move `CustomOauthRouteUrlBuilder` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/oauth/CustomOauthRouteUrlBuilder.kt`
+  - PHASE_5.4.5: Move `EnhancedIdTokenLoginHandler` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/handlers/EnhancedIdTokenLoginHandler.kt`
+  - PHASE_5.4.6: Update all imports of web service classes
+
+## PHASE_6: Migrate Controller Components
+- PHASE_6.1: Migrate Authentication Controllers
+  - PHASE_6.1.1: Move `EnhancedLogoutController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/EnhancedLogoutController.kt`
+  - PHASE_6.1.2: Move `RedirectController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/RedirectController.kt`
+  - PHASE_6.1.3: Move `CheckSessionController` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/controllers/CheckSessionController.kt`
+  - PHASE_6.1.4: Update all imports in controller classes to use new package paths
+
+- PHASE_6.2: Migrate Utility Components
+  - PHASE_6.2.1: Move `PkceUtil` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/kotlin/net/blugrid/server/rest/security/pkce/PkceUtil.kt`
+  - PHASE_6.2.2: Update all imports of PKCE utilities
+
+## PHASE_7: Migrate Context and Mapping Components
+- PHASE_7.1: Migrate Context Components
+  - PHASE_7.1.1: Move `CurrentRequestContext` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/CurrentRequestContext.kt`
+  - PHASE_7.1.2: Move `RequestContextProvider` interface to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/RequestContextProvider.kt`
+  - PHASE_7.1.3: Move `RequestContextOverride` components from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-core/src/main/kotlin/net/blugrid/security/core/context/RequestContextOverride.kt`
+  - PHASE_7.1.4: Update all imports of context components
+
+- PHASE_7.2: Migrate Mapping Components
+  - PHASE_7.2.1: Move authentication mapping files from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-authentication/src/main/kotlin/net/blugrid/security/authentication/mapping/`
+  - PHASE_7.2.2: Move JWT mapping files from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/kotlin/net/blugrid/security/tokens/mapping/`
+  - PHASE_7.2.3: Update all imports in mapping files to use new package paths
+  - PHASE_7.2.4: Update all usages of mapping functions to use new package paths
+
+## PHASE_8: Update Dependencies and Remove Old Modules
+- PHASE_8.1: Update Module Dependencies
+  - PHASE_8.1.1: Update `common/common-kotlin/security/security-tokens/build.gradle.kts` to depend on `common:common-kotlin:security:security-core` and `common:common-kotlin:platform:platform-logging`
+  - PHASE_8.1.2: Update `common/common-kotlin/security/security-authentication/build.gradle.kts` to depend on `common:common-kotlin:security:security-core` and `common:common-kotlin:security:security-tokens`
+  - PHASE_8.1.3: Update `common/common-kotlin/server/server-rest/build.gradle.kts` to depend on security and platform modules
+  - PHASE_8.1.4: Update `common/common-kotlin/server/server-persistence/build.gradle.kts` to depend on data and platform modules
+  - PHASE_8.1.5: Update `common/common-kotlin/server/server-multitenancy/build.gradle.kts` to depend on server-persistence and security-core
+  - PHASE_8.1.6: Update `common/common-kotlin/server/server-services/build.gradle.kts` to depend on security and data modules
+
+- PHASE_8.2: Verify All Imports Updated
+  - PHASE_8.2.1: Search and replace all `import net.blugrid.api.logging` with `import net.blugrid.platform.logging`
+  - PHASE_8.2.2: Search and replace all `import net.blugrid.api.jwt` with `import net.blugrid.security.tokens`
+  - PHASE_8.2.3: Search and replace all `import net.blugrid.api.security` with appropriate new security package imports
+  - PHASE_8.2.4: Search and replace all `import net.blugrid.api.db` with `import net.blugrid.server.persistence` or `import net.blugrid.server.multitenancy`
+  - PHASE_8.2.5: Search and replace all `import net.blugrid.api.config` with `import net.blugrid.platform.config`
+
+- PHASE_8.3: Remove Old Modules
+  - PHASE_8.3.1: Remove `common/common-kotlin/common-api/common-api-jwt` directory and all its contents
+  - PHASE_8.3.2: Remove `common/common-kotlin/common-api/common-api-security` directory and all its contents
+  - PHASE_8.3.3: Remove `common/common-kotlin/common-api/common-api-multitenant` directory and all its contents
+  - PHASE_8.3.4: Remove references to old modules from root `settings.gradle.kts`
+  - PHASE_8.3.5: Remove old module dependencies from any remaining build.gradle.kts files
+
+## PHASE_9: Update Configuration Files
+- PHASE_9.1: Update Application Configuration
+  - PHASE_9.1.1: Move `application-security.yml` from `common/common-kotlin/common-api/common-api-multitenant` to `common/common-kotlin/server/server-rest/src/main/resources/application-security.yml`
+  - PHASE_9.1.2: Move `application-multitenant-test.yml` to `common/common-kotlin/server/server-multitenancy/src/test/resources/application-multitenant-test.yml`
+  - PHASE_9.1.3: Move `logback.xml` to `common/common-kotlin/platform/platform-logging/src/main/resources/logback.xml`
+  - PHASE_9.1.4: Update package references in configuration files to use new package paths
+
+- PHASE_9.2: Update Resource Files
+  - PHASE_9.2.1: Move `jwks.json` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/resources/jwks.json`
+  - PHASE_9.2.2: Move `keystore.jks` from `common/common-kotlin/common-api/common-api-security` to `common/common-kotlin/security/security-tokens/src/main/resources/keystore.jks`
+  - PHASE_9.2.3: Update any configuration references to these resource files
+
+## PHASE_10: Create Documentation and Finalize
+- PHASE_10.1: Create Module Documentation
+  - PHASE_10.1.1: Create `common/common-kotlin/platform/platform-logging/README.md` with module purpose and usage
+  - PHASE_10.1.2: Create `common/common-kotlin/security/security-core/README.md` with security domain overview
+  - PHASE_10.1.3: Create `common/common-kotlin/security/security-tokens/README.md` with JWT token handling documentation
+  - PHASE_10.1.4: Create `common/common-kotlin/server/server-rest/README.md` with REST API module documentation
+  - PHASE_10.1.5: Create `common/common-kotlin/server/server-multitenancy/README.md` with multitenancy implementation details
+
+- PHASE_10.2: Update Root Documentation
+  - PHASE_10.2.1: Update root `README.md` to reflect new module structure
+  - PHASE_10.2.2: Update architecture diagrams to show new platform-first design
+  - PHASE_10.2.3: Create developer onboarding guide with new package structure
+  - PHASE_10.2.4: Create module dependency diagram showing clear separation of concerns
+
+- PHASE_10.3: Update Example Projects
+  - PHASE_10.3.1: Update all `examples/` project imports to use new package paths
+  - PHASE_10.3.2: Update example build.gradle.kts files to reference new module structure
+  - PHASE_10.3.3: Update example code to use new service interfaces instead of static factories
+  - PHASE_10.3.4: Update example application.yml files to use new configuration properties
+
+- PHASE_10.4: Update Code Generation
+  - PHASE_10.4.1: Update TypeScript codegen templates in `codegen/` to generate new package structure
+  - PHASE_10.4.2: Update import statements in generated code templates
+  - PHASE_10.4.3: Update generated service references to use new dependency injection patterns
+  - PHASE_10.4.4: Update generated configuration files to use new config structure
+
+- PHASE_10.5: Verify Build and Tests
+  - PHASE_10.5.1: Run `./gradlew clean build` to verify all modules compile
+  - PHASE_10.5.2: Run all existing tests to ensure functionality preserved
+  - PHASE_10.5.3: Verify example projects compile and run with new structure
+  - PHASE_10.5.4: Verify code generation produces valid output in `dist/` directory
+  - PHASE_10.5.5: Fix any remaining import or dependency issues
+  - PHASE_10.5.6: Update test imports to use new package paths Move `logback.xml` to `platform/platform-logging/src/main/resources/logback.xml`
+  - PHASE_9.1.4: Update package references in configuration files to use new package paths
+
+- PHASE_9.2: Update Resource Files
+  - PHASE_9.2.1: Move `jwks.json` from `common-api-security` to `security/security-tokens/src/main/resources/jwks.json`
+  - PHASE_9.2.2: Move `keystore.jks` from `common-api-security` to `security/security-tokens/src/main/resources/keystore.jks`
+  - PHASE_9.2.3: Update any configuration references to these resource files
+
+## PHASE_10: Create Documentation and Finalize
+- PHASE_10.1: Create Module Documentation
+  - PHASE_10.1.1: Create `platform/platform-logging/README.md` with module purpose and usage
+  - PHASE_10.1.2: Create `security/security-core/README.md` with security domain overview
+  - PHASE_10.1.3: Create `security/security-tokens/README.md` with JWT token handling documentation
+  - PHASE_10.1.4: Create `server/server-rest/README.md` with REST API module documentation
+  - PHASE_10.1.5: Create `server/server-multitenancy/README.md` with multitenancy implementation details
+
+- PHASE_10.2: Update Root Documentation
+  - PHASE_10.2.1: Update root `README.md` to reflect new module structure
+  - PHASE_10.2.2: Update architecture diagrams to show new platform-first design
+  - PHASE_10.2.3: Create developer onboarding guide with new package structure
+  - PHASE_10.2.4: Create module dependency diagram showing clear separation of concerns
+
+- PHASE_10.3: Verify Build and Tests
+  - PHASE_10.3.1: Run `./gradlew clean build` to verify all modules compile
+  - PHASE_10.3.2: Run all existing tests to ensure functionality preserved
+  - PHASE_10.3.3: Fix any remaining import or dependency issues
+  - PHASE_10.3.4: Update test imports to use new package paths

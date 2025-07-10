@@ -1,6 +1,6 @@
 package net.blugrid.api.test.support
 
-import io.github.serpro69.kfaker.faker
+import net.blugrid.api.test.generator.*
 import io.micronaut.core.type.Argument
 import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
@@ -46,7 +46,6 @@ abstract class BaseControllerIntegTest(
         log.info("Embedded server started on port: ${embeddedServer.port}")
     }
 
-    protected val faker = faker {}
 
     fun <T : BaseResource<out Any>> assertCreate(createPayload: BaseCreateResource<out Any>, responseType: Class<T>, uri: String = baseUri): T {
         return create(createPayload = createPayload, responseType = responseType, uri = uri)
