@@ -1,0 +1,1605 @@
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/util/Either.kt =====
+package net.blugrid.api.util
+
+sealed class Either<out L, out R> {
+
+    data class Left<out L, out R>(val a: L) : Either<L, R>()
+
+    data class Right<out L, out R>(val b: R) : Either<L, R>()
+
+}
+
+fun <E> E.left() = Either.Left<E, Nothing>(this)
+
+fun <T> T.right() = Either.Right<Nothing, T>(this)
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/util/SwaggerContants.kt =====
+package net.blugrid.api.util
+
+object SwaggerConstants {
+
+    // Generic Actions
+    const val CREATE = "Create"
+    const val UPDATE = "Update"
+    const val GET = "Get"
+    const val DELETE = "Delete"
+    const val FETCH = "Fetch"
+    const val SUCCESSFULLY = "successfully"
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/util/CommonExtensions.kt =====
+package net.blugrid.api.util
+
+import kotlin.reflect.KClass
+import kotlin.reflect.full.memberProperties
+
+inline fun <reified R : Any> R.toMap() = objectToMap(this)
+
+val emptyLinesRegex = Regex("\n\\s*\n")
+
+fun String.removeEmptyLines(): String = this.replace(emptyLinesRegex, "")
+
+fun String?.toWords(): List<String>? = this
+    ?.trim()
+    ?.splitToSequence(' ')
+    ?.filter { it.isNotBlank() }
+    ?.toList()
+
+fun String?.toSearchTerms(): String? = this?.let {
+    toWords()
+        ?.joinToString(" ") {
+            it.filter {
+                !it.isWhitespace()
+            }
+        }
+}
+
+fun List<String?>.toSearchTerms(): String =
+    filter { !it.isNullOrBlank() }
+        .map { it.toSearchTerms() }
+        .joinToString(" ")
+
+@Suppress("UNCHECKED_CAST")
+fun <T : Any> objectToMap(obj: T): Map<String, Any?> {
+    return (obj::class as KClass<T>).memberProperties.associate { prop ->
+        prop.name to prop.get(obj)
+            ?.let { value ->
+                if (value::class.isData) {
+                    objectToMap(value)
+                } else {
+                    value
+                }
+            }
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun Map<String, Any?>.flatten(): Map<String, Any?> {
+    // Flatten a nested JSON file
+
+    // Keep iterating until the termination condition is satisfied
+    var currentDictionary = this
+    while (true) {
+        // Keep unpacking the JSON file until all values are atomic elements (not dictionary or list)
+        val flattenedDictionary = currentDictionary
+            .filterNotNullValues()
+            .flatMap { (key, value) -> unpack(key, value) }
+            .toMap()
+        // Terminate condition: not any value in the JSON file is dictionary or list
+        if (!flattenedDictionary.any { it.value is Map<*, *> } && !flattenedDictionary.any { it.value is List<*> }) {
+            return flattenedDictionary
+        }
+        currentDictionary = flattenedDictionary as Map<String, Any>
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <K, V> Map<K, V?>.filterNotNullValues(): Map<K, V> =
+    filterValues { it != null } as Map<K, V>
+
+fun unpack(parentKey: String, parentValue: Any): Sequence<Pair<String, Any>> {
+    // Unpack one level of nesting in the JSON file
+    // Unpack one level only!!!
+
+    return when (parentValue) {
+        is Map<*, *> -> parentValue.entries.asSequence().flatMap { (key, value) ->
+            val temp1 = "$parentKey${if (parentKey.isNotEmpty()) "_" else ""}$key"
+            unpack(temp1, value!!)
+        }
+
+        is List<*> -> parentValue.asSequence().withIndex().flatMap { (index, value) ->
+            val temp2 = "$parentKey${if (parentKey.isNotEmpty()) "_" else ""}$index"
+            unpack(temp2, value!!)
+        }
+
+        else -> sequenceOf(parentKey to parentValue)
+    }
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/util/EntityExtensions.kt =====
+package net.blugrid.api.util
+
+import java.util.Objects
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty1
+import kotlin.reflect.KVisibility
+
+interface SupportsMixedTypeEquality {
+
+    /**
+     * Returns true if this object can be compared for equality with the other object.
+     *
+     * The typical implementation is to check if other is an instance of this class. This method should always be
+     * overridden in subclasses, unless they are trivially different (no new fields).
+     */
+    fun canEqual(other: Any?): Boolean
+}
+
+/**
+ * Extension functions for Any.
+ *
+ * @author James Bassett (james.bassett@console.com.au)
+ */
+
+/**
+ * Checks the other object for equality with this one, based on the supplied properties.
+ *
+ * @param other the other object to test for equality with this object
+ * @param properties the list of properties to use when calculating equality
+ * @param superEquals lambda for calling super.equals() if required (if used, all classes involved should implement the [SupportsMixedTypeEquality] interface)
+ * @param T the type of the receiving class
+ */
+inline fun <reified T : Any> T.kotlinEquals(
+    other: Any?,
+    properties: Array<out KProperty1<T, Any?>>,
+    noinline superEquals: (() -> Boolean)? = null,
+): Boolean {
+    return when {
+        other === this -> true
+        other !is T -> false
+        other is SupportsMixedTypeEquality && !other.canEqual(this) -> false
+        superEquals != null && !superEquals() -> false
+        else -> properties.all {
+            val property = it.get(this)
+            val otherProperty = it.get(other)
+            if (property is Array<*>) {
+                Objects.deepEquals(property, otherProperty)
+            } else {
+                Objects.equals(property, otherProperty)
+            }
+        }
+    }
+}
+
+
+inline fun <reified T : Any> T.kotlinUpdate(
+    update: T,
+    propertiesToUpdate: Array<out KProperty1<T, Any?>>
+): T {
+    propertiesToUpdate.forEach { property ->
+        val updatedValue = property.get(update)
+
+        if (property.visibility == KVisibility.PUBLIC && property is KMutableProperty<*>) {
+            property.setter.call(this, updatedValue)
+        }
+    }
+    return this
+}
+
+/**
+ * Generates the hash of an object, based on the supplied properties.
+ *
+ * @param properties the list of properties to include
+ * @param superHashCode lambda for calling super.hashCode() if required
+ * @param T the type of the receiving class
+ */
+inline fun <reified T : Any> T.kotlinHashCode(properties: Array<out KProperty1<T, Any?>>, noinline superHashCode: (() -> Int)? = null): Int {
+    val values = Array(properties.size) { i ->
+        val property = properties[i].get(this)
+        if (property is Array<*>) {
+            property.contentDeepHashCode()
+        } else {
+            property
+        }
+    }
+
+    return if (superHashCode != null) {
+        Objects.hash(*values, superHashCode())
+    } else {
+        Objects.hash(*values)
+    }
+}
+
+/**
+ * Generates the String representation of an object, based on the supplied properties.
+ *
+ * The implementation is based on the implementation provided by Guava's ToStringHelper (https://github.com/google/guava/wiki/CommonObjectUtilitiesExplained).
+ *
+ * @param properties the list of properties to include
+ * @param omitNulls whether to exclude null values
+ * @param superToString lambda for calling super.toString() if required
+ * @param T the type of the receiving class
+ */
+inline fun <reified T : Any> T.kotlinToString(
+    properties: Array<out KProperty1<T, Any?>>,
+    omitNulls: Boolean = false,
+    noinline superToString: (() -> String)? = null,
+): String {
+    val builder = StringBuilder(32).append(T::class.java.simpleName).append("(")
+    var nextSeparator = ""
+
+    properties.forEach {
+        val property = it.name
+        val value = it.get(this)
+        if (!omitNulls || value != null) {
+            with(builder) {
+                append(nextSeparator)
+                nextSeparator = ", "
+                append(property)
+                append("=")
+                if (value is Array<*>) {
+                    val arrayString = arrayOf(value).contentDeepToString()
+                    append(arrayString, 1, arrayString.length - 1)
+                } else {
+                    append(value)
+                }
+            }
+        }
+    }
+
+    if (superToString != null) {
+        with(builder) {
+            append(nextSeparator)
+            append("super=")
+            append(superToString())
+        }
+    }
+
+    return builder.append(")").toString()
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/audit/AuditEvent.kt =====
+package net.blugrid.api.common.model.audit
+
+import io.micronaut.context.event.ApplicationEvent
+import net.blugrid.api.common.model.resource.BaseAuditedResource
+import net.blugrid.api.common.model.resource.ResourceType
+import net.blugrid.common.domain.IdentityID
+import java.time.LocalDateTime
+
+class AuditEvent(
+    val auditEventType: AuditEventType,
+    val auditEventTimestamp: LocalDateTime,
+    val resourceType: ResourceType,
+    val resourceId: IdentityID,
+    val resource: BaseAuditedResource<*>,
+    val tenantId: IdentityID,
+    val sessionId: IdentityID,
+    val version: Int? = null
+) : ApplicationEvent(resource)
+
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/audit/AuditStamp.kt =====
+package net.blugrid.api.common.model.audit
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityID
+import java.time.LocalDateTime
+
+@Schema(description = "Stamp of a user session and time of action.")
+data class AuditStamp(
+    val sessionId: IdentityID?,
+    val session: Any?,
+    val timestamp: LocalDateTime?
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/audit/AuditEventLog.kt =====
+package net.blugrid.api.common.model.audit
+
+import net.blugrid.api.common.model.resource.ResourceType
+import net.blugrid.common.domain.IdentityID
+import java.time.LocalDateTime
+
+class AuditEventLog(
+    val auditEventType: AuditEventType,
+    val auditEventTimestamp: LocalDateTime,
+    val resourceType: ResourceType,
+    val resourceId: IdentityID,
+    val resource: Any,
+    val tenantId: IdentityID,
+    val sessionId: IdentityID,
+    val version: Int? = 0
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/audit/ResourceAudit.kt =====
+package net.blugrid.api.common.model.audit
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Audit metadata tracking resource creation and modification.")
+data class ResourceAudit(
+    @Schema(description = "Optimistic locking version.", example = "1")
+    val version: Int = 0,
+
+    @Schema(description = "Who and when the resource was created.")
+    val created: AuditStamp? = null,
+
+    @Schema(description = "Who and when the resource was last changed.")
+    val lastChanged: AuditStamp? = null
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/audit/AuditEventType.kt =====
+package net.blugrid.api.common.model.audit
+
+import com.fasterxml.jackson.annotation.JsonProperty
+
+enum class AuditEventType {
+    @JsonProperty("CREATE")
+    CREATE,
+
+    @JsonProperty("UPDATE")
+    UPDATE,
+
+    @JsonProperty("DELETE")
+    DELETE
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/scope/TenantScope.kt =====
+package net.blugrid.api.common.model.scope
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityID
+
+
+@Schema(description = "Represents the base Scopes associated with a tenant in a multi-tenant environment.")
+open class TenantScope(
+    @Schema(description = "The unique identifier of the tenant.", example = "1001")
+    open var tenantId: IdentityID? = null,
+) {
+    @Schema(description = "Indicates whether the resource is external to the tenant.", example = "false")
+    var isExternalResource: Boolean? = null
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/scope/BusinessUnitScope.kt =====
+package net.blugrid.api.common.model.scope
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityID
+
+@Schema(description = "Represents the Scopes associated with a business unit within a tenant.")
+class BusinessUnitScope(
+    @Schema(description = "The unique identifier of the tenant.", example = "1001")
+    override var tenantId: IdentityID? = null,
+
+    @Schema(description = "The unique identifier of the business unit within the tenant.", example = "2001")
+    var businessUnitId: IdentityID? = null,
+) : TenantScope(tenantId)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseCreateOrUpdateResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityUUID
+
+@Schema(description = "Base create or update resource")
+interface BaseCreateOrUpdateResource<T> {
+    var uuid: IdentityUUID
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseUpdateResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+
+@Schema(description = "Base update resource")
+abstract class BaseUpdateResource<T>(
+    @Schema(
+        description = "Unique identifier of the resource to be updated.",
+        example = "1"
+    )
+    open var id: IdentityID,
+
+    @Schema(
+        description = "Universally unique identifier for the resource. This ID is generated upon creation and is used to uniquely identify the resource across systems.",
+        example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    )
+    override var uuid: IdentityUUID
+) : BaseCreateOrUpdateResource<T>
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseTenantResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.audit.ResourceAudit
+import net.blugrid.api.common.model.scope.TenantScope
+
+@Schema(description = "Tenant resource")
+abstract class BaseTenantResource<T>(
+    @Schema(
+        description = "Permissions associated with the tenant resource, defining access control and security settings.",
+        nullable = true
+    )
+    open val scope: TenantScope?,
+
+    @Schema(
+        description = "Audit information for the tenant resource, including creation and modification details.",
+        nullable = true
+    )
+    override val audit: ResourceAudit?
+) : BaseAuditedResource<T>
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/UnscopedResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.audit.ResourceAudit
+
+@Schema(description = "Unscoped resource")
+abstract class UnscopedResource<T>(
+    @Schema(
+        description = "Audit information for the unscoped resource, including creation and modification details.",
+        nullable = true
+    )
+    override val audit: ResourceAudit?
+) : BaseAuditedResource<T>
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseCreateResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityUUID
+
+@Schema(description = "Base create resource")
+abstract class BaseCreateResource<T>(
+    @Schema(
+        description = "Universally unique identifier for the resource. This ID is generated upon creation and is used to uniquely identify the resource across systems.",
+        example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    )
+    override var uuid: IdentityUUID
+) : BaseCreateOrUpdateResource<T>
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseAuditedResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.audit.ResourceAudit
+
+@Schema(description = "Base audited resource")
+interface BaseAuditedResource<T> : BaseResource<T> {
+    @get:JsonIgnore
+    val resourceType: ResourceType
+    val audit: ResourceAudit?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+
+@Schema(description = "Base resource")
+interface BaseResource<T> {
+    var id: IdentityID
+    var uuid: IdentityUUID
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/Searchable.kt =====
+package net.blugrid.api.common.model.resource
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Base searchable interface")
+interface Searchable {
+
+    @get:JsonIgnore
+    val resourceType: ResourceType
+
+    @get:JsonIgnore
+    val searchTerms: String?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/BaseBusinessUnitResource.kt =====
+package net.blugrid.api.common.model.resource
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.audit.ResourceAudit
+import net.blugrid.api.common.model.scope.BusinessUnitScope
+
+@Schema(description = "Business unit resource")
+abstract class BaseBusinessUnitResource<T>(
+    @Schema(
+        description = "Permissions associated with the business unit resource, defining access control and security settings.",
+        nullable = true
+    )
+    open val scope: BusinessUnitScope?,
+
+    @Schema(
+        description = "Audit information for the business unit resource, including creation and modification details.",
+        nullable = true
+    )
+    override val audit: ResourceAudit?
+) : BaseAuditedResource<T>
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/resource/ResourceType.kt =====
+package net.blugrid.api.common.model.resource
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Resource type")
+enum class ResourceType {
+    @JsonProperty("BRAND")
+    @Schema(description = "Represents a brand resource type.")
+    BRAND,
+
+    @JsonProperty("LOGO")
+    @Schema(description = "Represents a logo resource type.")
+    LOGO,
+
+    @JsonProperty("BOOK")
+    @Schema(description = "Represents a book resource type.", example = "BOOK")
+    BOOK,
+
+    @JsonProperty("RESOURCE")
+    @Schema(description = "Represents a generic resource type.")
+    RESOURCE,
+
+    @JsonProperty("COMMAND")
+    @Schema(description = "Represents a command resource type.")
+    COMMAND,
+
+    @JsonProperty("CALENDAR")
+    @Schema(description = "Represents a calendar resource type.")
+    CALENDAR,
+
+    @JsonProperty("CALENDAR_LEVEL")
+    @Schema(description = "Represents a calendar level resource type.")
+    CALENDAR_LEVEL,
+
+    @JsonProperty("BUSINESS_UNIT")
+    @Schema(description = "Represents a business unit resource type.")
+    BUSINESS_UNIT,
+
+    @JsonProperty("ORGANISATION")
+    @Schema(description = "Represents an organisation resource type.")
+    ORGANISATION,
+
+    @JsonProperty("DEVICE")
+    @Schema(description = "Represents a device resource type.")
+    DEVICE,
+
+    @JsonProperty("OPERATIONAL_PARTY")
+    @Schema(description = "Represents an operational party resource type.")
+    OPERATIONAL_PARTY,
+
+    @JsonProperty("OPERATOR")
+    @Schema(description = "Represents an operator resource type.")
+    OPERATOR,
+
+    @JsonProperty("BUSINESS_UNIT_MEMBERSHIP")
+    @Schema(description = "Represents a business unit membership resource type.")
+    BUSINESS_UNIT_MEMBERSHIP,
+
+    @JsonProperty("USER_IDENTITY")
+    @Schema(description = "Represents a user identity resource type.")
+    USER_IDENTITY,
+
+    @JsonProperty("WORKER")
+    @Schema(description = "Represents a worker resource type.")
+    WORKER,
+
+    @JsonProperty("SESSION")
+    @Schema(description = "Represents a session resource type.")
+    SESSION,
+
+    @JsonProperty("PARTY_REGISTRATION")
+    @Schema(description = "Represents a party registration resource type.")
+    PARTY_REGISTRATION,
+
+    @JsonProperty("PARTY_REGISTRATION_INVITATION")
+    @Schema(description = "Represents a party registration invitation resource type.")
+    PARTY_REGISTRATION_INVITATION,
+
+    @JsonProperty("ANONYMOUS_PARTY")
+    @Schema(description = "Represents an anonymous party resource type.")
+    ANONYMOUS_PARTY,
+
+    @JsonProperty("BUSINESS")
+    @Schema(description = "Represents a business resource type.")
+    BUSINESS,
+
+    @JsonProperty("PERSON")
+    @Schema(description = "Represents a person resource type.")
+    PERSON,
+
+    @JsonProperty("ADDRESS")
+    @Schema(description = "Represents an address resource type.")
+    ADDRESS,
+
+    @JsonProperty("EMAIL_ADDRESS")
+    @Schema(description = "Represents an email address resource type.")
+    EMAIL_ADDRESS,
+
+    @JsonProperty("TELEPHONE")
+    @Schema(description = "Represents a telephone resource type.")
+    TELEPHONE,
+
+    @JsonProperty("ORGANISATION_MEMBERSHIP")
+    @Schema(description = "Represents an organisation membership resource type.")
+    ORGANISATION_MEMBERSHIP,
+
+    @JsonProperty("PARTY_CONTACT_METHOD")
+    @Schema(description = "Represents a party contact method resource type.")
+    PARTY_CONTACT_METHOD,
+
+    @JsonProperty("EMAIL")
+    @Schema(description = "Represents an email resource type.")
+    EMAIL,
+
+    @JsonProperty("EMAIL_SERVICE")
+    @Schema(description = "Represents an email service resource type.")
+    EMAIL_SERVICE,
+
+    @JsonProperty("FINANCIAL_ACCOUNT")
+    @Schema(description = "Represents a financial account resource type.")
+    FINANCIAL_ACCOUNT,
+
+    @JsonProperty("FINANCIAL_GOAL")
+    @Schema(description = "Represents a financial goal resource type.")
+    FINANCIAL_GOAL,
+
+    @JsonProperty("FINANCIAL_GOAL_BANK_ACCOUNT")
+    @Schema(description = "Represents a financial goal bank account resource type.")
+    FINANCIAL_GOAL_BANK_ACCOUNT,
+
+    @JsonProperty("FINANCIAL_GOAL_LOAN")
+    @Schema(description = "Represents a financial goal loan resource type.")
+    FINANCIAL_GOAL_LOAN,
+
+    @JsonProperty("FINANCIAL_GOAL_CAPITAL_PURCHASE")
+    @Schema(description = "Represents a financial goal capital purchase resource type.")
+    FINANCIAL_GOAL_CAPITAL_PURCHASE,
+
+    @JsonProperty("FINANCIAL_GOAL_REPORT_PERIOD")
+    @Schema(description = "Represents a financial goal report period resource type.")
+    FINANCIAL_GOAL_REPORT_PERIOD,
+
+    @JsonProperty("FINANCIAL_GOAL_YEAR")
+    @Schema(description = "Represents a financial goal year resource type.")
+    FINANCIAL_GOAL_YEAR,
+
+    @JsonProperty("FINANCIAL_GOAL_YEAR_EXPENSE")
+    @Schema(description = "Represents a financial goal year expense resource type.")
+    FINANCIAL_GOAL_YEAR_EXPENSE,
+
+    @JsonProperty("FINANCIAL_GOAL_YEAR_SALES")
+    @Schema(description = "Represents a financial goal year sales resource type.")
+    FINANCIAL_GOAL_YEAR_SALES,
+
+    @JsonProperty("FINANCIAL_GOAL_YEAR_WAGE")
+    @Schema(description = "Represents a financial goal year wage resource type.")
+    FINANCIAL_GOAL_YEAR_WAGE,
+
+    @JsonProperty("FINANCIAL_LEDGER_SUMMARY")
+    @Schema(description = "Represents a financial ledger summary resource type.")
+    FINANCIAL_LEDGER_SUMMARY,
+
+    @JsonProperty("LOAN_AGREEMENT")
+    @Schema(description = "Represents a loan agreement resource type.")
+    LOAN_AGREEMENT,
+
+    @JsonProperty("LOAN_AMORTIZATION_SCHEDULE")
+    @Schema(description = "Represents a loan amortization schedule resource type.")
+    LOAN_AMORTIZATION_SCHEDULE,
+
+    @JsonProperty("LOAN_AMORTIZATION_PAYMENT")
+    @Schema(description = "Represents a loan amortization payment resource type.")
+    LOAN_AMORTIZATION_PAYMENT,
+
+    @JsonProperty("JOB_POSITION")
+    @Schema(description = "Represents a job position resource type.")
+    JOB_POSITION,
+
+    @JsonProperty("SALES_SUMMARY")
+    @Schema(description = "Represents a sales summary resource type.")
+    SALES_SUMMARY,
+
+    @JsonProperty("BUSINESS_STRATEGY")
+    @Schema(description = "Represents a business strategy resource type.")
+    BUSINESS_STRATEGY,
+
+    @JsonProperty("BUSINESS_STRATEGY_ACTION")
+    @Schema(description = "Represents a business strategy action resource type.")
+    BUSINESS_STRATEGY_ACTION,
+
+    @JsonProperty("BUSINESS_STRATEGY_ISSUE")
+    @Schema(description = "Represents a business strategy issue resource type.")
+    BUSINESS_STRATEGY_ISSUE,
+
+    @JsonProperty("BUSINESS_STRATEGY_GOAL")
+    @Schema(description = "Represents a business strategy goal resource type.")
+    BUSINESS_STRATEGY_GOAL,
+
+    @JsonProperty("ISSUE")
+    @Schema(description = "Represents an issue resource type.")
+    ISSUE,
+
+    @JsonProperty("ACTION")
+    @Schema(description = "Represents an action resource type.")
+    ACTION,
+
+    @JsonProperty("GOAL")
+    @Schema(description = "Represents a goal resource type.")
+    GOAL,
+
+    @JsonProperty("BUSINESS_STRATEGY_CONFIGURATION")
+    @Schema(description = "Represents a business strategy configuration resource type.")
+    BUSINESS_STRATEGY_CONFIGURATION,
+
+    @JsonProperty("ISSUE_PRIORITY")
+    @Schema(description = "Represents an issue priority resource type.")
+    ISSUE_PRIORITY,
+
+    @JsonProperty("ISSUE_PRIORITY_SET")
+    @Schema(description = "Represents an issue priority set resource type.")
+    ISSUE_PRIORITY_SET,
+
+    @JsonProperty("ISSUE_SEVERITY")
+    @Schema(description = "Represents an issue severity resource type.")
+    ISSUE_SEVERITY,
+
+    @JsonProperty("ISSUE_SEVERITY_SET")
+    @Schema(description = "Represents an issue severity set resource type.")
+    ISSUE_SEVERITY_SET,
+
+    @JsonProperty("ISSUE_CATEGORY")
+    @Schema(description = "Represents an issue category resource type.")
+    ISSUE_CATEGORY,
+
+    @JsonProperty("ISSUE_CATEGORY_SET")
+    @Schema(description = "Represents an issue category set resource type.")
+    ISSUE_CATEGORY_SET,
+
+    @JsonProperty("PROJECT")
+    @Schema(description = "Represents a project resource type.")
+    PROJECT,
+
+    @JsonProperty("PROJECT_TASK")
+    @Schema(description = "Represents a project task resource type.")
+    PROJECT_TASK,
+
+    @JsonProperty("TASK")
+    @Schema(description = "Represents a task resource type.")
+    TASK,
+
+    @JsonProperty("PROJECT_CONFIGURATION")
+    @Schema(description = "Represents a project configuration resource type.")
+    PROJECT_CONFIGURATION,
+
+    @JsonProperty("TASK_PRIORITY")
+    @Schema(description = "Represents a task priority resource type.")
+    TASK_PRIORITY,
+
+    @JsonProperty("TASK_STATUS")
+    @Schema(description = "Represents a task status resource type.")
+    TASK_STATUS,
+
+    @JsonProperty("TASK_CATEGORY")
+    @Schema(description = "Represents a task category resource type.")
+    TASK_CATEGORY,
+
+    @JsonProperty("TASK_PRIORITY_SET")
+    @Schema(description = "Represents a task priority set resource type.")
+    TASK_PRIORITY_SET,
+
+    @JsonProperty("TASK_STATUS_SET")
+    @Schema(description = "Represents a task status set resource type.")
+    TASK_STATUS_SET,
+
+    @JsonProperty("TASK_CATEGORY_SET")
+    @Schema(description = "Represents a task category set resource type.")
+    TASK_CATEGORY_SET,
+}
+
+val <T> T.resourceName: String
+    get() = if (this is BaseAuditedResource<*>) {
+        this.resourceType.toString()
+    } else {
+        "Unknown Resource"
+    }
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/query/SortField.kt =====
+package net.blugrid.api.common.model.query
+
+import io.micronaut.data.model.Sort
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents a field by which results can be sorted, including the direction of the sort.")
+class SortField(
+    @Schema(description = "The name of the field by which to sort the results.", example = "name")
+    val field: String,
+
+    @Schema(description = "The direction of the sort, either ascending or descending.", example = "ASC")
+    val direction: Sort.Order.Direction = Sort.Order.Direction.ASC
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/query/SortableQuery.kt =====
+package net.blugrid.api.common.model.query
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents a query with optional sorting criteria.")
+class SortableQuery<T>(
+    @Schema(description = "The query object containing the criteria for the search or filtering.", example = "SomeQueryObject")
+    val query: T,
+
+    @Schema(description = "The sorting criteria to apply to the query results.", example = "[{\"field\": \"name\", \"direction\": \"ASC\"}]")
+    val sort: List<SortField>? = null,
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/query/DefaultPageRequest.kt =====
+package net.blugrid.api.common.model.query
+
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Sort
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Default page request create")
+data class DefaultPageRequest(
+    @Schema(description = "The page number to retrieve, starting from 0.", example = "0")
+    val page: Int,
+
+    @Schema(description = "The number of records to retrieve per page.", example = "20")
+    private val size: Int,
+
+    @Schema(description = "The sorting criteria to apply to the page request.", example = "Sort.by('name').ascending()")
+    private val sort: Sort? = Sort.unsorted()
+) : Pageable {
+
+    init {
+        require(size >= 0) { "Page size must not be less than zero!" }
+        require(page >= 0) { "Page index must not be less than zero!" }
+    }
+
+    override fun getNumber(): Int = page
+    override fun next(): Pageable = DefaultPageRequest(page + 1, size, getSort())
+    override fun getSort(): Sort = sort ?: Sort.unsorted()
+    override fun getSize(): Int = size
+    override fun getOffset(): Long = page.toLong() * size.toLong()
+    fun hasPrevious(): Boolean = page > 0
+    fun first(): Pageable = DefaultPageRequest(0, page, sort)
+    override fun previous(): Pageable = if (page == 0) this else DefaultPageRequest(page - 1, size, sort)
+    fun previousOrFirst(): Pageable = if (hasPrevious()) previous() else first()
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/query/PageMapping.kt =====
+package net.blugrid.api.common.model.query
+
+import io.micronaut.data.model.Pageable
+import io.micronaut.data.model.Sort
+
+
+fun <T> Pageable.toPageableQuery(query: T): PageableQuery<T> {
+    val pageRequest = this
+    return PageableQuery(
+        number = pageRequest.number,
+        size = pageRequest.size,
+        sort = pageRequest.sort.toSortFields().takeIf { it.isNotEmpty() },
+        query = query
+    )
+}
+
+fun PageableQuery<*>.toPageable(): Pageable {
+    val sortOrUnsorted = sort
+        ?.let {
+            Sort.of(it.map { it.toSortOrder() })
+        }
+        ?: Sort.unsorted()
+
+    return DefaultPageRequest(number, size, sortOrUnsorted)
+}
+
+private fun SortField.toSortOrder(): Sort.Order {
+    return Sort.Order(field, direction, true)
+}
+
+fun Sort.toSortFields(): List<SortField> = this.orderBy.map { SortField(field = it.property, direction = it.direction) }.toList()
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/query/PageableQuery.kt =====
+package net.blugrid.api.common.model.query
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents a pageable query with customizable pagination and sorting options.")
+open class PageableQuery<T>(
+    @Schema(description = "The query object containing the criteria for the search or filtering.", example = "SomeQueryObject")
+    open val query: T,
+
+    @Schema(description = "The page number to retrieve, starting from 0.", example = "0")
+    open val number: Int = DEFAULT_NUMBER,
+
+    @Schema(description = "The number of records to retrieve per page.", example = "50")
+    open val size: Int = DEFAULT_SIZE,
+
+    @Schema(description = "The sorting criteria to apply to the query results.", example = "[{\"field\": \"name\", \"direction\": \"ASC\"}]")
+    open val sort: List<SortField>? = null,
+) {
+    companion object {
+        const val DEFAULT_NUMBER = 0
+        const val DEFAULT_SIZE = 50
+    }
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/search/SearchPage.kt =====
+package net.blugrid.api.common.model.search
+
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Represents a paginated response for search results, including content and metadata about the search.")
+data class SearchPage<T, S>(
+    @Schema(description = "The list of content items returned by the search query.", example = "List of items")
+    val content: List<T> = emptyList(),
+
+    @Schema(description = "Additional search results or metadata related to the search query.", example = "SearchResultMetadata")
+    val searchResults: S? = null,
+
+    @Schema(description = "The number of items per page.", example = "20")
+    val size: Int? = 0,
+
+    @Schema(description = "The current page number, starting from 1.", example = "1")
+    val number: Int? = 1,
+
+    @Schema(description = "Indicates whether this is the first page of results.", example = "true")
+    val first: Boolean? = true,
+
+    @Schema(description = "Indicates whether this is the last page of results.", example = "true")
+    val last: Boolean? = true,
+
+    @Schema(description = "The number of elements in the current page.", example = "20")
+    val numberOfElements: Int? = 0,
+
+    @Schema(description = "The total number of elements across all pages.", example = "100")
+    val totalElements: Int? = 0,
+
+    @Schema(description = "The total number of pages available.", example = "5")
+    val totalPages: Int? = 1,
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/model/search/SearchIndex.kt =====
+package net.blugrid.api.common.model.search
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.resource.ResourceType
+import java.time.LocalDateTime
+
+@Schema(description = "Represents a search index entry, storing searchable metadata for a resource.")
+data class SearchIndex<T>(
+    @Schema(description = "The unique identifier of the resource.", example = "12345")
+    val resourceId: Long,
+
+    @Schema(description = "The type of resource being indexed, such as 'Document', 'User', etc.", example = "DOCUMENT")
+    val resourceType: ResourceType,
+
+    @Schema(description = "The resource object itself, which can be of any type.", example = "ResourceObject")
+    val resource: T,
+
+    @Schema(description = "The unique identifier of the tenant associated with this resource.", example = "1001")
+    val tenantId: Long,
+
+    @Schema(description = "A string containing search terms related to the resource, used for indexing.", example = "sample, document, user guide")
+    val searchTerms: String,
+
+    @Schema(description = "The timestamp when the resource was created in the index.", example = "2024-08-25T10:15:30")
+    val createdTimestamp: LocalDateTime? = null,
+
+    @Schema(description = "The timestamp when the resource was last changed in the index.", example = "2024-08-26T12:30:45")
+    val lastChangedTimestamp: LocalDateTime? = null
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/exception/APIError.kt =====
+package net.blugrid.api.common.exception
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Base api error interface")
+interface APIError {
+
+    @get: [JsonProperty("statusCode")]
+    val statusCode: String
+
+    @get: [JsonProperty("code")]
+    val code: String
+
+    @get: [JsonProperty("message")]
+    val message: String
+
+    @get: [JsonIgnore]
+    val headers: Map<String, String>?
+
+    @get: [JsonProperty("details")]
+    val details: List<Any>?
+
+    @get: [JsonProperty("_links")]
+    val links: Map<String, Link>?
+}
+
+data class Link(
+    val href: String,
+    val templated: Boolean = false
+)
+
+@Schema(description = "Default API error")
+data class DefaultAPIError(
+    override val statusCode: String,
+    override val code: String,
+    override val message: String,
+    override val headers: Map<String, String>? = null,
+    override val links: Map<String, Link>? = null,
+    override val details: List<Any>? = null
+) : APIError
+
+@Schema(description = "OAuth error")
+data class OAuthError(
+
+    override val statusCode: String,
+    override val code: String,
+    override val message: String,
+
+    val errorDescription: String? = null,
+
+    override val headers: Map<String, String>? = null,
+    override val links: Map<String, Link>?,
+    override val details: List<Any>? = null
+) : APIError
+
+@Schema(description = "API Error detail")
+data class APIErrorDetail(
+
+    @JsonProperty("field")
+    val field: String? = null,
+
+    @JsonProperty("index")
+    val index: Int? = null,
+
+    @JsonProperty("message")
+    val message: String,
+)
+
+@Schema(description = "API validation detail")
+data class APIErrorValidationDetail(
+
+    @JsonProperty("field")
+    val field: String? = null,
+
+    @JsonProperty("value")
+    val value: String? = null,
+
+    @JsonProperty("message")
+    val message: String,
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/exception/APIException.kt =====
+package net.blugrid.api.common.exception
+
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
+
+open class APIException(
+    val apiError: APIError,
+    val includeStackTrace: Boolean = false
+) : HttpStatusException(HttpStatus.valueOf(apiError.statusCode.toInt()), apiError.message) {
+
+    private val stackTraceInfo: List<String> = if (includeStackTrace) {
+        this.stackTrace.map { it.toString() }
+    } else {
+        emptyList()
+    }
+
+    fun toResponseBody(): Map<String, Any> {
+        val response = mutableMapOf<String, Any>(
+            "status" to apiError.statusCode,
+            "message" to apiError.message,
+            "code" to apiError.code,
+            "details" to apiError.details.orEmpty(),
+            "_links" to apiError.links.orEmpty()
+        )
+        apiError.headers?.let { response.putAll(it) }
+        if (includeStackTrace && stackTraceInfo.isNotEmpty()) {
+            response["stackTrace"] = stackTraceInfo
+        }
+        return response
+    }
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/exception/NotFoundException.kt =====
+package net.blugrid.api.common.exception
+
+import io.micronaut.http.HttpStatus
+
+class NotFoundException(
+    message: String = "Resource Not Found",
+    details: List<Any>? = null,
+    includeStackTrace: Boolean = false
+) : APIException(
+    apiError = DefaultAPIError(
+        statusCode = HttpStatus.NOT_FOUND.code.toString(),
+        code = "NOT_FOUND",
+        message = message,
+        details = details
+    ),
+    includeStackTrace = includeStackTrace
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/exception/APIAccessDeniedException.kt =====
+package net.blugrid.api.common.exception
+
+import io.micronaut.http.HttpStatus
+
+class APIAccessDeniedException(
+    message: String = "Access Denied",
+    details: List<Any>? = null,
+    includeStackTrace: Boolean = false
+) : APIException(
+    apiError = DefaultAPIError(
+        statusCode = HttpStatus.FORBIDDEN.code.toString(),
+        code = "ACCESS_DENIED",
+        message = message,
+        details = details
+    ),
+    includeStackTrace = includeStackTrace
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/exception/APIInternalServerException.kt =====
+package net.blugrid.api.common.exception
+
+import io.micronaut.http.HttpStatus
+
+
+class APIInternalServerException(
+    message: String = "API Internal Server Error",
+    details: List<Any>? = null,
+    includeStackTrace: Boolean = false
+) : APIException(
+    apiError = DefaultAPIError(
+        statusCode = HttpStatus.INTERNAL_SERVER_ERROR.code.toString(),
+        code = "INTERNAL_SERVER_ERROR",
+        message = message,
+        details = details
+    ),
+    includeStackTrace = includeStackTrace
+)
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/controller/GenericQueryResource.kt =====
+package net.blugrid.api.common.controller
+
+import io.micronaut.data.model.Page
+import io.micronaut.data.model.Pageable
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.Post
+import net.blugrid.api.common.model.query.PageableQuery
+import java.util.Optional
+import java.util.UUID
+
+interface GenericQueryResource<F, T> {
+
+    @Post(uri = "/query", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
+    fun query(@Body query: PageableQuery<F>): Page<T>
+
+    @Get(uri = "/", produces = [MediaType.APPLICATION_JSON])
+    fun getAll(): List<T>
+
+    @Get(uri = "/page", produces = [MediaType.APPLICATION_JSON])
+    fun getPage(pageable: Pageable): Page<T>
+
+    @Get(uri = "/{id}", produces = [MediaType.APPLICATION_JSON])
+    fun getById(@PathVariable id: Long): T
+
+    @Get(uri = "/{id}/optional", produces = [MediaType.APPLICATION_JSON])
+    fun getByIdOptional(@PathVariable id: Long): Optional<T>
+
+    @Get(uri = "/uuid/{uuid}", produces = [MediaType.APPLICATION_JSON])
+    fun getByUuid(@PathVariable uuid: UUID): T
+
+    @Get(uri = "/uuid/{uuid}/optional", produces = [MediaType.APPLICATION_JSON])
+    fun getByUuidOptional(@PathVariable uuid: UUID): Optional<T>
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/common/controller/GenericCommandResource.kt =====
+package net.blugrid.api.common.controller
+
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Put
+import net.blugrid.api.common.model.resource.BaseCreateResource
+import net.blugrid.api.common.model.resource.BaseResource
+import net.blugrid.api.common.model.resource.BaseUpdateResource
+
+interface GenericCommandResource<T : BaseResource<T>, U : BaseCreateResource<U>, V : BaseUpdateResource<V>> {
+
+    @Put(consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
+    fun create(@Body created: U): T
+
+    @Post(uri = "/{id}", consumes = [MediaType.APPLICATION_JSON], produces = [MediaType.APPLICATION_JSON])
+    fun update(@PathVariable id: Long, @Body updated: V): T
+
+    @Delete(value = "/{id}", produces = [MediaType.APPLICATION_JSON])
+    fun delete(@PathVariable id: Long)
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/BaseAuthenticatedSession.kt =====
+package net.blugrid.api.security.model
+
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import net.blugrid.api.session.model.BusinessUnitSession
+import net.blugrid.api.session.model.GuestSession
+import net.blugrid.api.session.model.SessionType
+import net.blugrid.api.session.model.TenantSession
+
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "sessionType"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = GuestSession::class, name = "GUEST"),
+    JsonSubTypes.Type(value = TenantSession::class, name = "WEB_APPLICATION"),
+    JsonSubTypes.Type(value = BusinessUnitSession::class, name = "BUSINESS_UNIT")
+)
+interface BaseAuthenticatedSession {
+    val sessionId: String
+    val sessionType: SessionType
+    val userId: String
+    val webApplicationId: String
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/BaseAuthenticatedOrganisation.kt =====
+package net.blugrid.api.security.model
+
+interface BaseAuthenticatedOrganisation {
+    val tenantId: String
+    val partyId: String?
+    val primaryPartyId: String?
+    val displayName: String?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/BaseAuthenticatedUser.kt =====
+package net.blugrid.api.security.model
+
+interface BaseAuthenticatedUser {
+    val userIdentityId: String
+    val email: String
+    val displayName: String?
+    val providerId: String
+
+    val emailVerified: Boolean?
+    val partyId: String?
+    val tenantId: String?
+
+    val nickName: String?
+    val givenName: String?
+    val familyName: String?
+    val pictureUrl: String?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/SessionType.kt =====
+package net.blugrid.api.security.model
+
+enum class SessionType {
+    GUEST,
+    WEB_APPLICATION,
+    BUSINESS_UNIT
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/DecoratedAuthentication.kt =====
+package net.blugrid.api.security.model
+
+import java.util.Date
+
+interface DecoratedAuthentication<T : BaseAuthenticatedSession> {
+    val authenticationType: AuthenticationType
+
+    // SSO core
+    val providerId: String
+    val principalName: String
+    val principalEmail: String
+
+    // Session
+    val sessionId: String
+    val userId: String
+    val expirationTime: Date?
+
+    // User + Session object
+    val user: BaseAuthenticatedUser
+    val session: T
+
+    val isExpired: Boolean get() = expirationTime?.before(Date()) ?: false
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/AuthenticationType.kt =====
+package net.blugrid.api.security.model
+
+enum class AuthenticationType {
+    GUEST,
+    TENANT,
+    BUSINESS_UNIT
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/AuthenticatedUser.kt =====
+package net.blugrid.api.security.model
+
+data class AuthenticatedUser(
+    override val userIdentityId: String,
+    override val email: String,
+    override val providerId: String,
+    override val displayName: String? = null,
+    override val emailVerified: Boolean? = true,
+    override val partyId: String? = null,
+    override val tenantId: String? = null,
+    override val nickName: String? = null,
+    override val givenName: String? = null,
+    override val familyName: String? = null,
+    override val pictureUrl: String? = null
+) : BaseAuthenticatedUser
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/model/AuthenticatedOrganisation.kt =====
+package net.blugrid.api.security.model
+
+data class AuthenticatedOrganisation(
+    override val tenantId: String,
+    override val partyId: String? = null,
+    override val primaryPartyId: String? = null,
+    override val displayName: String? = null,
+) : BaseAuthenticatedOrganisation
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/RequestContextProvider.kt =====
+package net.blugrid.api.security.context
+
+import net.blugrid.api.security.model.BaseAuthenticatedOrganisation
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+import net.blugrid.api.security.model.BaseAuthenticatedUser
+
+interface RequestContextProvider {
+    val currentTenantId: Long?
+    val currentBusinessUnitId: Long?
+    val currentSessionId: Long?
+    val currentSession: BaseAuthenticatedSession?
+    val currentUser: BaseAuthenticatedUser?
+    val currentOrganisation: BaseAuthenticatedOrganisation?
+
+    val currentIsUnscoped: Boolean
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/SessionContext.kt =====
+package net.blugrid.api.security.context
+
+import net.blugrid.api.userIdentity.model.UserIdentity
+
+sealed interface SessionContext {
+    val id: Long
+    val user: UserIdentity
+    val webApplicationId: Long
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/GuestSessionContext.kt =====
+package net.blugrid.api.security.context
+
+import net.blugrid.api.userIdentity.model.UserIdentity
+
+data class GuestSessionContext(
+    override val id: Long,
+    override val user: UserIdentity,
+    override val webApplicationId: Long
+) : SessionContext
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/WebApplicationSessionContext.kt =====
+package net.blugrid.api.security.context
+
+import net.blugrid.api.organisation.model.Organisation
+import net.blugrid.api.userIdentity.model.UserIdentity
+
+data class WebApplicationSessionContext(
+    override val id: Long,
+    override val user: UserIdentity,
+    override val webApplicationId: Long,
+    val organisation: Organisation,
+    val operatorId: Long
+) : SessionContext
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/BusinessUnitSessionContext.kt =====
+package net.blugrid.api.security.context
+
+import net.blugrid.api.organisation.model.Organisation
+import net.blugrid.api.userIdentity.model.UserIdentity
+
+data class BusinessUnitSessionContext(
+    override val id: Long,
+    override val user: UserIdentity,
+    override val webApplicationId: Long,
+    val organisation: Organisation,
+    val operatorId: Long,
+    val businessUnitId: Long
+) : SessionContext
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/OperatorRef.kt =====
+package net.blugrid.api.security.context
+
+interface OperatorRef {
+    val id: Long
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/security/context/WebApplicationRef.kt =====
+package net.blugrid.api.security.context
+
+interface WebApplicationRef {
+    val id: Long
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/session/model/SessionType.kt =====
+package net.blugrid.api.session.model
+
+enum class SessionType {
+    GUEST,
+    WEB_APPLICATION,
+    BUSINESS_UNIT
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/session/model/GuestSession.kt =====
+package net.blugrid.api.session.model
+
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+
+data class GuestSession(
+    override val sessionId: String,
+    override val userId: String,
+    override val webApplicationId: String
+) : BaseAuthenticatedSession {
+    override val sessionType: SessionType = SessionType.GUEST
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/session/model/TenantSession.kt =====
+package net.blugrid.api.session.model
+
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+
+data class TenantSession(
+    override val sessionId: String,
+    override val userId: String,
+    override val webApplicationId: String,
+    val tenantId: String,
+    val operatorId: String
+) : BaseAuthenticatedSession {
+    override val sessionType: SessionType = SessionType.WEB_APPLICATION
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/session/model/BusinessUnitSession.kt =====
+package net.blugrid.api.session.model
+
+import net.blugrid.api.security.model.BaseAuthenticatedSession
+
+data class BusinessUnitSession(
+    override val sessionId: String,
+    override val userId: String,
+    override val webApplicationId: String,
+    val tenantId: String,
+    val operatorId: String,
+    val businessUnitId: String
+) : BaseAuthenticatedSession {
+    override val sessionType: SessionType = SessionType.BUSINESS_UNIT
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/userIdentity/model/UserIdentity.kt =====
+package net.blugrid.api.userIdentity.model
+
+interface UserIdentity {
+    val id: Long
+    val uuid: java.util.UUID
+    val name: String
+    val email: String
+    val displayName: String?
+    val emailVerified: Boolean?
+    val providerId: String
+    val partyId: Long?
+    val nickName: String?
+    val givenName: String?
+    val familyName: String?
+    val pictureUrl: String?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/src/main/kotlin/net/blugrid/api/organisation/model/Organisation.kt =====
+package net.blugrid.api.organisation.model
+
+interface Organisation {
+    val id: Long
+    val displayName: String?
+    val partyId: Long?
+    val primaryPartyId: Long?
+}
+
+===== ./common/common-kotlin/common-api/common-api-model/gradle.properties =====
+micronautVersion=4.4.3
+kotlinVersion=1.9.23
+
+===== ./common/common-kotlin/common-api/common-api-model/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common-api:common-api-domain"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // Data model support (needed for Page, Pageable in controllers)
+    implementation(libs.micronaut.data.model)      // Just the model types, not full data stack
+    implementation(libs.bundles.micronautWeb)      // Full web stack including Netty
+
+    // Model-specific dependencies
+    implementation(libs.micronaut.serde)           // Serialization framework
+    implementation(libs.micronaut.validation)      // Validation annotations
+    implementation(libs.jackson.kotlin)            // JSON serialization
+    implementation(libs.mapstruct)                 // Object mapping
+    implementation(libs.kotlin.builder.annotation) // Builder pattern support
+
+    // Annotation processing
+    kapt(libs.micronaut.inject.java)
+    kapt(libs.micronaut.data.processor)
+    kapt(libs.micronaut.serde.processor)
+    kapt(libs.micronaut.openapi)
+    kapt(libs.mapstruct.processor)
+    kapt(libs.kotlin.builder.processor)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.api.*")
+    }
+}
+

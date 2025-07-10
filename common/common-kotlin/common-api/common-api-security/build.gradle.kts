@@ -67,3 +67,7 @@ micronaut {
         annotations("net.blugrid.api.*")
     }
 }
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
