@@ -7,14 +7,14 @@ plugins {
 
 dependencies {
     // API dependencies - expose to consumers
-    api(project(":common:common-kotlin:common-api:common-api-grpc"))
-    api(project(":common:common-kotlin:common-api:common-api-model"))
-    api(project(":common:common-kotlin:common-api:common-api-json"))
-    api(project(":common:common-kotlin:common-api:common-api-multitenant"))
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:integration:integration-grpc"))
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
 
     // Domain-specific modules
-    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-grpc-proto"))
     api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-grpc-proto"))
 
     // Platform BOM
     implementation(platform(libs.micronaut.bom))
@@ -42,7 +42,7 @@ dependencies {
     runtimeOnly(libs.bundles.runtimeCore)
 
     // Test dependencies
-    testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
     testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")

@@ -6,8 +6,8 @@ import net.blugrid.api.common.grpc.order
 import net.blugrid.api.common.grpc.sort
 import net.blugrid.api.core.organisation.grpc.OrganisationStateServiceGrpcKt.OrganisationStateServiceCoroutineStub
 import net.blugrid.api.core.organisation.grpc.assertion.assert
-import net.blugrid.api.test.support.BaseGrpcIntegTest
-import net.blugrid.api.test.support.grpc
+import net.blugrid.platform.testing.support.BaseGrpcIntegTest
+import net.blugrid.platform.testing.support.grpc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull

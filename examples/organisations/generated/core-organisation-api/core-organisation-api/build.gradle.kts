@@ -9,9 +9,13 @@ plugins {
 
 dependencies {
     // Common foundation APIs
-    api(project(":common:common-kotlin:common-api:common-api-model"))
-    api(project(":common:common-kotlin:common-api:common-api-json"))
-    api(project(":common:common-kotlin:common-api:common-api-multitenant"))
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:data:data-persistence"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+    api(project(":common:common-kotlin:security:security-core"))
+    api(project(":common:common-kotlin:server:server-rest"))
 
     // Domain-specific modules
     implementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
@@ -40,7 +44,7 @@ dependencies {
     runtimeOnly(libs.bundles.runtimeSecurity)
 
     // Test dependencies
-    testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
     testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")

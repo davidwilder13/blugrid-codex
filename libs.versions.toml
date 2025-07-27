@@ -8,6 +8,7 @@
 # Core Platform
 kotlin = "1.9.23"
 kotlinPlugin = "2.1.21"
+kotlinx-coroutines = "1.7.3"
 micronaut = "4.4.3"
 java = "17"
 
@@ -76,6 +77,11 @@ micronaut-context = { module = "io.micronaut:micronaut-context" }
 micronaut-kotlin-runtime = { module = "io.micronaut.kotlin:micronaut-kotlin-runtime" }
 micronaut-kotlin-extensions = { module = "io.micronaut.kotlin:micronaut-kotlin-extension-functions" }
 
+# Kotlin Coroutines
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-reactive = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactive", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+
 # ===== WEB & HTTP =====
 micronaut-http-server = { module = "io.micronaut:micronaut-http-server" }
 micronaut-http-client = { module = "io.micronaut:micronaut-http-client" }
@@ -91,6 +97,7 @@ micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-jackson" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 
 # ===== DATA & PERSISTENCE =====
@@ -207,6 +214,11 @@ micronautData = [
     "zeko-sql-builder"
 ]
 
+micronautReactive = [
+    "micronaut-reactor",
+    "micronaut-reactor-http-client",
+]
+
 micronautSecurity = [
     "micronaut-security",
     "micronaut-security-jwt",
@@ -224,7 +236,8 @@ grpcCore = [
     "protobuf-util",
     "proto-google-common",
     "javax-annotation",
-    "jakarta-validation"
+    "jakarta-validation",
+    "kotlinx-coroutines-core"
 ]
 
 grpcServer = [
@@ -289,6 +302,9 @@ compileOnly = [
 
 # ===== UTILITY BUNDLES =====
 jacksonLibs = [
+    "jackson-annotations",
+    "jackson-core",
+    "jackson-databind",
     "jackson-kotlin",
     "micronaut-jackson"
 ]

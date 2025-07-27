@@ -6,9 +6,8 @@ plugins {
 
 dependencies {
     // API dependencies - expose to consumers
-    api(project(":common:common-kotlin:common-api:common-api-domain"))
-    api(project(":common:common-kotlin:common-api:common-api-model"))
-    api(project(":common:common-kotlin:common-api:common-api-json"))
+    api(project(":common:common-kotlin:common:common-domain"))
+    api(project(":common:common-kotlin:common:common-model"))
 
     // Platform BOMs
     implementation(platform(libs.micronaut.bom))

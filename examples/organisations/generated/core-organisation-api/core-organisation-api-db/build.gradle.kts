@@ -8,14 +8,16 @@ plugins {
 
 dependencies {
     // API dependencies - expose to consumers
-    api(project(":common:common-kotlin:common-api:common-api-model"))
-    api(project(":common:common-kotlin:common-api:common-api-json"))
-    api(project(":common:common-kotlin:common-api:common-api-persistence"))
-
-    implementation(project(":common:common-kotlin:common-api:common-api-multitenant"))
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:data:data-persistence"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+    api(project(":common:common-kotlin:server:server-multitenancy"))
 
     // Domain-specific model
     api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
 
     // Platform BOMs
     implementation(platform(libs.micronaut.bom))
@@ -37,8 +39,7 @@ dependencies {
     runtimeOnly(libs.bundles.runtimeDatabase)
 
     // Test dependencies
-    testImplementation(project(":common:common-kotlin:common-api:common-api-multitenant"))
-    testImplementation(project(":common:common-kotlin:common-api:common-api-test"))
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
     testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")

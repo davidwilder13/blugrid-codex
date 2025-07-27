@@ -1,11 +1,11 @@
 package net.blugrid.api.core.organisation.mapping
 
 import jakarta.inject.Singleton
-import net.blugrid.api.common.persistence.mapping.ResourceEntityMapper
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.api.core.organisation.repository.model.OrganisationEntity
+import net.blugrid.data.persistence.mapping.ResourceEntityMapper
 
 @Singleton
 class OrganisationMappingService : ResourceEntityMapper<Organisation, OrganisationCreate, OrganisationUpdate, OrganisationEntity>() {

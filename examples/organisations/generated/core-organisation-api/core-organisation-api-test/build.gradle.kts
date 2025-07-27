@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     // API dependencies - expose ALL to test consumers
-    api(project(":common:common-kotlin:common-api:common-api-test"))
+    api(project(":common:common-kotlin:platform:platform-testing"))
     api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
 
     // Platform BOM - exposed to test consumers
@@ -24,9 +24,6 @@ dependencies {
 
     // Runtime dependencies for test environments
     runtimeOnly(libs.bundles.runtimeCore)
-
-    // Testing framework - exposed as API (inherited from common-api-test)
-    // Note: common-api-test already exposes libs.bundles.testing as API
 }
 
 java {

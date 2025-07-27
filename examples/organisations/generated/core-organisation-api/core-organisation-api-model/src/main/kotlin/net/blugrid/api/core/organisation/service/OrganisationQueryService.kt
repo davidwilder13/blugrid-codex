@@ -1,9 +1,9 @@
 package net.blugrid.api.core.organisation.service
 
-import io.micronaut.data.model.Page
-import io.micronaut.data.model.Pageable
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationFilter
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.Pageable
 import java.util.Optional
 import java.util.UUID
 

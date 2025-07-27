@@ -1,6 +1,0 @@
-applicationType: default
-defaultPackage: example.micronaut
-testFramework: junit
-sourceLanguage: java
-buildTool: gradle
-features: [ annotation-api, app-name, data, data-jpa, graalvm, gradle, h2, hibernate-jpa, http-client, jakarta-javax-persistence, java-application, jdbc-hikari, junit, logback, micronaut-build, netty-server, readme, serialization-jackson, shade, spring-boot-java, yaml ]

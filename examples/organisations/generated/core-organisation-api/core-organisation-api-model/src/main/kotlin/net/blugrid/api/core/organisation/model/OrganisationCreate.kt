@@ -1,8 +1,8 @@
 package net.blugrid.api.core.organisation.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import net.blugrid.api.common.model.resource.BaseCreateResource
 import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.resource.BaseCreateResource
 import java.time.LocalDateTime
 
 @Schema(description = "Model used to create a new organisation.")

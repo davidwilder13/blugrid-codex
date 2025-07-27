@@ -1,6 +1,6 @@
-package net.blugrid.api.core.organisation.repository.migration
+package net.blugrid.api.core.organisation.migration
 
-import net.blugrid.api.common.persistence.repository.migration.RepeatableDbMigration
+import net.blugrid.data.persistence.repository.migration.RepeatableDbMigration
 import org.flywaydb.core.api.migration.Context
 
 class R__5_table_organisation : RepeatableDbMigration() {

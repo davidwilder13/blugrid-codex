@@ -1,0 +1,657 @@
+./common/common-kotlin
+├── audit
+│   └── audit-core
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               ├── kotlin
+│               │   └── net
+│               │       └── blugrid
+│               │           └── audit
+│               │               └── core
+│               │                   ├── annotation
+│               │                   │   └── LogAuditEvent.kt
+│               │                   ├── aspect
+│               │                   │   └── AuditInterceptor.kt
+│               │                   ├── event
+│               │                   │   └── UpdateAuditLogAuditEventHandler.kt
+│               │                   ├── mapping
+│               │                   │   └── AuditEventLogMapper.kt
+│               │                   ├── model
+│               │                   │   └── AuditEventLogQuery.kt
+│               │                   ├── repository
+│               │                   │   ├── AuditEventLogInsertRepository.kt
+│               │                   │   ├── AuditEventLogReadRepository.kt
+│               │                   │   └── model
+│               │                   │       ├── AuditEventLogInsertEntity.kt
+│               │                   │       └── AuditEventLogReadEntity.kt
+│               │                   └── service
+│               │                       ├── AuditEventLogService.kt
+│               │                       ├── AuditEventPublisherService.kt
+│               │                       └── GenericAuditLoader.kt
+│               └── resources
+│                   └── db
+│                       └── migration
+│                           └── auditEventLog
+│                               ├── R__2_proc_create_audit_event_log_client_partition_table.sql
+│                               ├── R__2_proc_create_audit_event_log_partition_table.sql
+│                               ├── R__3_vw_audit_event_log_insert.sql
+│                               ├── R__3_vw_audit_event_log_read.sql
+│                               ├── V2020.01.01.10.08.01__audit_extensions.sql
+│                               └── V2021.01.01.10.08.02__audit_event_log.sql
+├── common
+│   ├── common-domain
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── common
+│   │                           └── domain
+│   │                               ├── CreatedTimestamp.kt
+│   │                               ├── EffectiveTimestamp.kt
+│   │                               ├── IdentityID.kt
+│   │                               ├── IdentityUUID.kt
+│   │                               └── LastChangedTimestamp.kt
+│   └── common-model
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               └── kotlin
+│                   └── net
+│                       └── blugrid
+│                           └── common
+│                               ├── model
+│                               │   ├── audit
+│                               │   │   ├── AuditEvent.kt
+│                               │   │   ├── AuditEventLog.kt
+│                               │   │   ├── AuditEventType.kt
+│                               │   │   ├── AuditStamp.kt
+│                               │   │   └── ResourceAudit.kt
+│                               │   ├── controller
+│                               │   │   ├── GenericCommandResource.kt
+│                               │   │   └── GenericQueryResource.kt
+│                               │   ├── exception
+│                               │   │   ├── APIAccessDeniedException.kt
+│                               │   │   ├── APIError.kt
+│                               │   │   ├── APIException.kt
+│                               │   │   ├── APIInternalServerException.kt
+│                               │   │   └── NotFoundException.kt
+│                               │   ├── organisation
+│                               │   │   └── Organisation.kt
+│                               │   ├── pagination
+│                               │   │   ├── CursorPage.kt
+│                               │   │   ├── CursorPageRequest.kt
+│                               │   │   ├── Pageable.kt
+│                               │   │   ├── PageableQuery.kt
+│                               │   │   ├── Page.kt
+│                               │   │   ├── PageMapping.kt
+│                               │   │   ├── PageRequest.kt
+│                               │   │   ├── Slice.kt
+│                               │   │   ├── SortableQuery.kt
+│                               │   │   ├── SortDirection.kt
+│                               │   │   ├── SortField.kt
+│                               │   │   ├── Sort.kt
+│                               │   │   ├── SortOrder.kt
+│                               │   │   └── UnpagedRequest.kt
+│                               │   ├── resource
+│                               │   │   ├── BaseAuditedResource.kt
+│                               │   │   ├── BaseBusinessUnitResource.kt
+│                               │   │   ├── BaseCreateOrUpdateResource.kt
+│                               │   │   ├── BaseCreateResource.kt
+│                               │   │   ├── BaseResource.kt
+│                               │   │   ├── BaseTenantResource.kt
+│                               │   │   ├── BaseUpdateResource.kt
+│                               │   │   ├── ResourceType.kt
+│                               │   │   ├── Searchable.kt
+│                               │   │   └── UnscopedResource.kt
+│                               │   ├── scope
+│                               │   │   ├── BusinessUnitScope.kt
+│                               │   │   └── TenantScope.kt
+│                               │   ├── search
+│                               │   │   ├── SearchIndex.kt
+│                               │   │   └── SearchPage.kt
+│                               │   └── useridentity
+│                               │       └── UserIdentity.kt
+│                               └── util
+│                                   ├── CommonExtensions.kt
+│                                   ├── Either.kt
+│                                   ├── EntityExtensions.kt
+│                                   └── SwaggerContants.kt
+├── data
+│   ├── data-models
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── data
+│   │                           └── models
+│   │                               └── Models.kt
+│   ├── data-persistence
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           ├── kotlin
+│   │           │   └── net
+│   │           │       └── blugrid
+│   │           │           └── data
+│   │           │               └── persistence
+│   │           │                   ├── audit
+│   │           │                   │   └── AuditEmbeddable.kt
+│   │           │                   ├── config
+│   │           │                   │   ├── ObjectMapperSupplier.kt
+│   │           │                   │   └── PostgreSQL10JsonDialect.kt
+│   │           │                   ├── mapping
+│   │           │                   │   ├── AuditMapper.kt
+│   │           │                   │   ├── MicronautPaginationUtils.kt
+│   │           │                   │   └── ResourceEntityMapper.kt
+│   │           │                   ├── model
+│   │           │                   │   ├── AuditablePersistable.kt
+│   │           │                   │   ├── contract
+│   │           │                   │   │   └── HasUuid.kt
+│   │           │                   │   ├── PersistableResource.kt
+│   │           │                   │   └── resource
+│   │           │                   │       ├── BusinessUnitScopedResource.kt
+│   │           │                   │       ├── TenantScopedResource.kt
+│   │           │                   │       └── UnscopedPersistable.kt
+│   │           │                   ├── repository
+│   │           │                   │   ├── GenericEntityRepository.kt
+│   │           │                   │   ├── JpaSpecificationDSL.kt
+│   │           │                   │   └── migration
+│   │           │                   │       ├── DbMigration.kt
+│   │           │                   │       └── RepeatableDbMigration.kt
+│   │           │                   ├── scope
+│   │           │                   │   ├── BusinessUnitScopedEntity.kt
+│   │           │                   │   ├── BusinessUnitScoped.kt
+│   │           │                   │   ├── BusinessUnitScopeEmbeddable.kt
+│   │           │                   │   ├── TenantScopedEntity.kt
+│   │           │                   │   ├── TenantScoped.kt
+│   │           │                   │   └── TenantScopeEmbeddable.kt
+│   │           │                   ├── sequence
+│   │           │                   │   ├── TenantSequenceDetails.kt
+│   │           │                   │   ├── TenantSequenceGenerator.kt
+│   │           │                   │   ├── TenantSequenceImpl.kt
+│   │           │                   │   └── TenantSequence.kt
+│   │           │                   ├── service
+│   │           │                   │   ├── DatabaseService.kt
+│   │           │                   │   ├── GenericCommandServiceImpl.kt
+│   │           │                   │   ├── GenericCommandService.kt
+│   │           │                   │   ├── GenericQueryServiceImpl.kt
+│   │           │                   │   └── GenericQueryService.kt
+│   │           │                   └── util
+│   │           │                       ├── except.kt
+│   │           │                       ├── hasAny.kt
+│   │           │                       ├── intersect.kt
+│   │           │                       ├── merge.kt
+│   │           │                       ├── PostgresqlUtils.kt
+│   │           │                       └── replaceCollection.kt
+│   │           └── resources
+│   │               ├── application-db-tracing.yml
+│   │               ├── application-db.yml
+│   │               ├── db
+│   │               │   └── migration
+│   │               │       ├── archived
+│   │               │       │   ├── R__2_proc_create_tenant_partition_table.sql
+│   │               │       │   ├── R__2_proc_get_tenant_partition_table_name.sql
+│   │               │       │   ├── R__2_proc_partition_table_column_exists.sql
+│   │               │       │   ├── R__2_proc_partition_table_exists.sql
+│   │               │       │   └── V2019.04.01.09.01.00__multitenant_table.sql
+│   │               │       ├── audit
+│   │               │       │   └── R__40__audit_trigger_and_version_fn.sql
+│   │               │       ├── before_migrate.sql
+│   │               │       ├── domains
+│   │               │       │   └── R__08__common_type_domains.sql
+│   │               │       ├── enums
+│   │               │       │   ├── R__10__common_enums.sql
+│   │               │       │   └── R__15__access_control_permission_enum.sql
+│   │               │       ├── extensions
+│   │               │       │   └── R__00__enable_pg_extensions.sql
+│   │               │       ├── README.md
+│   │               │       ├── resource_columns
+│   │               │       │   ├── R__20__resource_columns_template.sql
+│   │               │       │   ├── R__21__tenant_resource_columns_template.sql
+│   │               │       │   ├── R__22__business_unit_columns_template.sql
+│   │               │       │   └── R__23__unscoped_columns_template.sql
+│   │               │       ├── scope
+│   │               │       │   ├── R__60__get_business_unit_tenant_scope.sql
+│   │               │       │   ├── R__61__get_business_unit_scope.sql
+│   │               │       │   ├── R__62__get_tenant_scope.sql
+│   │               │       │   ├── R__63__get_operator_party_scope.sql
+│   │               │       │   ├── R__64__get_session_scope.sql
+│   │               │       │   ├── R__65__reset_request_scope.sql
+│   │               │       │   ├── R__66__set_request_scope.sql
+│   │               │       │   └── R__69__vw_request_scope.sql
+│   │               │       ├── sequence
+│   │               │       │   ├── R__114__tenant_nextval.sql
+│   │               │       │   ├── R__115__tenant_sequence_details.sql
+│   │               │       │   └── R__116__unscoped_nextval.sql
+│   │               │       ├── settings
+│   │               │       │   └── R__05__baseline_settings.sql
+│   │               │       └── util
+│   │               │           ├── R__100__copy_table_index.sql
+│   │               │           ├── R__101__create_tenant_table.sql
+│   │               │           ├── R__102__get_new_table_index_name.sql
+│   │               │           ├── R__103__get_new_table_index_statement.sql
+│   │               │           ├── R__104__get_new_table_short_code.sql
+│   │               │           ├── R__105__get_short_code.sql
+│   │               │           ├── R__106__get_table_primary_key.sql
+│   │               │           ├── R__107__get_tenant_table_name.sql
+│   │               │           ├── R__108__is_nil.sql
+│   │               │           ├── R__109__is_not_nil.sql
+│   │               │           ├── R__110__setvar.sql
+│   │               │           ├── R__111__strip_schema_name.sql
+│   │               │           ├── R__112__table_column_exists.sql
+│   │               │           ├── R__113__table_exists.sql
+│   │               │           └── R__80__text_to_bigint.sql
+│   │               └── hibernate.properties
+│   ├── data-sync
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── data
+│   │                           └── sync
+│   │                               └── Sync.kt
+│   └── data-validation
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               └── kotlin
+│                   └── net
+│                       └── blugrid
+│                           └── data
+│                               └── validation
+│                                   └── Validation.kt
+├── integration
+│   ├── integration-grpc
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── integration
+│   │                           └── grpc
+│   │                               ├── mapper
+│   │                               │   └── SortProtoMapper.kt
+│   │                               ├── model
+│   │                               │   └── exception
+│   │                               │       ├── InvalidRequestException.kt
+│   │                               │       └── NotFoundException.kt
+│   │                               ├── service
+│   │                               │   └── GrpcServiceBase.kt
+│   │                               └── util
+│   │                                   └── GrpcValidator.kt
+│   ├── integration-grpc-proto
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── proto
+│   │               └── common
+│   │                   ├── PageRequest.proto
+│   │                   └── Status.proto
+│   └── integration-http-client
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               └── kotlin
+│                   └── net
+│                       └── blugrid
+│                           └── integration
+│                               └── http
+│                                   └── client
+│                                       └── HttpClientUtils.kt
+├── platform
+│   ├── platform-config
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── platform
+│   │                           └── config
+│   │                               ├── DbProps.kt
+│   │                               ├── EnvProps.kt
+│   │                               ├── ServerProps.kt
+│   │                               └── WebProps.kt
+│   ├── platform-logging
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── platform
+│   │                           └── logging
+│   │                               ├── api
+│   │                               │   └── Logger.kt
+│   │                               ├── config
+│   │                               │   └── LoggingConfig.kt
+│   │                               └── LoggerExt.kt
+│   ├── platform-serialization
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── net
+│   │       │   │       └── blugrid
+│   │       │   │           └── platform
+│   │       │   │               └── serialization
+│   │       │   │                   ├── config
+│   │       │   │                   │   ├── CustomObjectMapperFactory.kt
+│   │       │   │                   │   ├── DbLocalDateTimeDeserializer.kt
+│   │       │   │                   │   ├── ObjectMapperBeanListener.kt
+│   │       │   │                   │   └── SerializationConfig.kt
+│   │       │   │                   ├── exception
+│   │       │   │                   │   └── JsonException.kt
+│   │       │   │                   ├── Json.kt
+│   │       │   │                   ├── JsonPath.kt
+│   │       │   │                   └── ObjectMappers.kt
+│   │       │   └── resources
+│   │       │       └── application-serialization.yml
+│   │       └── test
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── platform
+│   │                           └── serialization
+│   │                               └── DeserialisationTests.kt
+│   ├── platform-testing
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── net
+│   │       │   │       └── blugrid
+│   │       │   │           └── platform
+│   │       │   │               └── testing
+│   │       │   │                   ├── controller
+│   │       │   │                   │   ├── CommonControllerIntegTest.kt
+│   │       │   │                   │   └── CommonSearchControllerIntegTest.kt
+│   │       │   │                   ├── factory
+│   │       │   │                   │   ├── audit
+│   │       │   │                   │   │   ├── AuditStampFactory.kt
+│   │       │   │                   │   │   └── ResourceAuditFactory.kt
+│   │       │   │                   │   ├── base
+│   │       │   │                   │   │   ├── BaseFactory.kt
+│   │       │   │                   │   │   ├── RandomizableFactory.kt
+│   │       │   │                   │   │   └── ScenarioFactory.kt
+│   │       │   │                   │   ├── GenericResourceFactory.kt
+│   │       │   │                   │   ├── RandomInstanceFactory.kt
+│   │       │   │                   │   ├── resource
+│   │       │   │                   │   │   └── ExampleTenantResource.kt
+│   │       │   │                   │   ├── scope
+│   │       │   │                   │   │   └── TenantScopeFactory.kt
+│   │       │   │                   │   └── session
+│   │       │   │                   │       ├── BusinessUnitSessionFactory.kt
+│   │       │   │                   │       ├── GuestSessionFactory.kt
+│   │       │   │                   │       └── TenantSessionFactory.kt
+│   │       │   │                   ├── generator
+│   │       │   │                   │   └── DataGenerationExtensions.kt
+│   │       │   │                   ├── security
+│   │       │   │                   │   ├── TestApplicationContext.kt
+│   │       │   │                   │   └── TestAuthFilter.kt
+│   │       │   │                   ├── support
+│   │       │   │                   │   ├── BaseControllerIntegTest.kt
+│   │       │   │                   │   ├── BaseGrpcClientIntegTest.kt
+│   │       │   │                   │   ├── BaseGrpcIntegTest.kt
+│   │       │   │                   │   ├── BaseIntegTest.kt
+│   │       │   │                   │   ├── BaseServiceIntegTest.kt
+│   │       │   │                   │   ├── ConsulTestSupport.kt
+│   │       │   │                   │   ├── DockerHostIpSupport.kt
+│   │       │   │                   │   ├── EcrDockerLoginHelper.kt
+│   │       │   │                   │   ├── GrpcClientTestSupport.kt
+│   │       │   │                   │   ├── GrpcServerTestSupport.kt
+│   │       │   │                   │   ├── GrpcTestDsl.kt
+│   │       │   │                   │   ├── PostgresTestSupport.kt
+│   │       │   │                   │   ├── TestcontainersBootstrap.kt
+│   │       │   │                   │   └── TestNetwork.kt
+│   │       │   │                   └── Testing.kt
+│   │       │   └── resources
+│   │       │       └── application-test.yml
+│   │       └── test
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── platform
+│   │                           └── testing
+│   │                               └── factory
+│   │                                   └── RandomInstanceFactoryTest.kt
+│   └── platform-validation
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               └── kotlin
+│                   └── net
+│                       └── blugrid
+│                           └── platform
+│                               └── validation
+│                                   └── Validation.kt
+├── security
+│   ├── security-authentication
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── security
+│   │                           └── authentication
+│   │                               ├── jwt
+│   │                               │   └── JwtAuthenticationDecoder.kt
+│   │                               ├── mapping
+│   │                               │   ├── AuthenticatedOrganisationMapper.kt
+│   │                               │   ├── AuthenticatedUserMapper.kt
+│   │                               │   ├── AuthenticationMappers.kt
+│   │                               │   ├── HttpRequestAuthenticationExt.kt
+│   │                               │   ├── JwtAuthenticationMapper.kt
+│   │                               │   └── SessionMappers.kt
+│   │                               └── model
+│   │                                   ├── BusinessUnitAuthentication.kt
+│   │                                   ├── GuestAuthentication.kt
+│   │                                   └── TenantAuthentication.kt
+│   ├── security-authorization
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── security
+│   │                           └── authorization
+│   │                               └── Authorization.kt
+│   ├── security-core
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── security
+│   │                           └── core
+│   │                               ├── config
+│   │                               │   ├── RedirectProps.kt
+│   │                               │   ├── SecurityContextConfiguration.kt
+│   │                               │   └── SecurityProps.kt
+│   │                               ├── context
+│   │                               │   ├── AuthenticationResolver.kt
+│   │                               │   ├── BusinessUnitSessionContext.kt
+│   │                               │   ├── CurrentRequestContext.kt
+│   │                               │   ├── GuestSessionContext.kt
+│   │                               │   ├── OperatorRef.kt
+│   │                               │   ├── RequestContextOverride.kt
+│   │                               │   ├── RequestContextProvider.kt
+│   │                               │   ├── RequestContextService.kt
+│   │                               │   ├── SessionContext.kt
+│   │                               │   ├── WebApplicationRef.kt
+│   │                               │   └── WebApplicationSessionContext.kt
+│   │                               ├── model
+│   │                               │   ├── AuthenticatedOrganisation.kt
+│   │                               │   ├── AuthenticatedUser.kt
+│   │                               │   ├── AuthenticationType.kt
+│   │                               │   ├── BaseAuthenticatedOrganisation.kt
+│   │                               │   ├── BaseAuthenticatedSession.kt
+│   │                               │   ├── BaseAuthenticatedUser.kt
+│   │                               │   └── DecoratedAuthentication.kt
+│   │                               ├── service
+│   │                               │   ├── SecurityContextServiceImpl.kt
+│   │                               │   └── SecurityContextService.kt
+│   │                               └── session
+│   │                                   ├── BusinessUnitSession.kt
+│   │                                   ├── GuestSession.kt
+│   │                                   ├── SessionType.kt
+│   │                                   └── TenantSession.kt
+│   ├── security-crypto
+│   │   ├── build.gradle.kts
+│   │   └── src
+│   │       └── main
+│   │           └── kotlin
+│   │               └── net
+│   │                   └── blugrid
+│   │                       └── security
+│   │                           └── crypto
+│   │                               └── Crypto.kt
+│   └── security-tokens
+│       ├── build.gradle.kts
+│       └── src
+│           └── main
+│               ├── kotlin
+│               │   └── net
+│               │       └── blugrid
+│               │           └── security
+│               │               └── tokens
+│               │                   ├── factory
+│               │                   │   ├── AbstractJwtGenerator.kt
+│               │                   │   └── AccessTokenFactory.kt
+│               │                   ├── mapping
+│               │                   │   └── JwtTokenExt.kt
+│               │                   └── model
+│               │                       ├── JwtDecoder.kt
+│               │                       ├── JwtToken.kt
+│               │                       └── SelfSignedJwtDecoder.kt
+│               └── resources
+│                   ├── jwks.json
+│                   └── keystore.jks
+└── server
+    ├── server-api
+    │   ├── build.gradle.kts
+    │   └── src
+    │       └── main
+    │           └── kotlin
+    │               └── net
+    │                   └── blugrid
+    │                       └── server
+    │                           └── api
+    │                               ├── config
+    │                               │   ├── MultiTenantResolver.kt
+    │                               │   ├── ServerMode.kt
+    │                               │   └── TenantContextHolder.kt
+    │                               ├── persistence
+    │                               │   └── ConnectionProvider.kt
+    │                               └── tenant
+    │                                   ├── RequestContextTenantResolver.kt
+    │                                   ├── TenantContext.kt
+    │                                   └── TenantResolver.kt
+    ├── server-multitenancy
+    │   ├── build.gradle.kts
+    │   └── src
+    │       └── main
+    │           └── kotlin
+    │               └── net
+    │                   └── blugrid
+    │                       └── server
+    │                           └── multitenancy
+    │                               ├── config
+    │                               │   ├── IntegratedMultiTenantConnectionProvider.kt
+    │                               │   └── MultiTenantResolver.kt
+    │                               ├── generators
+    │                               │   └── GlobalTenantSequenceGenerator.kt
+    │                               └── inspection
+    │                                   └── CustomJdbcStatementInspector.kt
+    ├── server-persistence
+    │   ├── build.gradle.kts
+    │   └── src
+    │       └── main
+    │           └── kotlin
+    │               └── net
+    │                   └── blugrid
+    │                       └── server
+    │                           └── persistence
+    │                               ├── config
+    │                               │   └── JpaConfigurationCreatedEventListener.kt
+    │                               ├── entities
+    │                               │   └── RequestScopeEntity.kt
+    │                               ├── repositories
+    │                               │   └── RequestScopeRepository.kt
+    │                               └── scope
+    │                                   ├── RequestScopeServiceImpl.kt
+    │                                   └── RequestScopeService.kt
+    ├── server-rest
+    │   ├── build.gradle.kts
+    │   └── src
+    │       └── main
+    │           └── kotlin
+    │               └── net
+    │                   └── blugrid
+    │                       └── server
+    │                           └── rest
+    │                               ├── config
+    │                               │   └── ApplicationConfiguration.kt
+    │                               ├── controllers
+    │                               │   ├── CheckSessionController.kt
+    │                               │   ├── EnhancedLogoutController.kt
+    │                               │   └── RedirectController.kt
+    │                               ├── exceptions
+    │                               │   └── GlobalExceptionHandler.kt
+    │                               ├── oauth
+    │                               │   └── CustomOauthRouteUrlBuilder.kt
+    │                               └── security
+    │                                   ├── filters
+    │                                   │   └── JwtAuthenticationFetcher.kt
+    │                                   ├── handlers
+    │                                   │   └── EnhancedIdTokenLoginHandler.kt
+    │                                   ├── jwt
+    │                                   │   ├── JwksLoader.kt
+    │                                   │   ├── JwtDecoderImpl.kt
+    │                                   │   ├── JwtUtils.kt
+    │                                   │   ├── SelfSignedJwtDecoderImpl.kt
+    │                                   │   └── SelfSignedJwtEncoder.kt
+    │                                   ├── pkce
+    │                                   │   └── PkceUtil.kt
+    │                                   └── service
+    │                                       ├── CookieService.kt
+    │                                       └── RedirectService.kt
+    ├── server-services
+    │   ├── build.gradle.kts
+    │   └── src
+    │       └── main
+    │           └── kotlin
+    │               └── net
+    │                   └── blugrid
+    │                       └── server
+    │                           └── services
+    │                               └── security
+    │                                   └── PersistenceAwareSecurityContextService.kt
+    └── server-standalone
+        ├── build.gradle.kts
+        └── src
+            └── main
+                └── kotlin
+                    └── net
+                        └── blugrid
+                            └── server
+                                └── standalone
+                                    ├── config
+                                    │   └── StandaloneDataConfiguration.kt
+                                    ├── inspection
+                                    │   └── SimpleJdbcStatementInspector.kt
+                                    └── persistence
+                                        └── SimpleConnectionProvider.kt
+
+331 directories, 324 files

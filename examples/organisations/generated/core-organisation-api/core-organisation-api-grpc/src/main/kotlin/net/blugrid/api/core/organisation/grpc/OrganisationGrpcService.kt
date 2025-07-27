@@ -1,15 +1,14 @@
 package net.blugrid.api.core.organisation.grpc
 
 import com.google.protobuf.Empty
-import io.micronaut.data.model.Pageable
 import io.micronaut.validation.validator.Validator
 import jakarta.inject.Singleton
 import net.blugrid.api.core.organisation.service.OrganisationCommandService
 import net.blugrid.api.core.organisation.service.OrganisationQueryService
-import net.blugrid.api.logging.logger
-import net.blugrid.common.grpc.mapper.toMicronautSort
-import net.blugrid.common.grpc.service.GrpcServiceBase
-import net.blugrid.common.grpc.util.GrpcValidator
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.integration.grpc.mapper.toCommonSort
+import net.blugrid.integration.grpc.util.GrpcValidator
+import net.blugrid.platform.logging.logger
 import java.util.UUID
 
 @Singleton
@@ -37,7 +36,7 @@ class OrganisationGrpcService(
         organisationQueryService.getAll().toGrpcList()
 
     override suspend fun getPage(request: OrganisationPageRequest): OrganisationPageResponse {
-        val pageable = Pageable.from(request.page, request.size, request.sort.toMicronautSort())
+        val pageable = Pageable.from(request.page, request.size, request.sort.toCommonSort())
         return organisationQueryService.getPage(pageable).toGrpcPage()
     }
 

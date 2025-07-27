@@ -1,0 +1,1955 @@
+===== ./output/core-organisation-api/core-organisation-api-model/build.gradle.kts =====
+
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.application)
+}
+
+version = "0.1.0"
+group = "net.blugrid.api"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api(project(":common-api:common-api:common-api-model"))
+    api(project(":common-api:common-api:common-api-json"))
+    
+
+    implementation(platform("io.micronaut.platform:micronaut-platform"))
+    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
+    implementation(libs.bundles.commonLibs)
+
+    runtimeOnly(runTimeLibs.bundles.commonRuntimeLibs)
+
+    compileOnly(libs.bundles.compileOnlyLibs)
+}
+
+application {
+    mainClass.set("net.blugrid.core.organisation.ApplicationKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.core.organisation.*")
+    }
+}
+
+===== ./output/core-organisation-api/core-organisation-api-db/build.gradle.kts =====
+
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.application)
+}
+
+version = "0.1.0"
+group = "net.blugrid.api"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api(project(":common-api:common-api:common-api-model"))
+    api(project(":common-api:common-api:common-api-json"))
+    api(project(":common-api:common-api:common-api-db"))
+    api(project(":common-api:common-api:common-api-multitenant"))
+    
+    api(project(":core-api:core-organisation-api:core-organisation-api-model"))
+
+    implementation(platform("io.micronaut.platform:micronaut-platform"))
+    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
+    implementation(libs.bundles.commonLibs)
+    implementation(libs.bundles.dbLibs)
+
+    runtimeOnly(runTimeLibs.bundles.commonRuntimeLibs)
+    runtimeOnly(runTimeLibs.bundles.dbRuntimeLibs)
+
+    compileOnly(libs.bundles.compileOnlyLibs)
+    testImplementation(project(":common-api:common-api:common-api-test"))
+    testImplementation(testLibs.bundles.testImplementationLibs) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+application {
+    mainClass.set("net.blugrid.core.organisation.ApplicationKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.core.organisation.*")
+    }
+}
+
+===== ./output/core-organisation-api/core-organisation-api/build.gradle.kts =====
+
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.application)
+}
+
+version = "0.1.0"
+group = "net.blugrid.api"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api(project(":common-api:common-api:common-api-model"))
+    api(project(":common-api:common-api:common-api-json"))
+    api(project(":common-api:common-api:common-api-db"))
+    api(project(":common-api:common-api:common-api-multitenant"))
+    
+    api(project(":core-api:core-organisation-api:core-organisation-api-model"))
+
+    implementation(platform("io.micronaut.platform:micronaut-platform"))
+    kapt(annotationProcessorLibs.bundles.commonAnnotationProcessors)
+    implementation(libs.bundles.commonLibs)
+    implementation(libs.bundles.dbLibs)
+
+    runtimeOnly(runTimeLibs.bundles.commonRuntimeLibs)
+    runtimeOnly(runTimeLibs.bundles.dbRuntimeLibs)
+
+    compileOnly(libs.bundles.compileOnlyLibs)
+    testImplementation(project(":common-api:common-api:common-api-test"))
+    testImplementation(testLibs.bundles.testImplementationLibs) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+application {
+    mainClass.set("net.blugrid.core.organisation.ApplicationKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.core.organisation.*")
+    }
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.application)
+    alias(libs.plugins.shadow)
+}
+
+dependencies {
+    // Common foundation APIs
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:data:data-persistence"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+    api(project(":common:common-kotlin:security:security-core"))
+    api(project(":common:common-kotlin:server:server-rest"))
+
+    // Domain-specific modules
+    implementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    implementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-db"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautWeb)      // REST API support
+    implementation(libs.bundles.micronautData)     // Database operations
+    implementation(libs.bundles.micronautSecurity) // Authentication/authorization
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+    runtimeOnly(libs.bundles.runtimeSecurity)
+
+    // Test dependencies
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
+    testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+application {
+    mainClass.set("net.blugrid.api.core.organisation.ApplicationKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.api.core.organisation.*")
+    }
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-db/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+    api(project(":common:common-kotlin:data:data-persistence"))
+
+    // Domain-specific model
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautData)     // Complete database stack
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+
+    // Test dependencies
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
+    testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.*")
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-grpc/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.jpa)
+    alias(libs.plugins.application)
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.protobuf)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:data:data-persistence"))
+    api(project(":common:common-kotlin:integration:integration-grpc"))
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+    api(project(":common:common-kotlin:security:security-core"))
+    api(project(":common:common-kotlin:server:server-multitenancy"))
+
+    // Domain-specific modules
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-db"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-grpc-proto"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautData)     // Database access
+    implementation(libs.bundles.grpcCore)          // gRPC core functionality
+    implementation(libs.bundles.grpcServer)        // gRPC server support
+
+    // Service discovery for gRPC
+    implementation(libs.micronaut.discovery)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+
+    // Test dependencies
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
+    testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+application {
+    mainClass.set("net.blugrid.api.core.organisation.grpc.ApplicationKt")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.*")
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.api.core.organisation.grpc.*")
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+    plugins {
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.versions.grpc.get()}"
+        }
+        create("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.3.0:jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("kotlin")
+            }
+            task.plugins {
+                create("grpc")
+                create("grpckt")
+            }
+        }
+    }
+}
+
+sourceSets["main"].java.srcDirs(
+    "build/generated/source/proto/main/java",
+    "build/generated/source/proto/main/grpc",
+    "build/generated/source/proto/main/grpckt"
+)
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
+}
+
+tasks.register<Exec>("buildLocalGrpcDockerImage") {
+    dependsOn("shadowJar")
+    commandLine("docker", "build", "-t", "core-organisation-api-grpc:local", ".")
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-grpc-client/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.protobuf)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:integration:integration-grpc"))
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+
+    // Domain-specific modules
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-grpc-proto"))
+
+    // Platform BOM
+    implementation(platform(libs.micronaut.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.grpcCore)          // gRPC core functionality
+    implementation(libs.bundles.grpcClient)        // gRPC client support
+
+    // Micronaut Data
+    implementation(libs.bundles.micronautData)
+    implementation(libs.micronaut.data.model)
+
+    // Kotlin coroutines for async gRPC calls
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+
+    // Test dependencies
+    testImplementation(project(":common:common-kotlin:platform:platform-testing"))
+    testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.api.core.organisation.grpc.*")
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+    plugins {
+        create("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.versions.grpc.get()}"
+        }
+        create("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.3.0:jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("kotlin")
+            }
+            task.plugins {
+                create("grpc")
+                create("grpckt")
+            }
+        }
+    }
+}
+
+sourceSets["main"].java.srcDirs(
+    "build/generated/source/proto/main/java",
+    "build/generated/source/proto/main/grpc",
+    "build/generated/source/proto/main/grpckt"
+)
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-grpc-proto/build.gradle.kts =====
+import com.google.protobuf.gradle.id
+
+plugins {
+   alias(libs.plugins.jvm)
+    id("com.google.protobuf") version "0.9.4"
+}
+
+version = "0.1.0"
+group = "net.blugrid.api"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+
+    implementation("io.grpc:grpc-kotlin-stub:1.3.0")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+
+    implementation("io.grpc:grpc-stub:1.62.2")
+    implementation("io.grpc:grpc-netty-shaded:1.62.2")
+    implementation("io.grpc:grpc-protobuf:1.62.2")
+    implementation("com.google.protobuf:protobuf-java:4.31.1")
+    implementation("com.google.protobuf:protobuf-kotlin:4.31.1")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.31.1"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.62.2"
+        }
+        id("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.3.0:jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("kotlin")
+            }
+            task.plugins {
+                id("grpc")
+                id("grpckt")
+            }
+        }
+    }
+}
+
+sourceSets["main"].java.srcDirs(
+    "build/generated/source/proto/main/java",
+    "build/generated/source/proto/main/grpc",
+    "build/generated/source/proto/main/grpckt"
+)
+
+sourceSets {
+    main {
+        proto {
+            srcDir("src/main/proto")
+        }
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn("generateProto")
+}
+
+tasks.withType<JavaCompile> {
+    dependsOn("generateProto")
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-model/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common:common-domain"))
+    api(project(":common:common-kotlin:common:common-model"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies using new bundles
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // Model-specific dependencies
+    implementation(libs.micronaut.data.model)
+    implementation(libs.micronaut.serde)           // Serialization framework
+    implementation(libs.micronaut.validation)      // Validation annotations
+    implementation(libs.jackson.kotlin)            // JSON serialization
+    implementation(libs.mapstruct)                 // Object mapping
+    implementation(libs.kotlin.builder.annotation) // Builder pattern support
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.core.organisation.*")
+    }
+}
+
+===== ./examples/organisations/generated/core-organisation-api/core-organisation-api-test/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    // API dependencies - expose ALL to test consumers
+    api(project(":common:common-kotlin:platform:platform-testing"))
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+
+    // Platform BOM - exposed to test consumers
+    api(platform(libs.micronaut.bom))
+
+    // Core dependencies using new bundles
+    api(libs.bundles.kotlinCore)
+    api(libs.bundles.micronautCore)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies for test environments
+    runtimeOnly(libs.bundles.runtimeCore)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.core.organisation.*")
+    }
+}
+
+===== ./common/common-kotlin/platform/platform-logging/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    implementation(platform(libs.micronaut.bom))
+
+    implementation(libs.logback.classic)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.jakarta.annotation)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/platform/platform-config/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+    implementation(libs.micronaut.runtime)
+    implementation(libs.micronaut.validation)
+    implementation(libs.jakarta.validation)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/platform/platform-validation/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    implementation(platform(libs.micronaut.bom))
+
+    implementation(libs.jakarta.validation)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/platform/platform-serialization/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    implementation(platform(libs.micronaut.bom))
+    implementation(libs.bundles.jacksonLibs)
+    implementation(libs.bundles.jsonLibs)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/platform/platform-testing/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:common:common-model"))
+    implementation(project(":common:common-kotlin:integration:integration-http-client"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:platform:platform-serialization"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:security:security-tokens"))
+    implementation(project(":common:common-kotlin:server:server-rest"))
+
+    implementation(platform(libs.micronaut.bom))
+    implementation(libs.bundles.testing)
+
+    // ===== CORE PLATFORM =====
+    implementation(platform(libs.micronaut.bom))
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // ===== WEB & HTTP (for test controllers and clients) =====
+    implementation(libs.micronaut.http.server)
+    implementation(libs.micronaut.http.client)
+    implementation(libs.micronaut.http.validation)
+    implementation(libs.micronaut.management)
+    implementation(libs.jackson.kotlin)
+
+    // ===== DATA & PERSISTENCE (for test repositories and entities) =====
+    implementation(libs.bundles.micronautData)
+    implementation(libs.micronaut.data.model)
+
+    // ===== SECURITY & JWT (for test authentication) =====
+    implementation(libs.bundles.micronautSecurity)
+    implementation(libs.nimbus.jose.jwt)
+
+    // ===== GRPC (for gRPC testing support) =====
+    implementation(libs.bundles.grpcCore)
+    implementation(libs.bundles.grpcServer)
+    implementation(libs.bundles.grpcClient)
+
+    // ===== REACTIVE SUPPORT =====
+    implementation(libs.bundles.micronautReactive)
+
+    // ===== TESTING CORE =====
+    api(libs.bundles.testing)
+    api(libs.micronaut.test.junit5)
+
+    // ===== TESTCONTAINERS =====
+    api(libs.testcontainers)
+    api(libs.testcontainers.postgresql)
+    api(libs.testcontainers.junit)
+
+    // ===== AWS SDK (for ECR login helper) =====
+    implementation(platform(libs.aws.bom))
+    implementation(libs.aws.sdk.ecr)
+
+    // ===== VALIDATION =====
+    implementation(libs.bundles.validationLibs)
+    implementation(libs.jakarta.annotation)
+
+    // ===== UTILITIES =====
+    implementation(libs.kotlin.faker)
+    implementation(libs.jsonpath.kt)
+
+    // ===== ANNOTATION PROCESSING =====
+    kapt(platform(libs.micronaut.bom))
+    kapt(libs.bundles.annotationProcessors)
+
+    // ===== RUNTIME DEPENDENCIES =====
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeDatabase)
+    runtimeOnly(libs.bundles.runtimeSecurity)
+
+    // ===== TEST SCOPE ONLY =====
+    testImplementation(libs.bundles.testing)
+    testRuntimeOnly(libs.logback.classic)
+}
+
+
+kapt {
+    arguments {
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.platform.testing.*")
+        arg("micronaut.processing.group", "net.blugrid.platform.testing")
+        arg("micronaut.processing.module", "platform-testing")
+    }
+}
+
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/security/security-core/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:common:common-model"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    implementation(libs.bundles.jacksonLibs)
+    kapt(libs.bundles.jacksonLibs)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/security/security-tokens/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:platform:platform-serialization"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+
+    // Core Kotlin
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // Specifically needed dependencies
+    implementation(libs.micronaut.security)                   // For Authentication interface
+    implementation(libs.micronaut.security.jwt)               // For JWT support
+    implementation(libs.nimbus.jose.jwt)                      // For JWT processing
+    implementation(libs.jackson.kotlin)                       // For JSON processing
+    implementation(libs.micronaut.jackson)                    // For Micronaut JSON integration
+
+    // Annotation processing
+    kapt(libs.micronaut.inject.java)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/security/security-authentication/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:security:security-tokens"))
+    implementation(project(":common:common-kotlin:common:common-model"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // Security dependencies
+    implementation(libs.micronaut.security)
+    implementation(libs.micronaut.security.jwt)
+
+    // Specific dependencies for JWT decoding
+    implementation(libs.nimbus.jose.jwt)        // For JWT class
+    implementation(libs.jackson.databind)       // For ObjectMapper and JsonNode
+    implementation(libs.jackson.core)           // For Jackson core classes
+    implementation(libs.jackson.kotlin)         // For Kotlin Jackson integration
+
+    // Annotation processing
+    kapt(libs.micronaut.inject.java)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/security/security-authorization/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:security:security-core"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/security/security-crypto/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:security:security-core"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/data/data-models/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-serialization"))
+    implementation(project(":common:common-kotlin:platform:platform-validation"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.jacksonLibs)
+    implementation(libs.bundles.validationLibs)
+
+    kapt(libs.bundles.annotationProcessors)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/data/data-validation/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-validation"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.jakarta.validation)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/data/data-sync/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:data:data-models"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/data/data-persistence/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:security:security-core"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
+
+    implementation(project(":common:common-kotlin:common:common-domain"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+
+    // Platform BOM
+    implementation(platform(libs.micronaut.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // Data persistence stack using new bundles
+    implementation(libs.bundles.micronautData)
+
+    // Validation support
+    implementation(libs.jakarta.validation)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing) {
+        exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-rest/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:common:common-model"))
+    implementation(project(":common:common-kotlin:platform:platform-config"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:platform:platform-serialization"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:security:security-tokens"))
+    implementation(project(":common:common-kotlin:security:security-authentication"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.http.server)
+    implementation(libs.micronaut.http.client)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+    implementation(libs.micronaut.runtime)
+    implementation(libs.micronaut.security)
+    implementation(libs.micronaut.security.oauth2)
+    implementation(libs.nimbus.jose.jwt)
+
+    implementation(libs.bundles.micronautReactive)
+    implementation(libs.bundles.jacksonLibs)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.micronaut.test.junit5)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-persistence/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:platform:platform-config"))
+    implementation(project(":common:common-kotlin:data:data-models"))
+    implementation(project(":common:common-kotlin:server:server-api"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.data.hibernate)
+    implementation(libs.micronaut.hibernate.jpa)
+    implementation(libs.micronaut.flyway)
+    implementation(libs.postgresql)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+    kapt(libs.micronaut.data.processor)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-multitenancy/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:common:common-model"))
+    implementation(project(":common:common-kotlin:data:data-persistence"))
+    implementation(project(":common:common-kotlin:platform:platform-config"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:server:server-api"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.multitenancy)
+    implementation(libs.micronaut.data.hibernate)
+    implementation(libs.postgresql)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-services/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:security:security-authentication"))
+    implementation(project(":common:common-kotlin:server:server-persistence"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+    implementation(libs.micronaut.runtime)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.micronaut.test.junit5)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-api/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:platform:platform-config"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:data:data-models"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.data.hibernate)
+    implementation(libs.micronaut.hibernate.jpa)
+    implementation(libs.micronaut.flyway)
+    implementation(libs.postgresql)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+    kapt(libs.micronaut.data.processor)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/server/server-standalone/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.kapt)
+}
+
+dependencies {
+    implementation(project(":common:common-kotlin:common:common-model"))
+    implementation(project(":common:common-kotlin:platform:platform-config"))
+    implementation(project(":common:common-kotlin:platform:platform-logging"))
+    implementation(project(":common:common-kotlin:security:security-core"))
+    implementation(project(":common:common-kotlin:server:server-api"))
+
+    implementation(platform(libs.micronaut.bom))
+    kapt(platform(libs.micronaut.bom))
+
+    implementation(libs.micronaut.multitenancy)
+    implementation(libs.micronaut.data.hibernate)
+    implementation(libs.postgresql)
+    implementation(libs.micronaut.inject)
+    implementation(libs.micronaut.core)
+
+    kapt(libs.micronaut.inject.java)
+
+    testImplementation(libs.bundles.testing)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+===== ./common/common-kotlin/common/common-domain/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    // Domain value objects - minimal dependencies
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./common/common-kotlin/common/common-model/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    // API dependencies - expose to consumers
+    api(project(":common:common-kotlin:common:common-domain"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // jackson
+    implementation(libs.bundles.jacksonLibs)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./common/common-kotlin/audit/audit-core/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+}
+
+dependencies {
+    // API dependencies
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+
+    // Micronaut dependencies
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautData)
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./common/common-kotlin/integration/integration-http-client/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    // API dependencies
+    api(project(":common:common-kotlin:common:common-model"))
+
+    // HTTP client dependencies
+    implementation(libs.bundles.micronautCore)
+    implementation(libs.micronaut.http.client)
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./common/common-kotlin/integration/integration-grpc/build.gradle.kts =====
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.allopen)
+    alias(libs.plugins.application)
+}
+
+dependencies {
+    api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+
+    // Platform BOMs
+    implementation(platform(libs.micronaut.bom))
+    implementation(platform(libs.aws.bom))
+
+    // Core dependencies
+    implementation(libs.bundles.kotlinCore)
+    implementation(libs.bundles.micronautCore)
+
+    // gRPC dependencies
+    implementation(libs.bundles.grpcCore)
+    implementation(libs.bundles.grpcServer)
+    implementation(libs.bundles.grpcClient)
+
+    // Micronaut gRPC integration
+    implementation(libs.micronaut.grpc.annotation)
+    implementation(libs.micronaut.grpc.server)
+    implementation(libs.micronaut.grpc.client)
+
+    // Validation for gRPC
+    implementation(libs.bundles.validationLibs)
+
+    // JSON processing (for gRPC-Web or debugging)
+    implementation(libs.bundles.jsonLibs)
+
+    // Annotation processing
+    kapt(libs.bundles.annotationProcessors)
+    kapt(libs.micronaut.inject.java)
+
+    // Compile-only dependencies
+    compileOnly(libs.bundles.compileOnly)
+
+    // Runtime dependencies
+    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.grpc.netty)
+
+    // Test dependencies
+    testImplementation(libs.bundles.testing)
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+kapt {
+    arguments {
+        arg("micronaut.openapi.project.dir", projectDir.toString())
+    }
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.*")
+    }
+}
+
+===== ./common/common-kotlin/integration/integration-grpc-proto/build.gradle.kts =====
+import com.google.protobuf.gradle.id
+
+plugins {
+    alias(libs.plugins.jvm)
+    id("com.google.protobuf") version "0.9.4"
+}
+
+dependencies {
+    implementation(libs.proto.google.common)
+
+    implementation("io.grpc:grpc-kotlin-stub:1.3.0")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+
+    implementation("io.grpc:grpc-stub:1.62.2")
+    implementation("io.grpc:grpc-netty-shaded:1.62.2")
+    implementation("io.grpc:grpc-protobuf:1.62.2")
+    implementation("com.google.api.grpc:proto-google-common-protos:2.59.0")
+    implementation("com.google.protobuf:protobuf-java:4.31.1")
+    implementation("com.google.protobuf:protobuf-kotlin:4.31.1")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.31.1"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.62.2"
+        }
+        id("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:1.3.0:jdk8@jar"
+        }
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                id("kotlin")
+            }
+            it.plugins {
+                id("grpc")
+                id("grpckt")
+            }
+        }
+    }
+}
+
+sourceSets["main"].java.srcDirs(
+    "build/generated/source/proto/main/java",
+    "build/generated/source/proto/main/grpc",
+    "build/generated/source/proto/main/grpckt"
+)
+
+sourceSets["main"].proto.srcDir("src/main/proto")
+
+===== ./build.gradle.kts =====
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.kapt) apply false
+    alias(libs.plugins.allopen) apply false
+    alias(libs.plugins.jpa) apply false
+    alias(libs.plugins.application) apply false
+    alias(libs.plugins.shadow) apply false
+    alias(libs.plugins.protobuf) apply false
+}
+
+allprojects {
+    group = "net.blugrid.api"
+    version = project.findProperty("version") ?: "0.1.0"
+
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+    }
+
+    configureLintCheck()
+}
+
+subprojects {
+    apply(plugin = "java")
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    configureKotlin()
+
+    // Common test dependency for all projects
+    dependencies {
+        testImplementation("io.github.serpro69:kotlin-faker:1.13.0") {
+            exclude(group = "org.slf4j", module = "slf4j-api")
+        }
+    }
+
+    // Resource processing configuration
+    tasks.named<ProcessResources>("processResources") {
+        duplicatesStrategy = DuplicatesStrategy.WARN
+    }
+
+    // Shadow JAR configuration when plugin is applied
+    plugins.withId("com.github.johnrengelman.shadow") {
+        tasks.named<Jar>("shadowJar") {
+            isZip64 = true
+        }
+    }
+}
+
+fun Project.configureKotlin() {
+    // Modern Kotlin compilation configuration
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            javaParameters.set(true)
+            allWarningsAsErrors.set(false)
+        }
+    }
+}
+
+fun Project.configureLintCheck() {
+    val ktlintConfig = configurations.create("ktlint")
+    dependencies.add("ktlint", "com.pinterest:ktlint:0.48.1")
+
+    tasks.register<JavaExec>("ktlint") {
+        group = "verification"
+        description = "Runs Kotlin lint checks"
+        mainClass.set("com.pinterest.ktlint.Main")
+        classpath = ktlintConfig
+        args("src/**/*.kt", "!**/build/**", "!**/migration/**")
+    }
+
+    tasks.register<JavaExec>("ktlintFormat") {
+        group = "verification"
+        description = "Formats Kotlin source code"
+        mainClass.set("com.pinterest.ktlint.Main")
+        classpath = ktlintConfig
+        args("--format", "src/**/*.kt", "!**/build/**", "!**/migration/**")
+    }
+}
+
+// OpenAPI aggregation task
+tasks.register("aggregateOpenApiSpecs") {
+    group = "openapi"
+    description = "Aggregates OpenAPI specifications from all subprojects"
+
+    doLast {
+        // Define the output directory for aggregated OpenAPI specs in the main project
+        val outputDir = layout.buildDirectory.dir("tmp/kapt3/classes/main/META-INF/swagger").get().asFile
+        outputDir.mkdirs() // Create the directory if it doesn't exist
+        println("Output directory: ${outputDir.absolutePath}")
+
+        subprojects.forEach { subproject ->
+            val subprojectSwaggerDir = subproject.layout.buildDirectory.dir("tmp/kapt3/classes/main/META-INF/swagger").get().asFile
+            println("Checking subproject directory: ${subprojectSwaggerDir.absolutePath}")
+
+            if (subprojectSwaggerDir.exists()) {
+                println("Directory exists. Files in directory:")
+                subprojectSwaggerDir.listFiles()?.forEach { file ->
+                    println(" - Found file: ${file.name}")
+                    val destinationFile = file("${outputDir}/${file.name}")
+                    file.copyTo(destinationFile, overwrite = true)
+                    println("Copied file to: ${destinationFile.absolutePath}")
+                } ?: run {
+                    println("No files found in ${subprojectSwaggerDir.absolutePath}")
+                }
+            }
+        }
+    }
+}
+
+tasks.named("build").configure {
+    dependsOn("aggregateOpenApiSpecs")
+}
+
+gradle.settingsEvaluated {
+    gradle.rootProject.allprojects {
+        tasks.withType<JavaCompile>().configureEach {
+            options.release.set(17)
+        }
+    }
+}
+
