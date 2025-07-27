@@ -1,11 +1,11 @@
 package net.blugrid.api.core.organisation.grpc
 
-import io.micronaut.data.model.Page
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.pagination.Page
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
@@ -51,8 +51,8 @@ fun List<Organisation>.toGrpcList(): OrganisationListResponse =
 fun Page<Organisation>.toGrpcPage(): OrganisationPageResponse =
     OrganisationPageResponse.newBuilder()
         .addAllOrganisations(content.map { it.toOrganisationResponse() })
-        .setTotalElements(totalSize.toInt())
+        .setTotalElements(totalElements.toInt())
         .setTotalPages(totalPages)
-        .setPage(pageNumber)
+        .setPage(number)
         .setSize(size)
         .build()

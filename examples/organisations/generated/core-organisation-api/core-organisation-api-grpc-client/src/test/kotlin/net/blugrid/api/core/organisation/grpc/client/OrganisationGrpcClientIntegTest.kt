@@ -4,11 +4,11 @@ import net.blugrid.api.core.organisation.grpc.toOrganisationCreateRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationUpdateRequest
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
-import net.blugrid.api.test.security.TestApplicationContext
-import net.blugrid.api.test.support.BaseGrpcClientIntegTest
-import net.blugrid.api.test.support.GrpcServerTestSupport
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.platform.testing.security.TestApplicationContext
+import net.blugrid.platform.testing.support.BaseGrpcClientIntegTest
+import net.blugrid.platform.testing.support.GrpcServerTestSupport
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue

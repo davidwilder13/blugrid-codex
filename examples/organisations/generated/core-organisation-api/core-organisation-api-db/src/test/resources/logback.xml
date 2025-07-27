@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender for test output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger configuration -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Application-specific loggers -->
+    <logger name="net.blugrid" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Hibernate logging (reduce noise) -->
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+    <!-- Micronaut logging -->
+    <logger name="io.micronaut" level="INFO"/>
+    <logger name="io.micronaut.context" level="WARN"/>
+
+    <!-- Database logging -->
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="org.testcontainers" level="INFO"/>
+
+    <!-- Reduce noise from other libraries -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="com.github.dockerjava" level="WARN"/>
+</configuration>

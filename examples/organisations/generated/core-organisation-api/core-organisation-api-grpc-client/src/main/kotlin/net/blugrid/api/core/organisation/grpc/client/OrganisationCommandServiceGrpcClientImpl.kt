@@ -1,20 +1,21 @@
 package net.blugrid.api.core.organisation.grpc.client
 
 import io.micronaut.context.annotation.Requires
-import io.micronaut.data.model.Page
-import io.micronaut.data.model.Pageable
 import jakarta.inject.Singleton
 import kotlinx.coroutines.runBlocking
-import net.blugrid.api.core.organisation.model.Organisation
-import net.blugrid.api.core.organisation.model.OrganisationCreate
-import net.blugrid.api.core.organisation.model.OrganisationUpdate
-import net.blugrid.api.core.organisation.service.OrganisationCommandService
 import net.blugrid.api.core.organisation.grpc.toOrganisation
 import net.blugrid.api.core.organisation.grpc.toOrganisationCreateRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationPageRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationUpdateRequest
+import net.blugrid.api.core.organisation.model.Organisation
+import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationFilter
+import net.blugrid.api.core.organisation.model.OrganisationUpdate
+import net.blugrid.api.core.organisation.service.OrganisationCommandService
 import net.blugrid.api.core.organisation.service.OrganisationQueryService
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.PageRequest
+import net.blugrid.common.model.pagination.Pageable
 import java.util.Optional
 import java.util.UUID
 
@@ -28,7 +29,7 @@ class OrganisationCommandServiceGrpcClientImpl(
         val response = grpcClient.getPage(pageable.toOrganisationPageRequest())
         Page.of(
             response.organisationsList.map { it.toOrganisation() },
-            pageable,
+            PageRequest.of(pageable.number, pageable.size, pageable.sort),
             response.totalElements.toLong()
         )
     }

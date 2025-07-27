@@ -1,7 +1,5 @@
 package net.blugrid.api.core.organisation.controller
 
-import io.micronaut.data.model.Page
-import io.micronaut.data.model.Pageable
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Delete
@@ -14,16 +12,17 @@ import io.micronaut.scheduling.annotation.ExecuteOn
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
-import net.blugrid.api.common.controller.GenericCommandResource
-import net.blugrid.api.common.controller.GenericQueryResource
-import net.blugrid.api.common.model.query.PageableQuery
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationFilter
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.api.core.organisation.service.OrganisationCommandService
 import net.blugrid.api.core.organisation.service.OrganisationQueryService
+import net.blugrid.common.model.controller.GenericCommandResource
+import net.blugrid.common.model.controller.GenericQueryResource
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.common.model.pagination.PageableQuery
 import java.util.Optional
 import java.util.UUID
 

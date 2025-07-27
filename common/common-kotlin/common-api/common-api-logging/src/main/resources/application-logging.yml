@@ -1,3 +1,0 @@
-logger:
-  levels:
-    net.blugrid.api: DEBUG

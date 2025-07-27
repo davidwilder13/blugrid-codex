@@ -1,12 +1,12 @@
 package net.blugrid.api.core.organisation.mapping
 
-import net.blugrid.api.common.persistence.mapping.toResourceAudit
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.api.core.organisation.repository.model.OrganisationEntity
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.data.persistence.mapping.toResourceAudit
 
 fun Organisation.toCreate(): OrganisationCreate =
     OrganisationCreate(

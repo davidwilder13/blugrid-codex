@@ -9,9 +9,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import net.blugrid.api.common.persistence.audit.AuditEmbeddable
-import net.blugrid.api.common.persistence.model.resource.UnscopedPersistable
-import net.blugrid.api.util.kotlinEquals
+import net.blugrid.common.util.kotlinEquals
+import net.blugrid.data.persistence.audit.AuditEmbeddable
+import net.blugrid.data.persistence.model.resource.UnscopedPersistable
 import org.hibernate.annotations.GenericGenerator
 import java.time.LocalDateTime
 import java.util.Objects
@@ -23,7 +23,7 @@ class OrganisationEntity(
 
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "organisation-sequence")
-    @GenericGenerator(name = "organisation-sequence", strategy = "net.blugrid.api.db.GlobalTenantSequenceGenerator")
+    @GenericGenerator(name = "organisation-sequence", strategy = "net.blugrid.server.multitenancy.generators.GlobalTenantSequenceGenerator")
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     override var id: Long? = null,
 

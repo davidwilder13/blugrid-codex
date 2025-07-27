@@ -1,0 +1,182 @@
+./examples/organisations/generated/core-organisation-api
+├── core-organisation-api
+│   ├── build.gradle.kts
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       ├── main
+│       │   └── kotlin
+│       │       └── net
+│       │           └── blugrid
+│       │               └── api
+│       │                   └── core
+│       │                       └── organisation
+│       │                           ├── Application.kt
+│       │                           └── controller
+│       │                               └── OrganisationController.kt
+│       └── test
+│           ├── kotlin
+│           │   └── net
+│           │       └── blugrid
+│           │           └── api
+│           │               └── core
+│           │                   └── organisation
+│           │                       └── controller
+│           │                           └── OrganisationControllerIntegTest.kt
+│           └── resources
+│               └── application-test.yml
+├── core-organisation-api-db
+│   ├── build.gradle.kts
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       ├── main
+│       │   └── kotlin
+│       │       └── net
+│       │           └── blugrid
+│       │               └── api
+│       │                   └── core
+│       │                       └── organisation
+│       │                           ├── mapping
+│       │                           │   ├── OrganisationMappingExtensions.kt
+│       │                           │   └── OrganisationMappingService.kt
+│       │                           ├── migration
+│       │                           │   ├── R__5_table_organisation.kt
+│       │                           │   └── R__6_view_organisation.kt
+│       │                           ├── repository
+│       │                           │   ├── model
+│       │                           │   │   └── OrganisationEntity.kt
+│       │                           │   ├── OrganisationRepository.kt
+│       │                           │   └── OrganisationSpecifications.kt
+│       │                           └── service
+│       │                               ├── OrganisationCommandServiceDbImpl.kt
+│       │                               └── OrganisationQueryServiceDbImpl.kt
+│       └── test
+│           └── kotlin
+│               └── net
+│                   └── blugrid
+│                       └── api
+│                           └── core
+│                               └── organisation
+│                                   └── service
+│                                       └── OrganisationStateServiceDbImplIntegTest.kt
+├── core-organisation-api-grpc
+│   ├── build.gradle.kts
+│   ├── Dockerfile
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       ├── main
+│       │   ├── kotlin
+│       │   │   └── net
+│       │   │       └── blugrid
+│       │   │           └── api
+│       │   │               └── core
+│       │   │                   └── organisation
+│       │   │                       └── grpc
+│       │   │                           ├── Application.kt
+│       │   │                           ├── OrganisationGrpcMappingExtensions.kt
+│       │   │                           └── OrganisationGrpcService.kt
+│       │   └── resources
+│       │       └── application.yml
+│       └── test
+│           ├── kotlin
+│           │   └── net
+│           │       └── blugrid
+│           │           └── api
+│           │               └── core
+│           │                   └── organisation
+│           │                       └── grpc
+│           │                           ├── assertion
+│           │                           │   └── OrganisationResponseAssertions.kt
+│           │                           └── OrganisationGrpcServiceIntegTest.kt
+│           └── resources
+│               └── application-test.yml
+├── core-organisation-api-grpc-client
+│   ├── build.gradle.kts
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       ├── main
+│       │   ├── kotlin
+│       │   │   └── net
+│       │   │       └── blugrid
+│       │   │           └── api
+│       │   │               └── core
+│       │   │                   └── organisation
+│       │   │                       └── grpc
+│       │   │                           ├── client
+│       │   │                           │   ├── OrganisationCommandServiceGrpcClientImpl.kt
+│       │   │                           │   ├── OrganisationGrpcClientFactory.kt
+│       │   │                           │   └── OrganisationGrpcClient.kt
+│       │   │                           └── OrganisationProtoMappers.kt
+│       │   └── resources
+│       │       └── application.yml
+│       └── test
+│           ├── kotlin
+│           │   └── net
+│           │       └── blugrid
+│           │           └── api
+│           │               └── core
+│           │                   └── organisation
+│           │                       └── grpc
+│           │                           ├── assertion
+│           │                           │   └── OrganisationResponseAssertions.kt
+│           │                           └── client
+│           │                               └── OrganisationGrpcClientIntegTest.kt
+│           └── resources
+│               └── application-test.yml
+├── core-organisation-api-grpc-proto
+│   ├── build.gradle.kts
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       └── main
+│           └── proto
+│               └── organisation.proto
+├── core-organisation-api-model
+│   ├── build.gradle.kts
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── src
+│       └── main
+│           └── kotlin
+│               └── net
+│                   └── blugrid
+│                       └── api
+│                           └── core
+│                               └── organisation
+│                                   ├── model
+│                                   │   ├── IOrganisation.kt
+│                                   │   ├── OrganisationCreate.kt
+│                                   │   ├── OrganisationFilter.kt
+│                                   │   ├── OrganisationResource.kt
+│                                   │   └── OrganisationUpdate.kt
+│                                   └── service
+│                                       ├── OrganisationCommandService.kt
+│                                       └── OrganisationQueryService.kt
+└── core-organisation-api-test
+    ├── build.gradle.kts
+    ├── gradle.properties
+    ├── gradlew
+    ├── gradlew.bat
+    └── src
+        └── main
+            └── kotlin
+                └── net
+                    └── blugrid
+                        └── api
+                            └── core
+                                └── organisation
+                                    ├── assertion
+                                    │   └── OrganisationAssertions.kt
+                                    └── factory
+                                        └── OrganisationTestFactory.kt
+
+112 directories, 68 files

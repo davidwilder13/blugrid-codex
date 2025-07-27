@@ -1,11 +1,11 @@
 package net.blugrid.api.core.organisation.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import net.blugrid.api.common.model.audit.ResourceAudit
-import net.blugrid.api.common.model.resource.ResourceType
-import net.blugrid.api.common.model.resource.UnscopedResource
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.audit.ResourceAudit
+import net.blugrid.common.model.resource.ResourceType
+import net.blugrid.common.model.resource.UnscopedResource
 import java.time.LocalDateTime
 
 @Schema(description = "Represents a organisation within the system.")

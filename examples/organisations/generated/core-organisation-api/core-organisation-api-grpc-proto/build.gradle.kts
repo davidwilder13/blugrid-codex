@@ -13,6 +13,10 @@ repositories {
 }
 
 dependencies {
+    api(project(":common:common-kotlin:integration:integration-grpc-proto"))
+
+    api(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-model"))
+
     implementation("io.grpc:grpc-kotlin-stub:1.3.0")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
@@ -68,9 +72,14 @@ sourceSets {
     main {
         proto {
             srcDir("src/main/proto")
-
-            // Add common proto directory from external module
-            srcDir(project(":common:common-kotlin:common-api:common-api-grpc-proto").file("src/main/proto"))
         }
     }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn("generateProto")
+}
+
+tasks.withType<JavaCompile> {
+    dependsOn("generateProto")
 }

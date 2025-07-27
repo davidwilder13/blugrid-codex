@@ -1,12 +1,13 @@
 package net.blugrid.api.core.organisation.grpc
 
-import io.micronaut.data.model.Pageable
 import net.blugrid.api.core.organisation.model.Organisation
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
-import net.blugrid.common.grpc.mapper.toProto
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.integration.grpc.mapper.toProto
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -64,4 +65,13 @@ fun OrganisationUpdate.toOrganisationUpdateRequest(): OrganisationUpdateRequest 
         .setUuid(this.uuid.value.toString())
         .setParentOrganisationId(this.parentOrganisationId)
         .setEffectiveTimestamp(this.effectiveTimestamp.toString())
+        .build()
+
+fun Page<Organisation>.toGrpcPage(): OrganisationPageResponse =
+    OrganisationPageResponse.newBuilder()
+        .addAllOrganisations(content.map { it.toOrganisationResponse() })
+        .setTotalElements(totalElements.toInt())
+        .setTotalPages(totalPages)
+        .setPage(number)
+        .setSize(size)
         .build()

@@ -1,0 +1,62 @@
+---
+env.db.schema: public
+---
+#tag::logging[]
+logger:
+  levels:
+    net.blugrid.api: DEBUG
+#end::logging[]
+---
+#tag::swagger[]
+micronaut.openapi.enabled: false
+micronaut.openapi.swagger.file.generation.enabled: false
+---
+#tag::endpoints[]
+endpoints:
+  all:
+    enabled: false
+#end::endpoints[]
+---
+#tag::security[]
+#micronaut:
+#  security:
+#    enabled: true
+#    authentication: bearer
+#    intercept-url-map:
+#      - pattern: "/**"
+#        access:
+#          - isAuthenticated()
+#    token:
+#      enabled: true
+#      roles-name: "roles"
+#      jwt:
+#        enabled: true
+#        signatures:
+#          jwks:
+#            auth0:
+#              url: "https://bizkinetics.au.auth0.com/.well-known/jwks.json"
+#end::security[]
+---
+#tag::client[]
+micronaut:
+  http:
+    client:
+      read-timeout: 300s
+  services:
+    localhost:
+      url: http://localhost
+#  security:
+#    oauth2:
+#      clients:
+#        auth0:
+#          client-id: '${OAUTH_CLIENT_ID:0hU7HAfkTzcBU7ZlY0vtUHl4dl1c5Gdk}'
+#          client-secret: '${OAUTH_CLIENT_SECRET:1-D9zbE6uA7v3AI4iZ6dzlPSSldaqhI20H5N3BjiHmKwYAPtE-5GtyTZLy6NwgMs}'
+#          grant-type: 'client_credentials'
+#          token:
+#            url: '${OAUTH_TOKEN_URL:`https://bizkinetics.au.auth0.com/oauth/token`}'
+#            auth-method: 'client_secret_post'
+#          client-credentials:
+#            service-id-regex: '.*'
+#            additional-request-params:
+#              audience: '${AUTH0_API_IDENTIFIER:`https://dev.bizkinetics.com.au/api/rest`}'
+#end::client[]
