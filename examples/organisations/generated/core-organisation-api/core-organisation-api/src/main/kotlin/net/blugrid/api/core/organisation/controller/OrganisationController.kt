@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
+import io.micronaut.http.annotation.QueryValue
 import io.micronaut.scheduling.TaskExecutors
 import io.micronaut.scheduling.annotation.ExecuteOn
 import io.swagger.v3.oas.annotations.Operation
@@ -57,8 +58,14 @@ open class OrganisationController(
 
     @Operation(summary = "Get a paginated list of organisations")
     @Get("/page")
-    override fun getPage(pageable: Pageable): Page<Organisation> =
-        queryService.getPage(pageable)
+    override fun getPage(
+        @QueryValue(defaultValue = "0") number: Int,
+        @QueryValue(defaultValue = "20") size: Int,
+        @QueryValue(defaultValue = "") sort: List<String>
+    ): Page<Organisation> {
+        val pageable = Pageable.fromQueryParams(number, size, sort)
+        return queryService.getPage(pageable)
+    }
 
     @Operation(summary = "Get organisation by ID")
     @Get("/{id}")

@@ -8,7 +8,6 @@ class R__5_vw_organisation : RepeatableDbMigration() {
         runMigration(
             context, """
 
-DROP VIEW IF EXISTS vw_organisation CASCADE;
 CREATE OR REPLACE VIEW vw_organisation WITH (security_barrier)
 AS
 SELECT *

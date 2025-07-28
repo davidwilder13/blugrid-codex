@@ -1,0 +1,43 @@
+micronaut:
+  server:
+    context-path: ""
+    cors:
+      enabled: true
+      configurations:
+        all:
+          allowed-origins:
+            - "${env.web.baseUri:http://localhost:4201}"
+            - "http://localhost:4201"
+            - "http://dev.bizkinetics.com.au"
+            - "https://dev.bizkinetics.com.au"
+          allowed-methods:
+            - HEAD
+            - OPTIONS
+            - POST
+            - PUT
+            - GET
+          allowed-headers:
+            - Content-Type
+            - Authorization
+          allow-credentials: true
+  security:
+    redirect:
+      login-success: "${env.web.baseUri:http://localhost:4201}/#/app/dashboard"
+      login-failure: "${env.web.baseUri:http://localhost:4201}/#/error/login-failure"
+      logout: "${env.web.baseUri:http://localhost:4201}/#/logout"
+
+redirect:
+  loginCallbackUrl: "${env.server.baseUri:http://localhost:8080}${micronaut.server.context-path}/oauth/callback"
+  loginRedirectUri: "${env.server.baseUri:http://localhost:8080}${micronaut.server.context-path}/oauth/login"
+  loginSuccessUrl: "${env.web.baseUri:http://localhost:4201}/#/app/dashboard"
+  loginFailureUrl: "${env.web.baseUri:http://localhost:4201}/#/error/login-failure"
+  logoutCallbackUrl: "${env.server.baseUri:http://localhost:8080}${micronaut.server.context-path}/logout/callback"
+  logoutUrl: "${env.web.baseUri:http://localhost:4201}/#/logout"
+  registrationUrl: "${env.server.baseUri:http://localhost:8080}${micronaut.server.context-path}/party-registration/signup"
+  registrationCallbackUrl: "${redirect.registrationUrl}/callback"
+
+endpoints:
+  all:
+    enabled: true
+    path: "/admin/"
+    sensitive: false

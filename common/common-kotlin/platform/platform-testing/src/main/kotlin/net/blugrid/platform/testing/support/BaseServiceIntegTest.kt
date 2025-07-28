@@ -5,7 +5,14 @@ import io.micronaut.test.support.TestPropertyProvider
 import org.junit.jupiter.api.TestInstance
 
 @MicronautTest(
-    environments = ["debug-logging", "json", "security", "db"],
+    environments = [
+        "data-persistence",
+        "platform-debug-logging",
+        "platform-serialization",
+        "security-core",
+        "security-oath",
+        "security-tokens",
+    ],
     transactional = true
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

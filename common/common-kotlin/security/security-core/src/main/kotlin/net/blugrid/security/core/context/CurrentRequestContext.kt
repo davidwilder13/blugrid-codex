@@ -2,6 +2,7 @@ package net.blugrid.security.core.context
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.context.ServerRequestContext
+import io.micronaut.security.filters.SecurityFilter
 import net.blugrid.security.core.model.BaseAuthenticatedOrganisation
 import net.blugrid.security.core.model.BaseAuthenticatedSession
 import net.blugrid.security.core.model.BaseAuthenticatedUser
@@ -70,7 +71,7 @@ object CurrentRequestContext : RequestContextProvider {
 
 @Suppress("UNCHECKED_CAST")
 fun HttpRequest<*>.toMultitenantAuthentication(): Optional<DecoratedAuthentication<out BaseAuthenticatedSession>> {
-    val attributeValue = attributes.getValue("AUTHENTICATION")
+    val attributeValue = attributes.getValue(SecurityFilter.AUTHENTICATION)
     return if (attributeValue is DecoratedAuthentication<*>) {
         Optional.of(attributeValue)
     } else {

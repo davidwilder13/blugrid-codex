@@ -5,7 +5,6 @@ import net.blugrid.common.model.resource.BaseAuditedResource
 import net.blugrid.common.model.resource.ResourceType
 import net.blugrid.common.domain.IdentityID
 import java.time.LocalDateTime
-
 class AuditEvent(
     val auditEventType: AuditEventType,
     val auditEventTimestamp: LocalDateTime,

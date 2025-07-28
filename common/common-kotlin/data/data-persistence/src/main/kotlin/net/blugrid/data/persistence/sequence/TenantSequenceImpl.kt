@@ -50,12 +50,6 @@ class TenantSequenceImpl(
         }
     }
 
-    private fun parseInputName(inputName: String, defaultSchemaName: String): Pair<String, String> {
-        val schemaName = inputName.substringBefore('.', defaultSchemaName)
-        val tableName = inputName.substringAfter('.', inputName)
-        return schemaName to tableName
-    }
-
     private fun sequenceExists(jdbcCoordinator: JdbcCoordinator, schemaName: String, sequenceName: String): Boolean {
         val sql = "SELECT EXISTS(SELECT 1 FROM pg_sequences WHERE schemaname = ? AND sequencename = ?)"
         val params = listOf(schemaName, sequenceName)
@@ -109,14 +103,33 @@ class TenantSequenceImpl(
     }
 
     private fun executeNextVal(jdbcCoordinator: JdbcCoordinator, sequenceName: String): Long {
-        val sql = "SELECT nextval(?)"
-        val params = listOf(sequenceName)
+        // PostgreSQL nextval() requires literal sequence name, not parameterized
+        // Validate sequence name to prevent SQL injection
+        require(sequenceName.matches(Regex("^[a-zA-Z_][a-zA-Z0-9_]*\\.[a-zA-Z_][a-zA-Z0-9_]*$|^[a-zA-Z_][a-zA-Z0-9_]*$"))) {
+            "Invalid sequence name format: $sequenceName"
+        }
+
+        val sql = "SELECT nextval('$sequenceName')"
+        val params = emptyList<Any>()
+
         return databaseService.executeQuery(jdbcCoordinator, sql, params).use { rs ->
             if (rs?.next() == true) {
                 rs.getLong(1)
             } else {
                 throw SQLException("Failed to get next value from sequence: $sequenceName")
             }
+        }
+    }
+
+    private fun parseInputName(inputName: String, defaultSchemaName: String): Pair<String, String> {
+        return if (inputName.contains('.')) {
+            // Schema.table format provided
+            val schemaName = inputName.substringBefore('.')
+            val tableName = inputName.substringAfter('.')
+            schemaName to tableName
+        } else {
+            // Only table name provided, use default schema
+            defaultSchemaName to inputName
         }
     }
 }

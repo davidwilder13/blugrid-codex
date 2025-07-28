@@ -25,5 +25,30 @@ interface Pageable {
         fun unpaged(): Pageable = UnpagedRequest
         fun from(page: Int, size: Int): Pageable = of(page, size)
         fun from(page: Int, size: Int, sort: Sort): Pageable = of(page, size, sort)
+        fun fromQueryParams(
+            number: Int = 0,
+            size: Int = 20,
+            sort: List<String> = emptyList()
+        ): Pageable {
+            val sortOrders = sort.mapNotNull { sortParam ->
+                if (sortParam.isBlank()) return@mapNotNull null
+
+                val parts = sortParam.split(",")
+                val property = parts[0]
+                val direction = if (parts.size > 1) {
+                    SortDirection.valueOf(parts[1].uppercase())
+                } else {
+                    SortDirection.ASC
+                }
+                val ignoreCase = parts.contains("ignorecase")
+
+                SortOrder(property, direction, ignoreCase)
+            }
+
+            val sortObj = if (sortOrders.isNotEmpty()) Sort.by(sortOrders) else Sort.unsorted()
+            return of(number, size, sortObj)
+        }
     }
+
+
 }

@@ -1,7 +1,0 @@
-
-logger:
-  levels:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.extract: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
-    org.hibernate.engine.transaction.internal.TransactionImpl: DEBUG

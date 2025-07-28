@@ -20,7 +20,7 @@ interface GenericQueryResource<F, T> {
     fun getAll(): List<T>
 
     @Get(uri = "/page", produces = [MediaType.APPLICATION_JSON])
-    fun getPage(pageable: Pageable): Page<T>
+    fun getPage(number: Int, size: Int, sort: List<String>): Page<T>
 
     @Get(uri = "/{id}", produces = [MediaType.APPLICATION_JSON])
     fun getById(@PathVariable id: Long): T

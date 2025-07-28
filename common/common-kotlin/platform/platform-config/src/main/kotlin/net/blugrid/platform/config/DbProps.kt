@@ -9,6 +9,6 @@ interface DbProps {
     @get:Bindable(defaultValue = "")
     val dbname: String
 
-    @get:Bindable(defaultValue = "")
+    @get:Bindable(defaultValue = "public")
     val schema: String
 }
