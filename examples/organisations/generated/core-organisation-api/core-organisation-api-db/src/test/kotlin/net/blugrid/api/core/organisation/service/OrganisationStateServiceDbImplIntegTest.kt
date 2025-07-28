@@ -6,9 +6,9 @@ import net.blugrid.api.core.organisation.assertion.assertEqualTo
 import net.blugrid.api.core.organisation.factory.OrganisationCreateFactory
 import net.blugrid.api.core.organisation.factory.OrganisationUpdateFactory
 import net.blugrid.api.core.organisation.repository.OrganisationRepository
-import net.blugrid.security.core.context.doInRequestContext
 import net.blugrid.platform.testing.security.TestApplicationContext
 import net.blugrid.platform.testing.support.BaseServiceIntegTest
+import net.blugrid.security.core.context.doInRequestContext
 import net.blugrid.security.core.service.SecurityContextService
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert

@@ -1,7 +1,7 @@
 package net.blugrid.security.core.context
 
-import net.blugrid.security.core.model.DecoratedAuthentication
 import net.blugrid.security.core.model.BaseAuthenticatedSession
+import net.blugrid.security.core.model.DecoratedAuthentication
 import java.util.Optional
 
 interface RequestContextService {

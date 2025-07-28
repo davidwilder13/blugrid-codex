@@ -1,16 +1,16 @@
 package net.blugrid.platform.testing.factory.scope
 
+import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.model.scope.TenantScope
 import net.blugrid.platform.testing.factory.base.BaseFactory
 import net.blugrid.platform.testing.factory.base.RandomizableFactory
 import net.blugrid.platform.testing.factory.base.ScenarioFactory
 import net.blugrid.platform.testing.generator.IdentityIDRandom
-import net.blugrid.common.domain.IdentityID
 import net.blugrid.platform.testing.generator.random
 
 object TenantScopeFactory : BaseFactory<TenantScope>,
-                           RandomizableFactory<TenantScope>,
-                           ScenarioFactory<TenantScope> {
+    RandomizableFactory<TenantScope>,
+    ScenarioFactory<TenantScope> {
 
     override fun createDefault(): TenantScope = create()
 

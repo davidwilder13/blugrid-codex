@@ -13,7 +13,16 @@ import net.blugrid.platform.logging.logger
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 
-@MicronautTest(environments = ["debug-logging", "json", "security", "db"])
+@MicronautTest(
+    environments = [
+        "data-persistence",
+        "platform-debug-logging",
+        "platform-serialization",
+        "security-core",
+        "security-oauth",
+        "security-tokens",
+    ]
+)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseGrpcIntegTest : PostgresTestSupport, TestPropertyProvider {
 

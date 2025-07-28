@@ -1,7 +1,7 @@
 package net.blugrid.common.model.audit
 
-import net.blugrid.common.model.resource.ResourceType
 import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.model.resource.ResourceType
 import java.time.LocalDateTime
 
 class AuditEventLog(

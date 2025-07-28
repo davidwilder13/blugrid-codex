@@ -5,9 +5,6 @@ import org.hibernate.engine.jdbc.spi.JdbcCoordinator
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
-import kotlin.collections.forEachIndexed
-import kotlin.collections.indices
-import kotlin.let
 
 interface DatabaseService {
     fun executeQuery(jdbcCoordinator: JdbcCoordinator, sql: String, params: List<Any>? = null): ResultSet?

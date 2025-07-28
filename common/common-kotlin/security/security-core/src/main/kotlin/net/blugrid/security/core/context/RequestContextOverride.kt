@@ -4,12 +4,8 @@ package net.blugrid.security.core.context
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.context.ServerRequestContext
-import io.micronaut.http.simple.SimpleHttpRequest
-import jdk.internal.net.http.common.Log.headers
 import java.io.Closeable
-import java.net.URI
 import java.util.Optional
-import java.util.function.Supplier
 
 abstract class IdOverride(private val attributeName: String) : Closeable {
 

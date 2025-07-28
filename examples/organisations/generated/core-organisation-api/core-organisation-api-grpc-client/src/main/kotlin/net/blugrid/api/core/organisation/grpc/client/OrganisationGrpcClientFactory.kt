@@ -2,7 +2,6 @@ package net.blugrid.api.core.organisation.grpc.client
 
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.micronaut.context.annotation.Bean
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Primary
 import io.micronaut.grpc.annotation.GrpcChannel

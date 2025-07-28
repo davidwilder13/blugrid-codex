@@ -1,9 +1,8 @@
 package net.blugrid.api.core.organisation.grpc.assertion
 
 import net.blugrid.api.core.organisation.grpc.OrganisationResponse
-import net.blugrid.api.core.organisation.model.Organisation
-import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
 import java.time.LocalDateTime
 import java.util.UUID
 

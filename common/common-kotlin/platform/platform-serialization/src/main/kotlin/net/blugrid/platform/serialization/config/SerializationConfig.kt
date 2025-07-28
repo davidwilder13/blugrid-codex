@@ -8,37 +8,37 @@ import jakarta.inject.Singleton
  */
 @Singleton
 class SerializationConfig {
-    
+
     /**
      * Default property naming strategy
      */
     var defaultNamingStrategy: NamingStrategy = NamingStrategy.SNAKE_CASE
-    
+
     /**
      * Whether to include null values in serialized output
      */
     var includeNulls: Boolean = false
-    
+
     /**
      * Whether to fail on unknown properties during deserialization
      */
     var failOnUnknownProperties: Boolean = false
-    
+
     /**
      * Whether to write dates as timestamps or ISO strings
      */
     var writeDatesAsTimestamps: Boolean = false
-    
+
     /**
      * Default date format pattern
      */
     var dateFormat: String = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-    
+
     /**
      * Custom deserializer configurations
      */
     val customDeserializers: MutableMap<Class<*>, String> = mutableMapOf()
-    
+
     /**
      * Custom serializer configurations
      */

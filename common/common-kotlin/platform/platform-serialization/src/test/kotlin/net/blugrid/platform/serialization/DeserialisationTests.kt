@@ -12,25 +12,25 @@ import java.math.BigDecimal
 class SerdeTests {
 
     val ServiceEntryJson = "{\n" +
-        "      \"ID\": \"rest-api:8080\",\n" +
-        "      \"Service\": \"rest-api\",\n" +
-        "      \"Tags\": [],\n" +
-        "      \"Address\": \"fedora\",\n" +
-        "      \"Meta\": null,\n" +
-        "      \"Port\": 8080,\n" +
-        "      \"Weights\": {\n" +
-        "        \"Passing\": 1,\n" +
-        "        \"Warning\": 1\n" +
-        "      },\n" +
-        "      \"EnableTagOverride\": false,\n" +
-        "      \"Proxy\": {\n" +
-        "        \"MeshGateway\": {},\n" +
-        "        \"Expose\": {}\n" +
-        "      },\n" +
-        "      \"Connect\": {},\n" +
-        "      \"CreateIndex\": 177,\n" +
-        "      \"ModifyIndex\": 177\n" +
-        "    }"
+            "      \"ID\": \"rest-api:8080\",\n" +
+            "      \"Service\": \"rest-api\",\n" +
+            "      \"Tags\": [],\n" +
+            "      \"Address\": \"fedora\",\n" +
+            "      \"Meta\": null,\n" +
+            "      \"Port\": 8080,\n" +
+            "      \"Weights\": {\n" +
+            "        \"Passing\": 1,\n" +
+            "        \"Warning\": 1\n" +
+            "      },\n" +
+            "      \"EnableTagOverride\": false,\n" +
+            "      \"Proxy\": {\n" +
+            "        \"MeshGateway\": {},\n" +
+            "        \"Expose\": {}\n" +
+            "      },\n" +
+            "      \"Connect\": {},\n" +
+            "      \"CreateIndex\": 177,\n" +
+            "      \"ModifyIndex\": 177\n" +
+            "    }"
 
     data class testSalesReportPeriod(
         val qty: BigDecimal = BigDecimal.ZERO,

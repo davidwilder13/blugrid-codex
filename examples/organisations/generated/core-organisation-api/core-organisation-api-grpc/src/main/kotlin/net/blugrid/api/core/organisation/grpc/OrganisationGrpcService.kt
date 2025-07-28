@@ -7,7 +7,6 @@ import net.blugrid.api.core.organisation.service.OrganisationCommandService
 import net.blugrid.api.core.organisation.service.OrganisationQueryService
 import net.blugrid.common.model.pagination.Pageable
 import net.blugrid.integration.grpc.mapper.toCommonSort
-import net.blugrid.integration.grpc.util.GrpcValidator
 import net.blugrid.platform.logging.logger
 import java.util.UUID
 
@@ -41,13 +40,13 @@ class OrganisationGrpcService(
     }
 
     override suspend fun create(request: OrganisationCreateRequest): OrganisationResponse {
-        val model = GrpcValidator.validate(validator) { request.toDomain() }
-        return organisationCommandService.create(model).toOrganisationResponse()
+//        val model = GrpcValidator.validate(validator) { request.toDomain() }
+        return organisationCommandService.create(request.toDomain()).toOrganisationResponse()
     }
 
     override suspend fun update(request: OrganisationUpdateRequest): OrganisationResponse {
-        val update = GrpcValidator.validate(validator) { request.toDomain() }
-        return organisationCommandService.update(request.id, update).toOrganisationResponse()
+//        val update = GrpcValidator.validate(validator) { request.toDomain() }
+        return organisationCommandService.update(request.id, request.toDomain()).toOrganisationResponse()
     }
 
     override suspend fun delete(request: OrganisationDeleteRequest): Empty {

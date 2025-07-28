@@ -1,11 +1,11 @@
 package net.blugrid.platform.testing.factory.audit
 
+import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.model.audit.AuditStamp
 import net.blugrid.platform.testing.factory.base.BaseFactory
 import net.blugrid.platform.testing.factory.base.RandomizableFactory
 import net.blugrid.platform.testing.factory.base.ScenarioFactory
 import net.blugrid.platform.testing.generator.IdentityIDRandom
-import net.blugrid.common.domain.IdentityID
 import net.blugrid.platform.testing.generator.random
 import net.blugrid.platform.testing.generator.randomAlphanumeric
 import java.time.LocalDateTime
@@ -194,7 +194,7 @@ object AuditStampFactory : BaseFactory<AuditStamp>,
         )
     }
 
-    override fun build(block: BaseFactory.Builder<AuditStamp>.() -> Unit): AuditStamp =Builder().apply(block).build()
+    override fun build(block: BaseFactory.Builder<AuditStamp>.() -> Unit): AuditStamp = Builder().apply(block).build()
 }
 
 // Usage Examples:

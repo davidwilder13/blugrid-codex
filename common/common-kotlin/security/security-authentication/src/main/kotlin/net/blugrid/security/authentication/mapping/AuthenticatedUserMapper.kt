@@ -1,7 +1,7 @@
 package net.blugrid.security.authentication.mapping
 
-import net.blugrid.security.core.model.AuthenticatedUser
 import net.blugrid.common.model.useridentity.UserIdentity
+import net.blugrid.security.core.model.AuthenticatedUser
 
 fun UserIdentity.toAuthenticatedUser(): AuthenticatedUser =
     AuthenticatedUser(

@@ -1,10 +1,10 @@
 package net.blugrid.server.standalone.persistence
 
+import io.micronaut.context.annotation.Requires
+import jakarta.inject.Singleton
 import net.blugrid.server.api.config.ServerMode
 import net.blugrid.server.api.persistence.ConnectionProvider
 import net.blugrid.server.api.tenant.TenantContext
-import io.micronaut.context.annotation.Requires
-import jakarta.inject.Singleton
 import javax.sql.DataSource
 
 /**

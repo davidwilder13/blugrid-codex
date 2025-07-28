@@ -1,7 +1,7 @@
 package net.blugrid.security.tokens.factory
 
-import net.blugrid.security.tokens.model.JwtToken
 import net.blugrid.security.tokens.mapping.toJWTRawMap
+import net.blugrid.security.tokens.model.JwtToken
 
 object AccessTokenFactory : AbstractJwtGenerator(
     keystoreFile = "keystore.jks",

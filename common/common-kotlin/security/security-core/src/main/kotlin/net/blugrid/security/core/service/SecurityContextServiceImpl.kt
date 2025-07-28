@@ -1,11 +1,11 @@
 package net.blugrid.security.core.service
 
 import jakarta.inject.Singleton
+import net.blugrid.platform.logging.logger
 import net.blugrid.security.core.context.BusinessUnitIdOverride
+import net.blugrid.security.core.context.CurrentRequestContext
 import net.blugrid.security.core.context.IsUnscoped
 import net.blugrid.security.core.context.TenantIdOverride
-import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
 import net.blugrid.security.core.model.BaseAuthenticatedOrganisation
 import net.blugrid.security.core.model.BaseAuthenticatedSession
 import net.blugrid.security.core.model.BaseAuthenticatedUser
