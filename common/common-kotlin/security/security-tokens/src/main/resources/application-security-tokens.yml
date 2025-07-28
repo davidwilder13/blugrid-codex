@@ -1,0 +1,18 @@
+micronaut:
+  security:
+    token:
+      cookie:
+        enabled: true
+      jwt:
+        enabled: true
+        signatures:
+          jwks-static:
+            selfSigned:
+              path: "jwks.json"
+
+security:
+  cookies:
+    jwt: "JWT"
+    oauthPkce: "OAUTH2_PKCE"
+    oathState: "OAUTH2_STATE"
+    oathNonce: "OPENID_NONCE"

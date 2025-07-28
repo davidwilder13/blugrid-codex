@@ -1,0 +1,33 @@
+micronaut:
+  security:
+    enabled: true
+    authentication: idtoken
+    endpoints:
+      logout:
+        enabled: true
+        get-allowed: true
+        path: "/logout"
+    intercept-url-map:
+      - pattern: "/admin/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/oauth/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/swagger/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/swagger-ui/**"
+        http-method: GET
+        access:
+          - isAnonymous()
+      - pattern: "/**"
+        http-method: OPTIONS
+        access:
+          - isAnonymous()
+      - pattern: "/**"
+        access:
+          - isAuthenticated()

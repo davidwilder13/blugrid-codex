@@ -79,3 +79,17 @@ fun Sort.toQuerySort(): List<SortField>? {
 fun List<SortField>.toSort(): Sort {
     return Sort(this.map { it.toSortOrder() })
 }
+
+fun Pageable.toQueryString(): String = buildString {
+    append("number=${number}&size=${size}")
+
+    sort.orders.forEach { order ->
+        append("&sort=${order.property}")
+        if (order.direction != SortDirection.ASC) {
+            append(",${order.direction.name.lowercase()}")
+        }
+        if (order.ignoreCase) {
+            append(",ignorecase")
+        }
+    }
+}

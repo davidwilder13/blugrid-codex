@@ -1,19 +1,17 @@
-#tag::datasources[]
 datasources:
   default:
-    url: jdbc:postgresql://${POSTGRES_HOST_1:localhost}:${POSTGRES_PORT_1:5432}/${POSTGRES_DB_1:bizkinetics}?currentSchema=${env.db.schema}
-    username: ${POSTGRES_USERNAME_1:postgres}
-    password: ${POSTGRES_PASSWORD_1:password}
-    driverClassName: org.postgresql.Driver
-    schema: ${env.db.schema}
+    url: ${DATASOURCE_URL:`jdbc:postgresql://localhost:5432/bizkinetics`}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
     dialect: POSTGRES
-#end::datasources[]
----
-#tag::jpa[]
+    schema-generate: NONE
+    schema-generate-names: false
+
 jpa:
   default:
-    entity-scan:
-      packages: 'net.blugrid.api'
+    packages-to-scan:
+      - 'net.blugrid'
     database: POSTGRESQL
     driverClassName: org.postgresql.Driver
     dialect: POSTGRES
@@ -23,9 +21,11 @@ jpa:
       hibernate:
         default_schema: ${env.db.schema}
         proc.param_null_passing: true
-#end::jpa[]
----
-#tag::flyway[]
+        show_sql: false
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+
 flyway:
   datasources:
     default:
@@ -40,4 +40,10 @@ flyway:
       placeholder-suffix: $$$
       placeholders:
         schema: ${env.db.schema}
-#end::flyway[]
+
+micronaut:
+  multitenancy:
+    tenantresolver:
+      httpheader:
+        header-name: tenantId
+        enabled: true

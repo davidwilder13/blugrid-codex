@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import jakarta.inject.Inject
 import net.blugrid.common.model.pagination.Page
 import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.common.model.pagination.toQueryString
 import net.blugrid.common.model.resource.BaseCreateResource
 import net.blugrid.common.model.resource.BaseResource
 import net.blugrid.common.model.resource.BaseUpdateResource
@@ -21,7 +22,17 @@ import org.hamcrest.MatcherAssert
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 
-@MicronautTest(environments = ["debug-logging", "json", "security", "db"])
+@MicronautTest(
+    environments = [
+        "data-persistence",
+        "platform-debug-logging",
+        "platform-serialization",
+        "security-core",
+        "security-oauth",
+        "security-tokens",
+        "server-rest",
+    ]
+)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseControllerIntegTest(
     open val baseUri: String,
@@ -43,6 +54,8 @@ abstract class BaseControllerIntegTest(
     @BeforeAll
     fun logPort() {
         log.info("Embedded server started on port: ${embeddedServer.port}")
+        log.info("Active environments: ${embeddedServer.applicationContext.environment.activeNames}")
+        log.info("DB Schema configured: ${properties.get("env.db.schema")}")
     }
 
 
@@ -75,7 +88,7 @@ abstract class BaseControllerIntegTest(
         return with(
             receiver = client.toBlocking()
                 .exchange(
-                    HttpRequest.PUT("$uri/${updatePayload.id}", updatePayload),
+                    HttpRequest.PUT("$uri/${updatePayload.id.value}", updatePayload),
                     Argument.of(responseType),
                 ),
         ) {
@@ -122,7 +135,7 @@ abstract class BaseControllerIntegTest(
         return with(
             receiver = client.toBlocking()
                 .exchange(
-                    HttpRequest.POST(uri, pageable),
+                    HttpRequest.GET<Unit>("$uri/page?${pageable.toQueryString()}"),
                     pageOf(responseType),
                 ),
         ) {

@@ -19,7 +19,6 @@ dependencies {
 
     // Model-specific dependencies
     implementation(libs.micronaut.data.model)
-    implementation(libs.micronaut.serde)           // Serialization framework
     implementation(libs.micronaut.validation)      // Validation annotations
     implementation(libs.jackson.kotlin)            // JSON serialization
     implementation(libs.mapstruct)                 // Object mapping

@@ -11,9 +11,10 @@ import io.micronaut.security.event.TokenValidatedEvent
 import io.micronaut.security.filters.AuthenticationFetcher
 import io.micronaut.security.filters.SecurityFilter
 import io.micronaut.security.token.TokenAuthenticationFetcher
+import jakarta.inject.Named
 import jakarta.inject.Singleton
 import net.blugrid.api.security.config.SecurityProps
-import net.blugrid.security.tokens.mapping.toMultitenantAuthentication
+import net.blugrid.security.authentication.jwt.toMultitenantAuthentication
 import net.blugrid.security.tokens.model.SelfSignedJwtDecoder
 import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
@@ -28,7 +29,7 @@ class JwtAuthenticationFetcher(
     private val tokenValidatedEventPublisher: ApplicationEventPublisher<TokenValidatedEvent>,
     private val httpHostResolver: HttpHostResolver,
     private val httpLocaleResolver: HttpLocaleResolver,
-    private val objectMapper: ObjectMapper
+    @Named("jwtObjectMapper") private val jwtObjectMapper: ObjectMapper
 ) : AuthenticationFetcher<HttpRequest<*>> {
 
     private val log = LoggerFactory.getLogger(JwtAuthenticationFetcher::class.java)
@@ -48,7 +49,7 @@ class JwtAuthenticationFetcher(
                     if (jwtOpt.isPresent) {
                         val jwt = jwtOpt.get()
 
-                        jwt.toMultitenantAuthentication(log, objectMapper)
+                        jwt.toMultitenantAuthentication(log, jwtObjectMapper)
                             ?.let { authentication ->
                                 request.setAttribute(SecurityFilter.TOKEN, tokenValue)
                                 request.setAttribute("jwt", jwt)

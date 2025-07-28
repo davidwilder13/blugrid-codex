@@ -1,0 +1,12 @@
+env:
+  name: ${SERVICE_NAME:restApi}
+  server:
+    baseUri: ${SERVICE_BASE_URI:`http://localhost:8080`}
+  web:
+    baseUri: ${WEB_BASE_URI:`http://localhost:4201`}
+  consul:
+    host: ${CONSUL_HOST:consul}
+    port: ${CONSUL_PORT:8500}
+  db:
+    schema: public
+

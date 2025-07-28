@@ -13,6 +13,7 @@ dependencies {
 
     implementation(libs.micronaut.inject)
     implementation(libs.micronaut.core)
+    implementation(libs.micronaut.security)
 
     implementation(libs.bundles.jacksonLibs)
     kapt(libs.bundles.jacksonLibs)

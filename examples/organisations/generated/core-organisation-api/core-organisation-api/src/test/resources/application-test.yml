@@ -1,13 +1,10 @@
 micronaut:
   server:
     port: -1
-#    host: localhost
 
-jpa:
-  default:
-    entity-scan:
-      packages: 'net.blugrid.api'
-
-logger:
-  levels:
+logging:
+  level:
+    net.blugrid.platform.testing: DEBUG
+    testcontainers: INFO
+    com.github.dockerjava: WARN
     io.micronaut.web.router: TRACE

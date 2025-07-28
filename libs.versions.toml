@@ -93,7 +93,6 @@ micronaut-reactor-http-client = { module = "io.micronaut.reactor:micronaut-react
 
 # ===== SERIALIZATION & VALIDATION =====
 micronaut-jackson = { module = "io.micronaut:micronaut-jackson-databind" }
-micronaut-serde = { module = "io.micronaut.serde:micronaut-serde-jackson" }
 micronaut-validation = { module = "io.micronaut.validation:micronaut-validation" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
@@ -139,7 +138,6 @@ micronaut-grpc-client = { module = "io.micronaut.grpc:micronaut-grpc-client-runt
 micronaut-inject-java = { module = "io.micronaut:micronaut-inject-java" }
 micronaut-data-processor = { module = "io.micronaut.data:micronaut-data-processor" }
 micronaut-validation-processor = { module = "io.micronaut.validation:micronaut-validation-processor" }
-micronaut-serde-processor = { module = "io.micronaut.serde:micronaut-serde-processor" }
 micronaut-openapi = { module = "io.micronaut.openapi:micronaut-openapi", version = "4.8.1" }
 micronaut-openapi-annotations = { module = "io.micronaut.openapi:micronaut-openapi-annotations", version = "4.8.1" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
@@ -257,7 +255,6 @@ annotationProcessors = [
     "micronaut-inject-java",
     "micronaut-data-processor",
     "micronaut-http-validation",
-    "micronaut-serde-processor",
     "micronaut-openapi",
     "mapstruct-processor",
     "kotlin-builder-processor"

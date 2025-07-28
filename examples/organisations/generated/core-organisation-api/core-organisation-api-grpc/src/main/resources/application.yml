@@ -18,8 +18,8 @@ consul:
       ip-addr: ${CONSUL_CLIENT_REGISTRATION_IP_ADDR:${DOCKER_HOST_IP}}
     defaultZone: "http://${CONSUL_HOST:consul}:${CONSUL_PORT:8500}"
 
-logger:
-  levels:
+logging:
+  level:
     io.grpc: DEBUG
     io.micronaut.discovery: TRACE
     io.micronaut.grpc: TRACE

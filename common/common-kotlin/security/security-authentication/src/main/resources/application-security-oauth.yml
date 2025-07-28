@@ -1,0 +1,20 @@
+micronaut:
+  security:
+    oauth2:
+      clients:
+        auth0:
+          client-id: "${OAUTH_CLIENT_ID:mR4yoUpZJQ4Ttk9zLcyH7jcMwirQydZG}"
+          client-secret: "${OAUTH_CLIENT_SECRET:A62x6oAXb556euKq-CcNs131iFSaq71buRE7I8OobXkPAxFOYjXoBT9UJd3L6fIg}"
+          openid:
+            issuer: "https://bizkinetics.au.auth0.com/"
+            jwks-uri: "https://bizkinetics.au.auth0.com/.well-known/jwks.json/"
+            scopes: "openid profile email"
+            end-session:
+              enabled: false
+      default-provider: auth0
+
+security:
+  auth0:
+    audience: "https://dev.bizkinetics.com.au/api/rest"
+    auth0Domain: "https://bizkinetics.au.auth0.com"
+    clientId: "mR4yoUpZJQ4Ttk9zLcyH7jcMwirQydZG"

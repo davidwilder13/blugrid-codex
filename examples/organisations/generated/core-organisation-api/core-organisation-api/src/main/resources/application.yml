@@ -1,0 +1,10 @@
+micronaut:
+  application:
+    name: core-organisation-api
+
+env:
+  name: ${SERVICE_NAME:core-organisation-api}
+  server:
+    baseUri: ${SERVICE_BASE_URI:`http://localhost:8080`}
+  web:
+    baseUri: ${WEB_BASE_URI:`http://localhost:4201`}
