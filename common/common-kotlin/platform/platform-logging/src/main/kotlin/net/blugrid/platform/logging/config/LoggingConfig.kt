@@ -8,32 +8,32 @@ import jakarta.inject.Singleton
  */
 @Singleton
 class LoggingConfig {
-    
+
     /**
      * Default log level for the platform
      */
     var defaultLevel: LogLevel = LogLevel.INFO
-    
+
     /**
      * Whether to include timestamps in log output
      */
     var includeTimestamp: Boolean = true
-    
+
     /**
      * Whether to include thread names in log output
      */
     var includeThreadName: Boolean = true
-    
+
     /**
      * Maximum length for log messages before truncation
      */
     var maxMessageLength: Int = 1000
-    
+
     /**
      * Package patterns to exclude from logging
      */
     val excludePatterns: MutableSet<String> = mutableSetOf()
-    
+
     /**
      * Package-specific log levels
      */

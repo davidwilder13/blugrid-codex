@@ -1,11 +1,13 @@
 package net.blugrid.api.core.organisation.model
 
+import io.micronaut.core.annotation.Introspected
 import io.swagger.v3.oas.annotations.media.Schema
 import net.blugrid.common.domain.IdentityUUID
 import net.blugrid.common.model.resource.BaseCreateResource
 import java.time.LocalDateTime
 
 @Schema(description = "Model used to create a new organisation.")
+@Introspected
 data class OrganisationCreate(
 
     @Schema(description = "The globally unique identifier for this organisation.", example = "123e4567-e89b-12d3-a456-426614174000")

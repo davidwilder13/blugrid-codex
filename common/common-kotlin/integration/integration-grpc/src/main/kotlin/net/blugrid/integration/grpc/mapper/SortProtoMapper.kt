@@ -1,11 +1,11 @@
 package net.blugrid.integration.grpc.mapper
 
-import net.blugrid.api.common.grpc.Sort as SortProto
-import net.blugrid.api.common.grpc.Order
 import net.blugrid.api.common.grpc.Direction
+import net.blugrid.api.common.grpc.Order
 import net.blugrid.common.model.pagination.Sort
-import net.blugrid.common.model.pagination.SortOrder
 import net.blugrid.common.model.pagination.SortDirection
+import net.blugrid.common.model.pagination.SortOrder
+import net.blugrid.api.common.grpc.Sort as SortProto
 
 /**
  * Convert from gRPC proto Sort to common Sort.

@@ -8,8 +8,8 @@ import com.nimbusds.jwt.SignedJWT
 import io.micronaut.context.annotation.Requires
 import io.micronaut.context.annotation.Value
 import jakarta.inject.Singleton
-import net.blugrid.security.tokens.model.SelfSignedJwtDecoder
 import net.blugrid.platform.logging.logger
+import net.blugrid.security.tokens.model.SelfSignedJwtDecoder
 import java.security.interfaces.RSAPublicKey
 import java.util.Optional
 

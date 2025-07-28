@@ -1,9 +1,9 @@
 package net.blugrid.data.persistence.mapping
 
+import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.model.audit.AuditStamp
 import net.blugrid.common.model.audit.ResourceAudit
 import net.blugrid.data.persistence.audit.AuditEmbeddable
-import net.blugrid.common.domain.IdentityID
 
 fun AuditEmbeddable.toResourceAudit(): ResourceAudit =
     ResourceAudit(

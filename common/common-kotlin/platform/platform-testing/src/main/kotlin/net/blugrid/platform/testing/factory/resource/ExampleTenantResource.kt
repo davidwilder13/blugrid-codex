@@ -4,6 +4,8 @@
 
 package net.blugrid.platform.testing.factory.resource
 
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
 import net.blugrid.common.model.audit.ResourceAudit
 import net.blugrid.common.model.scope.TenantScope
 import net.blugrid.platform.testing.factory.audit.ResourceAuditFactory
@@ -17,8 +19,6 @@ import net.blugrid.platform.testing.generator.random
 import net.blugrid.platform.testing.generator.randomAlphanumeric
 import net.blugrid.platform.testing.generator.randomCompany
 import net.blugrid.platform.testing.generator.randomSentence
-import net.blugrid.common.domain.IdentityID
-import net.blugrid.common.domain.IdentityUUID
 import java.util.UUID
 
 // Example resource for demonstration

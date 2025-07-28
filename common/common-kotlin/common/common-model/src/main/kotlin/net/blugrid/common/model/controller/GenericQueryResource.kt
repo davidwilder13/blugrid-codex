@@ -6,7 +6,6 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import net.blugrid.common.model.pagination.Page
-import net.blugrid.common.model.pagination.Pageable
 import net.blugrid.common.model.pagination.PageableQuery
 import java.util.Optional
 import java.util.UUID

@@ -20,8 +20,8 @@ import io.micronaut.context.env.Environment
 import io.micronaut.security.authentication.AuthorizationException
 import io.micronaut.security.oauth2.configuration.OauthClientConfigurationProperties
 import jakarta.inject.Singleton
-import net.blugrid.security.tokens.model.JwtDecoder
 import net.blugrid.platform.logging.logger
+import net.blugrid.security.tokens.model.JwtDecoder
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.text.ParseException

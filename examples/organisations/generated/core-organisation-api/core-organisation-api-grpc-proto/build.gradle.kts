@@ -1,7 +1,7 @@
 import com.google.protobuf.gradle.id
 
 plugins {
-   alias(libs.plugins.jvm)
+    alias(libs.plugins.jvm)
     id("com.google.protobuf") version "0.9.4"
 }
 
