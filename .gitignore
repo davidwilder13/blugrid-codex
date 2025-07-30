@@ -3,7 +3,8 @@
 Thumbs.db
 
 # ✨ IDEs
-.idea/
+.idea
+.kotlin
 *.iml
 *.ipr
 *.iws

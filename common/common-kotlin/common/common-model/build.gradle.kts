@@ -36,6 +36,8 @@ java {
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.*")
     }
 }
 

@@ -2,7 +2,7 @@ package net.blugrid.data.persistence.service
 
 import io.micronaut.data.jpa.repository.criteria.Specification
 import io.micronaut.transaction.annotation.ReadOnly
-import net.blugrid.common.model.exception.NotFoundException
+import net.blugrid.common.domain.exception.NotFoundException
 import net.blugrid.common.model.pagination.Page
 import net.blugrid.common.model.pagination.Pageable
 import net.blugrid.common.model.resource.BaseResource
@@ -42,7 +42,7 @@ open class GenericQueryServiceImpl<
     @ReadOnly
     override fun getById(id: Long): T {
         return repository.findById(id)
-            .orElseThrow { NotFoundException("Entity with id $id not found") }
+            .orElseThrow { NotFoundException("resource", id) }
             .toResponse()
     }
 

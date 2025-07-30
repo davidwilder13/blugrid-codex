@@ -2,7 +2,7 @@ package net.blugrid.data.persistence.service
 
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
-import net.blugrid.common.model.exception.NotFoundException
+import net.blugrid.common.domain.exception.NotFoundException
 import net.blugrid.common.model.resource.BaseCreateResource
 import net.blugrid.common.model.resource.BaseResource
 import net.blugrid.common.model.resource.BaseUpdateResource
@@ -20,7 +20,7 @@ open class GenericCommandServiceImpl<T : BaseResource<T>, U : BaseCreateResource
     @Transactional
     override fun update(id: Long, update: V): T {
         return repository.findById(id)
-            .orElseThrow { NotFoundException("Entity with id $id not found") }
+            .orElseThrow { NotFoundException("resource", id) }
             .let {
                 repository.update(it.update(update.toEntity()))
                     .toResponse()
@@ -36,7 +36,7 @@ open class GenericCommandServiceImpl<T : BaseResource<T>, U : BaseCreateResource
     @Transactional
     override fun delete(id: Long) {
         repository.findById(id)
-            .orElseThrow { NotFoundException("Entity with id $id not found") }
+            .orElseThrow { NotFoundException("resource", id) }
         repository.deleteById(id)
     }
 

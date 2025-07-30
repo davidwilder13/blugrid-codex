@@ -8,6 +8,8 @@ plugins {
 dependencies {
     // API dependencies
     api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-serialization"))
 
     // HTTP client dependencies
     implementation(libs.bundles.micronautCore)

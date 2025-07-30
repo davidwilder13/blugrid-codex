@@ -1,24 +1,157 @@
-// ALTERNATIVE APPROACH: Update your Status.proto file
-
 syntax = "proto3";
 
-package common;
+package common.grpc;
 
-// Instead of importing google.rpc.ErrorInfo directly, define your own
-// or use the correct Google RPC import path
-
-option java_multiple_files = true;
 option java_package = "net.blugrid.api.common.grpc";
 option java_outer_classname = "StatusProto";
+option java_multiple_files = true;
 
-message ErrorInfo {
-  string reason = 1;
-  string domain = 2;
-  map<string, string> metadata = 3;
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+/**
+ * Enhanced gRPC status for rich error information
+ * Based on Google's error model: https://cloud.google.com/apis/design/errors
+ *
+ * Note: This is NOT the same as google.rpc.Status - this is our custom enhanced status
+ * that gets packed into the details of google.rpc.Status
+ */
+message Status {
+  // The status code, which should be an enum value of google.rpc.Code
+  int32 code = 1;
+
+  // A developer-facing error message in English
+  string message = 2;
+
+  // A list of messages that carry the error details
+  repeated google.protobuf.Any details = 3;
 }
 
-message Status {
-  int32 code = 1;
-  string message = 2;
-  repeated ErrorInfo details = 3;
+/**
+ * Error metadata for tracking and debugging
+ * This gets included in the details of both our Status and google.rpc.Status
+ */
+message ErrorMetadata {
+  // Unique identifier for this error instance
+  string error_id = 1;
+
+  // Correlation ID for request tracing
+  string correlation_id = 2;
+
+  // Timestamp when the error occurred
+  google.protobuf.Timestamp timestamp = 3;
+
+  // Source service that generated the error
+  string source_service = 4;
+
+  // gRPC method where error occurred
+  string grpc_method = 5;
+
+  // Whether this error is retryable
+  bool retryable = 6;
+
+  // Error severity level
+  ErrorSeverity severity = 7;
+
+  // Additional context key-value pairs
+  map<string, string> context = 8;
+}
+
+/**
+ * Error severity levels
+ */
+enum ErrorSeverity {
+  ERROR_SEVERITY_UNSPECIFIED = 0;
+  ERROR_SEVERITY_INFO = 1;
+  ERROR_SEVERITY_WARNING = 2;
+  ERROR_SEVERITY_ERROR = 3;
+  ERROR_SEVERITY_CRITICAL = 4;
+}
+
+/**
+ * Validation error details
+ */
+message ValidationError {
+  // Field that failed validation
+  string field = 1;
+
+  // Validation error code
+  string code = 2;
+
+  // Human-readable error message
+  string message = 3;
+
+  // The value that was rejected
+  string rejected_value = 4;
+
+  // Additional context for the validation error
+  map<string, string> context = 5;
+}
+
+/**
+ * Resource error details
+ */
+message ResourceError {
+  // Type of resource (e.g., "User", "Organisation")
+  string resource_type = 1;
+
+  // Resource identifier
+  string resource_id = 2;
+
+  // Action that was attempted
+  string action = 3;
+
+  // Reason for the error
+  string reason = 4;
+}
+
+/**
+ * Business rule violation details
+ */
+message BusinessRuleError {
+  // Name/ID of the violated rule
+  string rule_name = 1;
+
+  // Description of the rule
+  string rule_description = 2;
+
+  // Resource type affected by the rule
+  string resource_type = 3;
+
+  // Additional rule context
+  map<string, string> rule_context = 4;
+}
+
+/**
+ * Tenant context error details
+ */
+message TenantContextError {
+  // Operation that required tenant context
+  string operation = 1;
+
+  // Required tenant scope
+  string required_scope = 2;
+
+  // Current scope (if any)
+  string current_scope = 3;
+}
+
+/**
+ * Rate limiting error details
+ */
+message RateLimitError {
+  // Rate limit that was exceeded
+  string limit_type = 1;
+
+  // Current usage
+  int64 current_usage = 2;
+
+  // Maximum allowed
+  int64 max_allowed = 3;
+
+  // Time window in seconds
+  int64 window_seconds = 4;
+
+  // Time until reset (seconds)
+  int64 retry_after_seconds = 5;
 }
