@@ -6,7 +6,11 @@ plugins {
 }
 
 dependencies {
+    api(project(":common:common-kotlin:common:common-domain"))
     api(project(":common:common-kotlin:common:common-model"))
+    api(project(":common:common-kotlin:platform:platform-config"))
+    api(project(":common:common-kotlin:platform:platform-logging"))
+    api(project(":common:common-kotlin:security:security-core"))
     api(project(":common:common-kotlin:integration:integration-grpc-proto"))
 
     // Platform BOMs
