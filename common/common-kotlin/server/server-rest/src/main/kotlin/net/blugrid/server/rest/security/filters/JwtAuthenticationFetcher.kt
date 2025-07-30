@@ -13,7 +13,7 @@ import io.micronaut.security.filters.SecurityFilter
 import io.micronaut.security.token.TokenAuthenticationFetcher
 import jakarta.inject.Named
 import jakarta.inject.Singleton
-import net.blugrid.api.security.config.SecurityProps
+import net.blugrid.security.core.config.SecurityProps
 import net.blugrid.security.authentication.jwt.toMultitenantAuthentication
 import net.blugrid.security.tokens.model.SelfSignedJwtDecoder
 import org.reactivestreams.Publisher

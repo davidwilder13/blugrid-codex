@@ -1,4 +1,4 @@
-package net.blugrid.api.security.config
+package net.blugrid.security.core.config
 
 import io.micronaut.context.annotation.ConfigurationProperties
 import io.micronaut.core.bind.annotation.Bindable

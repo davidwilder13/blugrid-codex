@@ -6,8 +6,8 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.uri.UriBuilder
 import jakarta.inject.Singleton
-import net.blugrid.api.security.config.RedirectProps
-import net.blugrid.api.security.config.SecurityProps
+import net.blugrid.security.core.config.RedirectProps
+import net.blugrid.security.core.config.SecurityProps
 import net.blugrid.api.security.pkce.PkceUtil
 import net.blugrid.platform.config.WebProps
 import net.blugrid.platform.logging.logger
