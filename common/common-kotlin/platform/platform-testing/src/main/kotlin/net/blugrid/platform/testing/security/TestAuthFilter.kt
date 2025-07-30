@@ -8,7 +8,7 @@ import io.micronaut.http.annotation.Filter
 import io.micronaut.http.filter.ClientFilterChain
 import io.micronaut.http.filter.HttpClientFilter
 import io.micronaut.http.filter.ServerFilterPhase
-import net.blugrid.api.security.config.SecurityProps
+import net.blugrid.security.core.config.SecurityProps
 import net.blugrid.platform.logging.logger
 import net.blugrid.web.core.jwt.applyCookies
 import net.blugrid.web.core.jwt.toCookie

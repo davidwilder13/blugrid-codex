@@ -2,7 +2,7 @@ package net.blugrid.server.rest.security.service
 
 import io.micronaut.http.MutableHttpResponse
 import jakarta.inject.Singleton
-import net.blugrid.api.security.config.SecurityProps
+import net.blugrid.security.core.config.SecurityProps
 import net.blugrid.platform.logging.logger
 import net.blugrid.security.authentication.mapping.toJwtToken
 import net.blugrid.security.core.model.BaseAuthenticatedSession
