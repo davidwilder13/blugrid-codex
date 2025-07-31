@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package blugrid.common.auth;
+
+option java_package = "net.blugrid.common.auth";
+option java_outer_classname = "InternalAuthProto";
+
+// Internal authentication context for API-to-API communication
+// Mental Model: Digital ID card structure for internal office communication
+message InternalAuthContext {
+  // Core session identification
+  string session_id = 1;           // Unique session identifier for audit trail
+  AuthenticationType auth_type = 2; // Security clearance level
+  string user_id = 3;              // Person identification
+
+  // Organizational context
+  string tenant_id = 4;            // Company/organization membership
+  string business_unit_id = 5;     // Department assignment (optional)
+  string operator_id = 6;          // Acting on behalf of (for delegation scenarios)
+  string web_application_id = 7;   // Source application context
+
+  // Audit and tracing
+  string trace_id = 8;             // Correlation ID for audit chain
+  int64 timestamp = 9;             // Context creation timestamp
+
+  // Additional context
+  repeated string roles = 10;       // Additional permissions/roles
+  map<string, string> attributes = 11; // Extended context attributes
+}
+
+// Authentication types matching the existing security framework
+enum AuthenticationType {
+  // Unknown/invalid authentication
+  UNKNOWN = 0;
+
+  // Anonymous/unauthenticated access
+  GUEST = 1;
+
+  // Organization-wide access (admin, platform operations)
+  TENANT = 2;
+
+  // Department/unit-specific access (store, departmental)
+  BUSINESS_UNIT = 3;
+}
+
+// Metadata for request correlation and debugging
+message RequestMetadata {
+  string correlation_id = 1;        // For tracking requests across services
+  string source_service = 2;        // Originating service name
+  string target_service = 3;        // Target service name
+  string operation = 4;             // gRPC method being called
+  int64 request_timestamp = 5;      // When request was initiated
+}
+
+// Standard response for authentication validation
+message AuthValidationResponse {
+  bool is_valid = 1;                // Whether authentication is valid
+  string error_message = 2;         // Error details if invalid
+  AuthenticationType validated_type = 3; // Confirmed authentication type
+}

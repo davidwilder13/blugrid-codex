@@ -57,32 +57,3 @@ object IsUnscoped : Closeable {
 
 object TenantIdOverride : IdOverride("tenantIdOverride")
 object BusinessUnitIdOverride : IdOverride("businessUnitIdOverride")
-
-fun <T> doInRequestContext(action: () -> T): T {
-    val currentRequest = ServerRequestContext.currentRequest<Any>()
-
-    return if (currentRequest.isPresent) {
-        // If the current request context is present, just execute the action
-        action()
-    } else {
-        // If no request context is present, create a new one
-        val newRequest: HttpRequest<Any> = createNewRequest()
-
-        // Use a wrapper to ensure proper type handling
-        var result: T? = null
-        ServerRequestContext.with(newRequest) {
-            result = action()
-        }
-
-        result ?: throw IllegalStateException("Action returned null")
-    }
-}
-
-private fun createNewRequest(): HttpRequest<Any> {
-    // Create a proper HTTP request that can hold attributes using Micronaut's API
-    return HttpRequest.GET<Any>("/test-context").apply {
-        // Set default headers that might be expected
-        headers.add("Content-Type", "application/json")
-        headers.add("User-Agent", "test-client")
-    }
-}

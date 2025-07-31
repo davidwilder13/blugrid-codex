@@ -2,9 +2,9 @@ micronaut:
   server:
     port: -1
 
-logging:
-  level:
-    net.blugrid.platform.testing: DEBUG
+logger:
+  levels:
+    net.blugrid: TRACE
     testcontainers: INFO
     com.github.dockerjava: WARN
     io.micronaut.web.router: TRACE

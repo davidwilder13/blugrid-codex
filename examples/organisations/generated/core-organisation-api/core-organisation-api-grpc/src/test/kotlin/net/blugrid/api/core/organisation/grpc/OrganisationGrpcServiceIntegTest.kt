@@ -6,12 +6,15 @@ import net.blugrid.api.common.grpc.order
 import net.blugrid.api.common.grpc.sort
 import net.blugrid.api.core.organisation.grpc.OrganisationStateServiceGrpcKt.OrganisationStateServiceCoroutineStub
 import net.blugrid.api.core.organisation.grpc.assertion.assert
+import net.blugrid.platform.testing.grpc.TestGrpcApplicationContext
+import net.blugrid.platform.testing.security.TestApplicationContext
 import net.blugrid.platform.testing.support.BaseGrpcIntegTest
 import net.blugrid.platform.testing.support.grpc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -26,6 +29,11 @@ class OrganisationGrpcServiceIntegTest : BaseGrpcIntegTest() {
 
     private val stub: OrganisationStateServiceCoroutineStub by lazy {
         createStub(::OrganisationStateServiceCoroutineStub)
+    }
+
+    @BeforeEach
+    fun setup() {
+        TestGrpcApplicationContext.configureTenantApplicationContext()
     }
 
     @Test

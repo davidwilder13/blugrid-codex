@@ -13,3 +13,16 @@ consul:
   client:
     registration:
       enabled: false
+
+logger:
+  levels:
+    com.github.dockerjava: WARN
+    io.micronaut.data: INFO
+    io.micronaut.http: INFO
+    io.micronaut.security: INFO
+    io.micronaut: INFO
+    net.blugrid: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
+    testcontainers: INFO

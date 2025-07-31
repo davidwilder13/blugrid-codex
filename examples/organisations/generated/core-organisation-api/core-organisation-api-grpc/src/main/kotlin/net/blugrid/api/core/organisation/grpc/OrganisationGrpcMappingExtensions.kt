@@ -6,7 +6,8 @@ import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
 import net.blugrid.common.model.pagination.Page
-import java.time.LocalDateTime
+import parseAsLocalDateTime
+import toIsoString
 import java.util.Optional
 import java.util.UUID
 
@@ -15,14 +16,14 @@ fun Organisation.toOrganisationResponse(): OrganisationResponse =
         .setId(id.value)
         .setUuid(uuid.value.toString())
         .setParentOrganisationId(parentOrganisationId)
-        .setEffectiveTimestamp(effectiveTimestamp.toString())
+        .setEffectiveTimestamp(effectiveTimestamp.toIsoString())
         .build()
 
 fun OrganisationCreateRequest.toDomain(): OrganisationCreate =
     OrganisationCreate(
         uuid = IdentityUUID(UUID.randomUUID()),
         parentOrganisationId = parentOrganisationId,
-        effectiveTimestamp = LocalDateTime.parse(effectiveTimestamp)
+        effectiveTimestamp = effectiveTimestamp.parseAsLocalDateTime()
     )
 
 fun OrganisationUpdateRequest.toDomain(): OrganisationUpdate =
@@ -32,7 +33,7 @@ fun OrganisationUpdateRequest.toDomain(): OrganisationUpdate =
             uuid.takeIf { it.isNotBlank() }?.let(UUID::fromString) ?: UUID.randomUUID()
         ),
         parentOrganisationId = parentOrganisationId,
-        effectiveTimestamp = LocalDateTime.parse(effectiveTimestamp)
+        effectiveTimestamp = effectiveTimestamp.parseAsLocalDateTime()
     )
 
 fun Optional<Organisation>.toGrpcOptional(): OrganisationOptionalResponse =

@@ -1,4 +1,4 @@
-logging:
-  level:
+logger:
+  levels:
     root: INFO
     net.blugrid: INFO
