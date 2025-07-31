@@ -2,17 +2,15 @@ plugins {
     alias(libs.plugins.jvm)
     alias(libs.plugins.kapt)
     alias(libs.plugins.allopen)
-    alias(libs.plugins.application)
 }
 
 dependencies {
+    // Core domain dependencies
     api(project(":common:common-kotlin:common:common-domain"))
     api(project(":common:common-kotlin:common:common-model"))
     api(project(":common:common-kotlin:platform:platform-config"))
     api(project(":common:common-kotlin:platform:platform-logging"))
-    api(project(":common:common-kotlin:platform:platform-serialization"))
     api(project(":common:common-kotlin:security:security-core"))
-    api(project(":common:common-kotlin:security:security-authentication"))
     api(project(":common:common-kotlin:integration:integration-grpc-proto"))
 
     // Platform BOMs
@@ -23,25 +21,23 @@ dependencies {
     implementation(libs.bundles.kotlinCore)
     implementation(libs.bundles.micronautCore)
 
-    // gRPC dependencies
+    // gRPC client-specific dependencies
     implementation(libs.bundles.grpcCore)
-    implementation(libs.bundles.grpcServer)
     implementation(libs.bundles.grpcClient)
 
-    // Micronaut gRPC integration
-    implementation(libs.micronaut.grpc.annotation)
-    implementation(libs.micronaut.grpc.server)
+    // Micronaut gRPC client integration
     implementation(libs.micronaut.grpc.client)
-    // explicit coroutines dependency
+
+    // Coroutines for async client operations
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
-    // Micronaut secutity
-    implementation(libs.micronaut.security)
+    // Service discovery for client connections
+    implementation(libs.micronaut.discovery)
 
-    // Validation for gRPC
+    // Validation for client-side data
     implementation(libs.bundles.validationLibs)
 
-    // JSON processing (for gRPC-Web or debugging)
+    // JSON processing (for debugging/logging)
     implementation(libs.bundles.jsonLibs)
 
     // Annotation processing
@@ -53,7 +49,6 @@ dependencies {
 
     // Runtime dependencies
     runtimeOnly(libs.bundles.runtimeCore)
-    runtimeOnly(libs.grpc.netty)
 
     // Test dependencies
     testImplementation(libs.bundles.testing)
@@ -66,14 +61,7 @@ java {
 kapt {
     arguments {
         arg("micronaut.openapi.project.dir", projectDir.toString())
-    }
-}
-
-micronaut {
-    runtime("netty")
-    testRuntime("junit5")
-    processing {
-        incremental(true)
-        annotations("net.blugrid.*")
+        arg("micronaut.processing.incremental", "true")
+        arg("micronaut.processing.annotations", "net.blugrid.*")
     }
 }

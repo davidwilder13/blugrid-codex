@@ -1,6 +1,6 @@
 env.db.schema: public
 
-logging:
+logger:
   levels:
     net.blugrid.api: DEBUG
 

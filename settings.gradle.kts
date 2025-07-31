@@ -15,22 +15,6 @@ dependencyResolutionManagement {
     }
 }
 
-// Common API projects (legacy - to be migrated)
-//include("common:common-kotlin:common-api:common-api-audit")
-//include("common:common-kotlin:common-api:common-api-client")
-//include("common:common-kotlin:common-api:common-api-domain")
-//include("common:common-kotlin:common-api:common-api-grpc")
-//include("common:common-kotlin:common-api:common-api-grpc-proto")
-//include("common:common-kotlin:common-api:common-api-json")
-//include("common:common-kotlin:common-api:common-api-jwt")
-//include("common:common-kotlin:common-api:common-api-logging")
-//include("common:common-kotlin:common-api:common-api-model")
-//include("common:common-kotlin:common-api:common-api-multitenant")
-//include("common:common-kotlin:common-api:common-api-persistence")
-//include("common:common-kotlin:common-api:common-api-security")
-//include("common:common-kotlin:common-api:common-api-test")
-//include("common:common-kotlin:common-api:common-api-web")
-
 // Common modules
 include("common:common-kotlin:common:common-domain")
 include("common:common-kotlin:common:common-model")
@@ -65,6 +49,7 @@ include("common:common-kotlin:server:server-services")
 
 // Integration modules
 include("common:common-kotlin:integration:integration-grpc")
+include("common:common-kotlin:integration:integration-grpc-client")
 include("common:common-kotlin:integration:integration-grpc-proto")
 include("common:common-kotlin:integration:integration-http-client")
 

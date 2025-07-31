@@ -1,26 +1,30 @@
 package net.blugrid.integration.grpc.service
 
 import io.grpc.StatusException
-import io.micronaut.context.annotation.Value
+import jakarta.inject.Inject
+import jakarta.inject.Named
 import jakarta.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import net.blugrid.integration.grpc.mapper.GrpcErrorMapper
 import net.blugrid.platform.logging.logger
+import net.blugrid.security.core.context.CurrentRequestContext
 
 /**
- * Executor for standardized gRPC operations with error handling and logging.
- * Uses composition pattern to be injectable into any gRPC service.
+ * Updated GrpcServiceExecutor with Context-Aware Execution
  */
 @Singleton
 class GrpcServiceExecutor(
-    private val grpcErrorMapper: GrpcErrorMapper
+    private val grpcErrorMapper: GrpcErrorMapper,
+    @Named("grpcDispatcher") @Inject private val grpcDispatcher: CoroutineDispatcher
 ) {
     private val log = logger()
 
-    @Value("\${app.service.name:unknown-service}")
-    private lateinit var serviceName: String
-
     /**
-     * Executes a gRPC call with comprehensive error handling and logging
+     * Executes a gRPC call with comprehensive error handling and context preservation
+     *
+     * CRITICAL CHANGE: Uses withContext(grpcDispatcher) to ensure business logic
+     * runs on Micronaut-managed threads that inherit security context.
      */
     suspend fun <T> executeCall(
         methodName: String,
@@ -31,8 +35,22 @@ class GrpcServiceExecutor(
         val effectiveCorrelationId = correlationId ?: generateCorrelationId()
 
         return try {
-            log.debug("Starting gRPC call: {} (correlationId: {})", methodName, effectiveCorrelationId)
-            val result = block()
+            log.debug(
+                "Starting gRPC call: {} (correlationId: {}) on thread: {}",
+                methodName, effectiveCorrelationId, Thread.currentThread().name
+            )
+
+            // CRITICAL FIX: Execute business logic on context-aware dispatcher
+            val result = withContext(grpcDispatcher) {
+                log.debug("📌 Executing {} on context thread: {}", methodName, Thread.currentThread().name)
+
+                // Debug: Verify context is available
+                debugContextAvailability(methodName)
+
+                // Execute the actual business logic
+                block()
+            }
+
             val duration = System.currentTimeMillis() - startTime
             log.debug("Completed gRPC call: {} in {}ms", methodName, duration)
             result
@@ -50,7 +68,22 @@ class GrpcServiceExecutor(
     }
 
     /**
+     * Debug helper to verify context availability
+     */
+    private fun debugContextAvailability(methodName: String) {
+        val currentThread = Thread.currentThread().name
+        val auth = CurrentRequestContext.currentAuthentication
+
+        if (auth != null) {
+            log.debug("✅ Context available for {}: {} on {}", methodName, auth.principalName, currentThread)
+        } else {
+            log.warn("❌ No context available for {} on {}", methodName, currentThread)
+        }
+    }
+
+    /**
      * Executes a blocking gRPC call (for non-suspending operations)
+     * Note: Blocking calls don't need context switching since they run synchronously
      */
     fun <T> executeCallBlocking(
         methodName: String,
