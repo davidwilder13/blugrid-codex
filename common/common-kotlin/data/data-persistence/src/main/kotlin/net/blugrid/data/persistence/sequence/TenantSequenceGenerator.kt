@@ -3,7 +3,7 @@ package net.blugrid.data.persistence.sequence
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
 import java.io.Serializable
@@ -29,7 +29,7 @@ class TenantSequenceGenerator @Inject constructor(
     }
 
     private fun getCurrentTenantId(): Long {
-        return CurrentRequestContext.currentTenantId
+        return RequestContext.currentTenantId
             ?: throw IllegalStateException("No tenant context available for sequence generation")
     }
 

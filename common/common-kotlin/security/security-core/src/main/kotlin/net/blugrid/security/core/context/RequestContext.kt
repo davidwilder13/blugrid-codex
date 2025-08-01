@@ -12,7 +12,16 @@ import net.blugrid.security.core.model.DecoratedAuthentication
 import net.blugrid.security.core.session.BusinessUnitSession
 import net.blugrid.security.core.session.TenantSession
 import java.util.Optional
-import kotlin.jvm.java
+
+interface RequestContextProvider {
+    val currentSessionId: Long?
+    val currentBusinessUnitId: Long?
+    val currentTenantId: Long?
+    val currentIsUnscoped: Boolean
+    val currentOrganisation: BaseAuthenticatedOrganisation?
+    val currentSession: BaseAuthenticatedSession?
+    val currentUser: BaseAuthenticatedUser?
+}
 
 /**
  * Current Request Context - Clean Authentication Access Layer
@@ -29,7 +38,7 @@ import kotlin.jvm.java
  * - Protocol-agnostic business logic
  * - Maintains backward compatibility with existing RequestContextProvider contract
  */
-object CurrentRequestContext : RequestContextProvider {
+object RequestContext : RequestContextProvider {
 
     private val log = logger()
 

@@ -2,6 +2,25 @@ grpc:
   client:
     discovery:
       enabled: false
+  data:
+    enabled: false
+    jpa:
+      enabled: false
+    flyway:
+      enabled: false
+
+datasources:
+  default:
+    enabled: false
+
+hibernate:
+  enabled: false
+
+jpa:
+  default:
+    enabled: false
+    entity-scan:
+      enabled: false
 
 consul:
   client:

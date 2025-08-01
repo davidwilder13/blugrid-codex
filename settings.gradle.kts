@@ -50,6 +50,7 @@ include("common:common-kotlin:server:server-services")
 // Integration modules
 include("common:common-kotlin:integration:integration-grpc")
 include("common:common-kotlin:integration:integration-grpc-client")
+include("common:common-kotlin:integration:integration-grpc-mappers")
 include("common:common-kotlin:integration:integration-grpc-proto")
 include("common:common-kotlin:integration:integration-http-client")
 

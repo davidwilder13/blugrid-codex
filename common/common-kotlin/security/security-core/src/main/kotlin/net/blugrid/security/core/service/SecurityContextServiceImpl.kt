@@ -3,7 +3,7 @@ package net.blugrid.security.core.service
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
 import net.blugrid.security.core.context.BusinessUnitIdOverride
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import net.blugrid.security.core.context.IsUnscoped
 import net.blugrid.security.core.context.TenantIdOverride
 import net.blugrid.security.core.model.BaseAuthenticatedOrganisation
@@ -23,22 +23,22 @@ open class SecurityContextServiceImpl : SecurityContextService {
     // ===== READ-ONLY ACCESS TO CURRENT CONTEXT =====
 
     override val currentSession: BaseAuthenticatedSession?
-        get() = CurrentRequestContext.currentSession
+        get() = RequestContext.currentSession
 
     override val currentTenant: BaseAuthenticatedOrganisation?
-        get() = CurrentRequestContext.currentOrganisation
+        get() = RequestContext.currentOrganisation
 
     override val currentUser: BaseAuthenticatedUser?
-        get() = CurrentRequestContext.currentUser
+        get() = RequestContext.currentUser
 
     override val currentBusinessUnitId: Long?
-        get() = CurrentRequestContext.currentBusinessUnitId
+        get() = RequestContext.currentBusinessUnitId
 
     override val currentTenantId: Long?
-        get() = CurrentRequestContext.currentTenantId
+        get() = RequestContext.currentTenantId
 
     override val currentIsUnscoped: Boolean
-        get() = CurrentRequestContext.currentIsUnscoped
+        get() = RequestContext.currentIsUnscoped
 
     // ===== SECURITY CONTEXT OVERRIDE METHODS =====
 
