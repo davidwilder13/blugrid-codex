@@ -1,5 +1,6 @@
 package net.blugrid.api.core.organisation.grpc.client
 
+import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import io.micronaut.context.annotation.Factory
@@ -9,7 +10,9 @@ import jakarta.inject.Singleton
 import net.blugrid.api.core.organisation.grpc.OrganisationStateServiceGrpcKt
 
 @Factory
-class OrganisationGrpcClientFactory {
+class OrganisationGrpcClientFactory(
+    private val authInterceptor: ClientInterceptor
+) {
 
     /**
      * Manual override, for explicit use in dev or test bootstrap.
@@ -17,6 +20,7 @@ class OrganisationGrpcClientFactory {
     fun create(host: String, port: Int): OrganisationGrpcClient {
         val channel = ManagedChannelBuilder.forAddress(host, port)
             .usePlaintext()
+            .intercept(authInterceptor)
             .build()
 
         val stub = OrganisationStateServiceGrpcKt.OrganisationStateServiceCoroutineStub(channel)

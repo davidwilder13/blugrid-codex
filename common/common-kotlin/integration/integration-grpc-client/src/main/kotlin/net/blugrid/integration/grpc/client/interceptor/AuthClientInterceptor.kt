@@ -7,6 +7,8 @@ import io.grpc.ClientInterceptor
 import io.grpc.ForwardingClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
+import io.micronaut.context.annotation.Requires
+import io.micronaut.context.env.Environment
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
 import net.blugrid.security.core.context.RequestContext
@@ -20,6 +22,7 @@ import net.blugrid.security.core.session.TenantSession
  * Mental Model: Simple envelope that packages current context and sends it along
  */
 @Singleton
+@Requires(notEnv = [Environment.TEST])
 class AuthClientInterceptor : ClientInterceptor {
 
     private val log = logger()

@@ -8,6 +8,8 @@ grpc:
   server:
     port: ${GRPC_SERVER_PORT:50051}
     instance-id: ${GRPC_SERVER_INSTANCE_ID:organisation-grpc}
+    health:
+      enabled: true
     reflection:
       enabled: true
 

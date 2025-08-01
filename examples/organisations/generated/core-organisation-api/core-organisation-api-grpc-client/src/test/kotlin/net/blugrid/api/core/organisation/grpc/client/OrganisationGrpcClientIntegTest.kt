@@ -1,12 +1,14 @@
 package net.blugrid.api.core.organisation.grpc.client
 
+import jakarta.inject.Inject
 import net.blugrid.api.core.organisation.grpc.toOrganisationCreateRequest
 import net.blugrid.api.core.organisation.grpc.toOrganisationUpdateRequest
 import net.blugrid.api.core.organisation.model.OrganisationCreate
 import net.blugrid.api.core.organisation.model.OrganisationUpdate
 import net.blugrid.common.domain.IdentityID
 import net.blugrid.common.domain.IdentityUUID
-import net.blugrid.platform.testing.security.TestApplicationContext
+import net.blugrid.platform.testing.grpc.TestGrpcApplicationContext
+import net.blugrid.platform.testing.grpc.TestGrpcClientInterceptor
 import net.blugrid.platform.testing.support.BaseGrpcClientIntegTest
 import net.blugrid.platform.testing.support.GrpcServerTestSupport
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,16 +23,19 @@ import java.util.UUID
 @DisplayName("OrganisationGrpcClient")
 class OrganisationGrpcClientIntegTest : BaseGrpcClientIntegTest() {
 
+    @Inject
+    private lateinit var authInterceptor: TestGrpcClientInterceptor
+
     private val client by lazy {
         val host = GrpcServerTestSupport.externalHost
         val port = GrpcServerTestSupport.externalPort
-        OrganisationGrpcClientFactory()
-            .create(host, port)
+        val factory = OrganisationGrpcClientFactory(authInterceptor)
+        factory.create(host, port)
     }
 
     @BeforeEach
     fun init() {
-        TestApplicationContext.configureTenantApplicationContext()
+        TestGrpcApplicationContext.configureTenantApplicationContext()
     }
 
     @Test
