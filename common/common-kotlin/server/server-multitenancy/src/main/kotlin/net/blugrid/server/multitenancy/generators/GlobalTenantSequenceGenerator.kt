@@ -5,7 +5,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import net.blugrid.common.domain.exception.TenantContextException
 import net.blugrid.data.persistence.sequence.TenantSequence
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
 import java.io.Serializable
@@ -35,7 +35,7 @@ class GlobalTenantSequenceGenerator : IdentifierGenerator {
     }
 
     override fun generate(session: SharedSessionContractImplementor, obj: Any): Serializable {
-        val tenantId = CurrentRequestContext.currentTenantId
+        val tenantId = RequestContext.currentTenantId
             ?: throw TenantContextException("No tenant context for sequence generation")
 
         val tableName = obj::class.simpleName?.lowercase()?.removeSuffix("entity")

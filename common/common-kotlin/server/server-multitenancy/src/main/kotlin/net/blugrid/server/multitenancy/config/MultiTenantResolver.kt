@@ -4,7 +4,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver
 
 /**
@@ -14,7 +14,7 @@ import org.hibernate.context.spi.CurrentTenantIdentifierResolver
 @Singleton
 @Named("currentTenantResolver")
 class MultiTenantResolver @Inject constructor(
-    private val currentRequestContext: CurrentRequestContext
+    private val currentRequestContext: RequestContext
 ) : CurrentTenantIdentifierResolver<String> {
 
     private val log = logger()

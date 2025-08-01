@@ -316,3 +316,35 @@ validationLibs = [
     "micronaut-validation",
     "jakarta-validation"
 ]
+
+# ===== CLIENT-ONLY BUNDLES =====
+micronautClient = [
+    "micronaut-core",
+    "micronaut-inject",
+    "micronaut-runtime",
+    "micronaut-kotlin-runtime",
+    "micronaut-kotlin-extensions",
+    "micronaut-discovery",          # For service discovery
+    "micronaut-http-client"         # For HTTP-based service calls
+]
+
+grpcClientOnly = [
+    "grpc-kotlin-stub",
+    "grpc-protobuf",
+    "grpc-stub",
+    "protobuf-java",
+    "protobuf-kotlin",
+    "micronaut-grpc-client",
+    "kotlinx-coroutines-core"
+]
+
+runtimeClientOnly = [
+    "logback-classic",
+    "jackson-kotlin",
+    "snakeyaml"
+]
+
+testingClientOnly = [
+    "micronaut-test-junit5",
+    "kotlin-faker"
+]

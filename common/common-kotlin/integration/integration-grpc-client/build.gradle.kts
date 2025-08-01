@@ -11,15 +11,17 @@ dependencies {
     api(project(":common:common-kotlin:platform:platform-config"))
     api(project(":common:common-kotlin:platform:platform-logging"))
     api(project(":common:common-kotlin:security:security-core"))
+    api(project(":common:common-kotlin:integration:integration-grpc-mappers"))
     api(project(":common:common-kotlin:integration:integration-grpc-proto"))
 
     // Platform BOMs
     implementation(platform(libs.micronaut.bom))
     implementation(platform(libs.aws.bom))
 
-    // Core dependencies
+    // Client dependencies
     implementation(libs.bundles.kotlinCore)
-    implementation(libs.bundles.micronautCore)
+    implementation(libs.bundles.micronautClient)
+    implementation(libs.bundles.grpcClientOnly)
 
     // gRPC client-specific dependencies
     implementation(libs.bundles.grpcCore)
@@ -48,10 +50,7 @@ dependencies {
     compileOnly(libs.bundles.compileOnly)
 
     // Runtime dependencies
-    runtimeOnly(libs.bundles.runtimeCore)
-
-    // Test dependencies
-    testImplementation(libs.bundles.testing)
+    runtimeOnly(libs.bundles.runtimeClientOnly)
 }
 
 java {

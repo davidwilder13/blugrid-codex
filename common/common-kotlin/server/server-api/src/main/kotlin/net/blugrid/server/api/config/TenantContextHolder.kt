@@ -1,7 +1,7 @@
 package net.blugrid.server.api.config
 
 import jakarta.inject.Singleton
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import net.blugrid.server.api.tenant.TenantContext
 import org.slf4j.LoggerFactory
 
@@ -40,7 +40,7 @@ class TenantContextHolder {
         threadLocalOverride.get()?.let { return it }
 
         // Get tenant from current request context (authentication system)
-        val tenantId = CurrentRequestContext.currentTenantId
+        val tenantId = RequestContext.currentTenantId
 
         return when {
             tenantId != null -> {
@@ -114,21 +114,21 @@ class TenantContextHolder {
      * This can be used for additional tenant scoping within a tenant
      */
     fun getCurrentBusinessUnitId(): Long? {
-        return CurrentRequestContext.currentBusinessUnitId
+        return RequestContext.currentBusinessUnitId
     }
 
     /**
      * Check if the current request is unscoped (admin/system operations)
      */
     fun isCurrentRequestUnscoped(): Boolean {
-        return CurrentRequestContext.currentIsUnscoped
+        return RequestContext.currentIsUnscoped
     }
 
     /**
      * Get tenant name from the current organisation in the request context
      */
     private fun getCurrentTenantName(): String? {
-        return CurrentRequestContext.currentOrganisation?.displayName
+        return RequestContext.currentOrganisation?.displayName
     }
 
     /**
@@ -138,7 +138,7 @@ class TenantContextHolder {
     fun getTenantDebugInfo(): TenantDebugInfo {
         val currentTenant = getCurrentTenant()
         val hasOverride = hasTenantOverride()
-        val requestTenantId = CurrentRequestContext.currentTenantId
+        val requestTenantId = RequestContext.currentTenantId
         val businessUnitId = getCurrentBusinessUnitId()
         val isUnscoped = isCurrentRequestUnscoped()
 

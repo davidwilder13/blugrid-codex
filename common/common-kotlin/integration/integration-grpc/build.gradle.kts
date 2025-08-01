@@ -13,6 +13,7 @@ dependencies {
     api(project(":common:common-kotlin:platform:platform-serialization"))
     api(project(":common:common-kotlin:security:security-core"))
     api(project(":common:common-kotlin:security:security-authentication"))
+    api(project(":common:common-kotlin:integration:integration-grpc-mappers"))
     api(project(":common:common-kotlin:integration:integration-grpc-proto"))
 
     // Platform BOMs

@@ -2,7 +2,7 @@ package net.blugrid.server.multitenancy.config
 
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import net.blugrid.security.core.session.BusinessUnitSession
 import net.blugrid.security.core.session.TenantSession
 import net.blugrid.server.api.config.ServerMode
@@ -34,7 +34,7 @@ import javax.sql.DataSource
 @Suppress("UNCHECKED_CAST")
 @Singleton
 open class IntegratedMultiTenantConnectionProvider(
-    private val securityContextService: CurrentRequestContext
+    private val securityContextService: RequestContext
 ) : AbstractDataSourceBasedMultiTenantConnectionProviderImpl<String>(),
     ConnectionProvider,
     ServiceRegistryAwareService,

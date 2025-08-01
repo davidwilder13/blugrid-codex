@@ -9,7 +9,7 @@ import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import jakarta.inject.Singleton
 import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 import net.blugrid.security.core.session.BusinessUnitSession
 import net.blugrid.security.core.session.TenantSession
 
@@ -57,7 +57,7 @@ class AuthClientInterceptor : ClientInterceptor {
      * Simple, fast, no error handling
      */
     private fun addContextToHeaders(headers: Metadata) {
-        val session = CurrentRequestContext.currentSession ?: return
+        val session = RequestContext.currentSession ?: return
 
         // Add basic session info
         addHeader(headers, SESSION_ID, session.sessionId)

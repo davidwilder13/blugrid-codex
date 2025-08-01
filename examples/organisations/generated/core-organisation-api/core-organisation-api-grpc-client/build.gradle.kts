@@ -3,12 +3,13 @@ plugins {
     alias(libs.plugins.kapt)
     alias(libs.plugins.allopen)
     alias(libs.plugins.protobuf)
+    alias(libs.plugins.application)
 }
 
 dependencies {
     // API dependencies - expose to consumers
     api(project(":common:common-kotlin:common:common-model"))
-    api(project(":common:common-kotlin:integration:integration-grpc"))
+    api(project(":common:common-kotlin:integration:integration-grpc-client"))
     api(project(":common:common-kotlin:integration:integration-grpc-proto"))
     api(project(":common:common-kotlin:platform:platform-serialization"))
 
@@ -21,12 +22,10 @@ dependencies {
 
     // Core dependencies using new bundles
     implementation(libs.bundles.kotlinCore)
-    implementation(libs.bundles.micronautCore)
-    implementation(libs.bundles.grpcCore)          // gRPC core functionality
-    implementation(libs.bundles.grpcClient)        // gRPC client support
+    implementation(libs.bundles.micronautClient)
+    implementation(libs.bundles.grpcClientOnly)
 
     // Micronaut Data
-    implementation(libs.bundles.micronautData)
     implementation(libs.micronaut.data.model)
 
     // Kotlin coroutines for async gRPC calls
@@ -39,13 +38,24 @@ dependencies {
     compileOnly(libs.bundles.compileOnly)
 
     // Runtime dependencies
-    runtimeOnly(libs.bundles.runtimeCore)
+    runtimeOnly(libs.bundles.runtimeClientOnly)
 
     // Test dependencies
     testImplementation(project(":common:common-kotlin:platform:platform-testing"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
     testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")
+    }
+
+    // ===== CRITICAL: EXCLUDE ALL JPA/HIBERNATE DEPENDENCIES =====
+    configurations.all {
+        exclude(group = "io.micronaut.sql", module = "micronaut-hibernate-jpa")
+        exclude(group = "io.micronaut.sql", module = "micronaut-jdbc-hikari")
+        exclude(group = "io.micronaut.data", module = "micronaut-data-hibernate-jpa")
+        exclude(group = "io.micronaut.flyway", module = "micronaut-flyway")
+        exclude(group = "org.hibernate")
+        exclude(group = "org.postgresql", module = "postgresql")
+        exclude(group = "com.zaxxer", module = "HikariCP")
     }
 }
 
@@ -62,6 +72,14 @@ kapt {
         arg("micronaut.openapi.project.dir", projectDir.toString())
         arg("micronaut.processing.incremental", "true")
         arg("micronaut.processing.annotations", "net.blugrid.api.core.organisation.grpc.*")
+    }
+}
+
+micronaut {
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("net.blugrid.api.core.organisation.grpc.*")
     }
 }
 
@@ -95,3 +113,8 @@ sourceSets["main"].java.srcDirs(
     "build/generated/source/proto/main/grpc",
     "build/generated/source/proto/main/grpckt"
 )
+
+tasks.test {
+    dependsOn(":examples:organisations:generated:core-organisation-api:core-organisation-api-grpc:buildLocalGrpcDockerImage")
+    useJUnitPlatform()
+}

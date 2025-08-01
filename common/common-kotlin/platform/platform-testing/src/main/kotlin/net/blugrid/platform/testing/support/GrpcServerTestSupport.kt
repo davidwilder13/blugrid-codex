@@ -3,6 +3,7 @@ package net.blugrid.platform.testing.support
 import net.blugrid.platform.logging.logger
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
+import org.testcontainers.images.PullPolicy
 import org.testcontainers.utility.DockerImageName
 
 interface GrpcServerTestSupport {

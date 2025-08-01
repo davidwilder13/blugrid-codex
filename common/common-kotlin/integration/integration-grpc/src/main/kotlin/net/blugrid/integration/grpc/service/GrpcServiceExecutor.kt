@@ -8,7 +8,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.blugrid.integration.grpc.mapper.GrpcErrorMapper
 import net.blugrid.platform.logging.logger
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 
 /**
  * Updated GrpcServiceExecutor with Context-Aware Execution
@@ -72,7 +72,7 @@ class GrpcServiceExecutor(
      */
     private fun debugContextAvailability(methodName: String) {
         val currentThread = Thread.currentThread().name
-        val auth = CurrentRequestContext.currentAuthentication
+        val auth = RequestContext.currentAuthentication
 
         if (auth != null) {
             log.debug("✅ Context available for {}: {} on {}", methodName, auth.principalName, currentThread)

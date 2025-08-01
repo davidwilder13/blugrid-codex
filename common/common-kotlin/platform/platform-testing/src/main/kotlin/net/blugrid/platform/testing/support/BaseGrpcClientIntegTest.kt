@@ -5,7 +5,15 @@ import io.micronaut.test.support.TestPropertyProvider
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 
-@MicronautTest(environments = ["debug-logging", "json", "security", "db"])
+@MicronautTest(
+    environments = [
+        "platform-debug-logging",
+        "platform-serialization",
+        "security-core",
+        "security-oauth",
+        "security-tokens",
+    ]
+)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseGrpcClientIntegTest :
     BaseIntegTest(),

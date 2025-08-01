@@ -1,7 +1,7 @@
 package net.blugrid.server.api.tenant
 
 import jakarta.inject.Singleton
-import net.blugrid.security.core.context.CurrentRequestContext
+import net.blugrid.security.core.context.RequestContext
 
 /**
  * Primary tenant resolver that uses your existing CurrentRequestContext system.
@@ -11,7 +11,7 @@ import net.blugrid.security.core.context.CurrentRequestContext
 class RequestContextTenantResolver : TenantResolver {
 
     override fun resolveCurrentTenant(): TenantContext? {
-        val tenantId = CurrentRequestContext.currentTenantId
+        val tenantId = RequestContext.currentTenantId
 
         return when {
             tenantId != null -> {
@@ -35,7 +35,7 @@ class RequestContextTenantResolver : TenantResolver {
             context.isStandalone -> true // Standalone is always valid
             context.tenantId.isNotBlank() -> {
                 // For multi-tenant, verify it matches current request context
-                val currentTenantId = CurrentRequestContext.currentTenantId
+                val currentTenantId = RequestContext.currentTenantId
                 currentTenantId?.toString() == context.tenantId
             }
 
@@ -49,7 +49,7 @@ class RequestContextTenantResolver : TenantResolver {
      * Extract tenant name from current organisation
      */
     private fun getCurrentTenantName(): String? {
-        return CurrentRequestContext.currentOrganisation?.let { org ->
+        return RequestContext.currentOrganisation?.let { org ->
             // You'll need to adjust this based on your BaseAuthenticatedOrganisation structure
             extractOrganisationName(org)
         }
