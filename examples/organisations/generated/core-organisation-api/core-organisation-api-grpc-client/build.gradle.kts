@@ -42,6 +42,7 @@ dependencies {
 
     // Test dependencies
     testImplementation(project(":common:common-kotlin:platform:platform-testing"))
+    testImplementation(project(":common:common-kotlin:integration:integration-grpc-client"))
     testImplementation(project(":examples:organisations:generated:core-organisation-api:core-organisation-api-test"))
     testImplementation(libs.bundles.testing) {
         exclude(group = "org.slf4j", module = "slf4j-api")
