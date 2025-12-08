@@ -1,0 +1,88 @@
+{# templates/kotlin/entity.kt.j2 #}
+{# Generates JPA Entity classes from entity schema #}
+{# Based on: codegen/src/generators/kotlin/templates/db/repository/KotlinEntityTemplate.ts #}
+package {{ packageName }}.repository.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType.SEQUENCE
+import jakarta.persistence.Id
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreUpdate
+import jakarta.persistence.Table
+{%- if hasAudit %}
+import net.blugrid.api.common.repository.model.EmbeddedAuditEntity
+{%- endif %}
+import net.blugrid.api.common.repository.model.{{ extends }}
+import net.blugrid.api.util.kotlinEquals
+import org.hibernate.annotations.GenericGenerator
+import java.time.LocalDateTime
+import java.util.Objects
+import java.util.UUID
+
+@Entity
+@Table(name = "{{ tableName }}")
+class {{ entityName }}Entity(
+
+    @Id
+    @GeneratedValue(strategy = SEQUENCE, generator = "{{ sequenceName }}")
+    @GenericGenerator(name = "{{ sequenceName }}", strategy = "{{ generatorStrategy }}")
+    @Column(name = "id", unique = true, nullable = false, updatable = false)
+    override var id: Long? = null,
+
+    @Column(name = "uuid", updatable = false)
+    override var uuid: UUID,
+
+    {%- for field in fields %}
+
+    @Column(name = "{{ field.columnName }}"{% if field.nullable %}, nullable = true{% else %}, nullable = false{% endif %}{% if field.updatable is defined and not field.updatable %}, updatable = false{% endif %})
+    var {{ field.name }}: {{ field.type }}{% if field.nullable %}? = null{% endif %}{% if not loop.last %},{% endif %}
+    {%- endfor %}
+
+) : {{ extends }}<{{ entityName }}Entity> {
+{%- if hasAudit %}
+
+    @Embedded
+    override var audit: EmbeddedAuditEntity = EmbeddedAuditEntity()
+{%- endif %}
+{%- if hasPermission %}
+
+    @Transient
+    override val permission: {{ permissionType }}? = null
+{%- endif %}
+{%- if hasAudit %}
+
+    @PrePersist
+    fun prePersist() {
+        audit.prePersist()
+    }
+
+    @PreUpdate
+    fun preUpdate() {
+        audit.preUpdate()
+    }
+{%- endif %}
+
+    companion object {
+        private val equalsProperties = arrayOf(
+{%- for field in fields %}
+            {{ entityName }}Entity::{{ field.name }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+        )
+    }
+
+    override fun update(update: {{ entityName }}Entity): {{ entityName }}Entity {
+{%- for field in fields %}
+        this.{{ field.name }} = update.{{ field.name }}
+{%- endfor %}
+        return this
+    }
+
+    override fun equals(other: Any?) = kotlinEquals(other = other, properties = equalsProperties)
+
+    override fun hashCode() = Objects.hash(
+        uuid{% for field in fields %}, {{ field.name }}{% endfor %}
+    )
+}
