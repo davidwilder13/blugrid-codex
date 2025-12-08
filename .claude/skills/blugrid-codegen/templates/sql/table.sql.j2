@@ -1,0 +1,79 @@
+{# templates/sql/table.sql.j2 #}
+{# Generates PostgreSQL table definitions with inheritance #}
+{# Based on: codegen/src/generators/kotlin/templates/db/sql/CreateTableSQLTemplate.ts #}
+
+-- ============================================================================
+-- Table: {{ name }}
+-- Scope: {{ scope }}
+-- ============================================================================
+
+-- Column definitions table
+CREATE TABLE IF NOT EXISTS {{ name }}_columns (
+{%- for col in columns %}
+    {{ col.name }} {{ col.dataType }}{% if col.defaultValue %} DEFAULT {{ col.defaultValue }}{% endif %}{% if not loop.last %},{% endif %}
+{%- endfor %}
+);
+
+-- Main table with inheritance
+CREATE TABLE IF NOT EXISTS {{ name }} (
+type T_TABLE_NAME NOT NULL DEFAULT '{{ name | upper }}',
+{%- if isPartitioned %}
+CHECK (FALSE) NO INHERIT
+{%- else %}
+CONSTRAINT pk_{{ name }} PRIMARY KEY (id)
+{%- endif %}
+)
+INHERITS (
+{%- if scope == 'generic' %}
+  _common_unscoped_resource_columns,
+{%- elif scope == 'unscoped' %}
+  _common_unscoped_resource_columns,
+  _common_audit_columns,
+{%- elif scope == 'tenantScoped' %}
+  _common_tenant_resource_columns,
+  _common_audit_columns,
+{%- elif scope == 'businessUnitScoped' %}
+  _common_business_unit_resource_columns,
+  _common_audit_columns,
+{%- endif %}
+{%- for baseTable in baseTables %}
+  {{ baseTable }},
+{%- endfor %}
+  {{ name }}_columns
+)
+WITHOUT OIDS;
+
+-- Indexes
+CREATE UNIQUE INDEX IF NOT EXISTS ak_{{ name }}_uuid ON {{ name }} USING btree (uuid);
+{%- for idx in indexes %}
+    CREATE {% if idx.unique %}UNIQUE {% endif %}INDEX IF NOT EXISTS ak_{{ name }}_{{ idx.name }} ON {{ name }} USING btree ({% for col in idx.columns %}{{ col }}{% if not loop.last %}, {% endif %}{% endfor %});
+{%- endfor %}
+
+{%- if scope == 'tenantScoped' %}
+CREATE INDEX IF NOT EXISTS idx_{{ name }}_tenant_id ON {{ name }} USING btree (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_{{ name }}_tenant_id_expiry ON {{ name }} USING btree (tenant_id, expiry_timestamp);
+{%- endif %}
+
+{%- if scope == 'businessUnitScoped' %}
+CREATE INDEX IF NOT EXISTS idx_{{ name }}_tenant_id ON {{ name }} USING btree (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_{{ name }}_business_unit_id ON {{ name }} USING btree (business_unit_id);
+CREATE INDEX IF NOT EXISTS idx_{{ name }}_tenant_id_expiry ON {{ name }} USING btree (tenant_id, expiry_timestamp);
+{%- endif %}
+
+{%- if scope != 'generic' %}
+
+-- Audit triggers
+DROP TRIGGER IF EXISTS trig_{{ name }}_insert_audit ON {{ name }};
+
+CREATE TRIGGER trig_{{ name }}_insert_audit
+BEFORE INSERT ON {{ name }}
+FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_insert_audit_columns();
+
+DROP TRIGGER IF EXISTS trig_{{ name }}_update_audit ON {{ name }};
+
+CREATE TRIGGER trig_{{ name }}_update_audit
+BEFORE UPDATE ON {{ name }}
+FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_update_audit_columns();
+{%- endif %}
