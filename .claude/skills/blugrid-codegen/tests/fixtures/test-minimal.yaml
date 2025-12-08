@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: test-api
+  version: 0.1.0
+  x-base-package: net.blugrid.test
+  x-group: net.blugrid.api
+  x-module-name: test-api
+
+components:
+  schemas:
+    TestEntity:
+      type: object
+      description: A minimal test entity
+      x-resource-type: UnscopedResource
+      x-auditable: false
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          x-generated: true
+        uuid:
+          type: string
+          format: uuid
+          x-generated: true
+        name:
+          type: string
+          description: The entity name
+
+paths:
+  /test-entities:
+    get:
+      summary: List test entities
+      operationId: listTestEntities
+      responses:
+        '200':
+          description: List of entities
