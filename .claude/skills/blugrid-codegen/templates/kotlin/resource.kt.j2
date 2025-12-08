@@ -1,0 +1,100 @@
+{# templates/kotlin/resource.kt.j2 #}
+{# Generates Kotlin resource DTOs - supports 4 variants: model, create, update, interface #}
+{% if variant == 'model' %}
+package {{ packageName }}
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.resource.Audit
+import net.blugrid.api.common.model.resource.UnscopedResource
+import net.blugrid.api.common.model.resource.ResourceType
+import java.util.UUID
+{% if imports %}
+{% for import in imports %}
+import {{ import.value }}
+{% endfor %}
+{% endif %}
+
+@Schema(description = "Represents a {{ nameLower }} within the system.")
+data class {{ name }}(
+
+    override var id: Long,
+
+    override var uuid: UUID,
+
+{% for field in fields %}
+    @Schema(description = "{{ field.description }}", example = "{{ field.example }}")
+    var {{ field.name }}: {{ field.type }}{% if not field.required %}? = null{% endif %},
+
+{% endfor %}
+    override val audit: Audit? = null
+) : UnscopedResource<{{ name }}>(audit) {
+
+    override val resourceType: ResourceType
+        get() = ResourceType.{{ nameUpperSnake }}
+}
+{% elif variant == 'create' %}
+package {{ packageName }}
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.resource.GenericCreateResource
+import java.util.UUID
+{% if imports %}
+{% for import in imports %}
+import {{ import.value }}
+{% endfor %}
+{% endif %}
+
+@Schema(description = "Model used to create a new {{ nameLower }}.")
+data class {{ name }}Create(
+
+    @Schema(description = "The globally unique identifier for this {{ nameLower }}.", example = "123e4567-e89b-12d3-a456-426614174000")
+    override var uuid: UUID,
+
+{% for field in fields %}
+    @Schema(description = "{{ field.description }}", example = "{{ field.example }}")
+    var {{ field.name }}: {{ field.type }}{% if not field.required %}? = null{% endif %},
+
+{% endfor %}
+) : GenericCreateResource<{{ name }}Create>(uuid)
+{% elif variant == 'update' %}
+package {{ packageName }}
+
+import io.swagger.v3.oas.annotations.media.Schema
+import net.blugrid.api.common.model.resource.GenericUpdateResource
+import java.util.UUID
+{% if imports %}
+{% for import in imports %}
+import {{ import.value }}
+{% endfor %}
+{% endif %}
+
+@Schema(description = "Model used to update an existing {{ nameLower }}.")
+data class {{ name }}Update(
+
+    override var id: Long,
+
+    override var uuid: UUID,
+
+{% for field in fields %}
+    @Schema(description = "{{ field.description }}", example = "{{ field.example }}")
+    var {{ field.name }}: {{ field.type }}{% if not field.required %}? = null{% endif %},
+
+{% endfor %}
+) : GenericUpdateResource<{{ name }}Update>(id, uuid)
+{% elif variant == 'interface' %}
+package {{ packageName }}
+
+import io.swagger.v3.oas.annotations.media.Schema
+{% if imports %}
+{% for import in imports %}
+import {{ import.value }}
+{% endfor %}
+{% endif %}
+
+@Schema(description = "Base {{ nameLower }} interface representing a {{ nameLower }} within the system.")
+interface I{{ name }} {
+{% for field in interfaceFields %}
+    var {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}
+{% endfor %}
+}
+{% endif %}
