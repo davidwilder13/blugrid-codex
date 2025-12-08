@@ -72,3 +72,9 @@ coverage/
 # ✨ Env files
 .env
 .env.*
+
+# ✨ Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
