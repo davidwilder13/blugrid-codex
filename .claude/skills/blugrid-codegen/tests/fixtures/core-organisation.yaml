@@ -1,0 +1,123 @@
+# tests/fixtures/core-organisation.yaml
+openapi: 3.0.3
+info:
+  title: core-organisation-api
+  version: 0.1.0
+  x-base-package: net.blugrid.core.organisation
+  x-group: net.blugrid.api
+  x-module-name: core-organisation-api
+
+components:
+  schemas:
+    Organisation:
+      type: object
+      description: An organisation represents a legal or operational entity.
+      x-resource-type: UnscopedResource
+      x-auditable: true
+      x-searchable: false
+      required:
+        - parentOrganisationId
+        - effectiveTimestamp
+      properties:
+        id:
+          type: integer
+          format: int64
+          x-generated: true
+        uuid:
+          type: string
+          format: uuid
+          x-generated: true
+        parentOrganisationId:
+          type: integer
+          format: int64
+          description: The ID of the parent organisation.
+        effectiveTimestamp:
+          type: string
+          format: date-time
+          description: The date and time the organisation becomes active.
+
+paths:
+  /organisations:
+    get:
+      summary: List organisations
+      operationId: listOrganisations
+      responses:
+        '200':
+          description: List of organisations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Organisation'
+    post:
+      summary: Create organisation
+      operationId: createOrganisation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organisation'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+
+  /organisations/{id}:
+    get:
+      summary: Get organisation by ID
+      operationId: getOrganisationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Organisation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+        '404':
+          description: Organisation not found
+    put:
+      summary: Update organisation
+      operationId: updateOrganisation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organisation'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+    delete:
+      summary: Delete organisation
+      operationId: deleteOrganisation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Deleted
