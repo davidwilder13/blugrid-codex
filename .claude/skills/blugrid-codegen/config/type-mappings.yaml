@@ -1,0 +1,71 @@
+# Type mappings for JDL → Kotlin → PostgreSQL conversion
+# Extracted from codegen/src/mapper/JdlToCodegenEntityMapper.ts
+
+jdl_to_kotlin:
+  String: String
+  UUID: UUID
+  Long: Long
+  Integer: Long
+  BigInteger: Long
+  Float: Double
+  Double: Double
+  BigDecimal: Double
+  Boolean: Boolean
+  Instant: LocalDateTime
+  ZonedDateTime: LocalDateTime
+  LocalDate: LocalDateTime
+  "byte[]": ByteArray
+  "byte[] (image)": ByteArray
+  ImageBlob: ByteArray
+
+jdl_to_db_domain:
+  UUID: t_uuid
+  String: t_text
+  Boolean: t_boolean
+  Int: bigint
+  Long: bigint
+  BigDecimal: t_money
+  Float: t_float
+  Double: t_float
+  LocalDate: t_datetime
+  LocalDateTime: t_timestamp
+  Instant: t_timestamp
+  ZonedDateTime: t_timestampz
+  Short: t_short_count
+  Byte: t_code1
+  ByteArray: t_bytea
+
+kotlin_type_imports:
+  BigDecimal: java.math.BigDecimal
+  LocalDate: java.time.LocalDateTime
+  LocalDateTime: java.time.LocalDateTime
+  LocalTime: java.time.LocalDateTime
+  UUID: java.util.UUID
+  ZonedDateTime: java.time.ZonedDateTime
+
+resource_types:
+  - UnscopedResource
+  - TenantResource
+  - BusinessUnitResource
+
+audit_fields:
+  - name: createdTimestamp
+    type: LocalDateTime
+    kotlin_type: LocalDateTime
+    db_domain: t_timestamp
+  - name: lastChangedTimestamp
+    type: LocalDateTime
+    kotlin_type: LocalDateTime
+    db_domain: t_timestamp
+  - name: createdBySessionId
+    type: Long
+    kotlin_type: Long
+    db_domain: bigint
+  - name: lastChangedBySessionId
+    type: Long
+    kotlin_type: Long
+    db_domain: bigint
+  - name: version
+    type: Int
+    kotlin_type: Int
+    db_domain: bigint
