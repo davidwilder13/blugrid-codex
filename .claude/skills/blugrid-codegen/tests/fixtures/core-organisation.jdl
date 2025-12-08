@@ -1,0 +1,26 @@
+/**
+ * An organisation represents a legal or operational entity.
+ */
+@resourceType(UnscopedResource)
+@Auditable
+entity Organisation {
+  /**
+   * The ID of the parent organisation.
+   */
+  parentOrganisationId Long required,
+
+  /**
+   * The date and time the organisation becomes active.
+   */
+  effectiveTimestamp LocalDate required
+}
+
+application {
+  config {
+    baseName organisation
+    packageName net.blugrid.core.organisation
+    applicationType microservice
+  }
+
+  entities Organisation
+}
