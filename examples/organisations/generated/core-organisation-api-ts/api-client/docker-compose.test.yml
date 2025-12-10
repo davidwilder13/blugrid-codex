@@ -1,0 +1,37 @@
+# Docker Compose for Organisation Integration Tests
+# Auto-generated - do not edit manually.
+
+version: '3.8'
+
+services:
+  organisation-api:
+    image: blugrid/organisation-api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      DATABASE_URL: jdbc:postgresql://postgres:5432/organisation_test
+      DATABASE_USERNAME: test
+      DATABASE_PASSWORD: test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: organisation_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d organisation_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    tmpfs:
+      - /var/lib/postgresql/data

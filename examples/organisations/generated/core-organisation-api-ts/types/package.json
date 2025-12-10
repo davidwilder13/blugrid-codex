@@ -1,0 +1,25 @@
+{
+  "name": "@blugrid/organisation-types",
+  "version": "0.0.1",
+  "description": "TypeScript types for Organisation",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/models/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/models/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0"
+  }
+}

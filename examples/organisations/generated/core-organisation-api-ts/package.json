@@ -1,0 +1,15 @@
+{
+  "name": "@blugrid/organisation-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:contract": "pnpm --filter @blugrid/organisation-api-client test:contract",
+    "test:integration": "pnpm --filter @blugrid/organisation-api-client test:integration",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

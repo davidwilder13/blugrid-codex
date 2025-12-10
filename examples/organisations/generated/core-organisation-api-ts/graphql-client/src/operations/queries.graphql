@@ -1,0 +1,20 @@
+# Organisation GraphQL Queries
+# Auto-generated from JDL entity definition.
+
+query GetOrganisation($id: Long!) {
+  organisation(id: $id) {
+    ...OrganisationFields
+  }
+}
+
+query GetOrganisations($first: Int, $after: String) {
+  organisations(first: $first, after: $after) {
+    ...OrganisationConnection
+  }
+}
+
+query GetAllOrganisations {
+  allOrganisations {
+    ...OrganisationFields
+  }
+}

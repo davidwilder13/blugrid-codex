@@ -1,0 +1,377 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Organisation API",
+    "version": "1.0.0",
+    "description": "API for managing Organisations"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development"
+    }
+  ],
+  "paths": {
+    "/api/organisations": {
+      "get": {
+        "operationId": "getOrganisations",
+        "summary": "Get paginated list of Organisations",
+        "tags": [
+          "Organisation"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of Organisations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganisationPage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createOrganisation",
+        "summary": "Create a new Organisation",
+        "tags": [
+          "Organisation"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created Organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{id}": {
+      "get": {
+        "operationId": "getOrganisationById",
+        "summary": "Get Organisation by ID",
+        "tags": [
+          "Organisation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organisation not found"
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateOrganisation",
+        "summary": "Update an existing Organisation",
+        "tags": [
+          "Organisation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganisationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated Organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organisation not found"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteOrganisation",
+        "summary": "Delete a Organisation",
+        "tags": [
+          "Organisation"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Organisation deleted"
+          },
+          "404": {
+            "description": "Organisation not found"
+          }
+        }
+      }
+    },
+    "/api/organisations/uuid/{uuid}": {
+      "get": {
+        "operationId": "getOrganisationByUuid",
+        "summary": "Get Organisation by UUID",
+        "tags": [
+          "Organisation"
+        ],
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Organisation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organisation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organisation not found"
+          }
+        }
+      }
+    },
+    "/api/organisations/all": {
+      "get": {
+        "operationId": "getAllOrganisations",
+        "summary": "Get all Organisations",
+        "tags": [
+          "Organisation"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all Organisations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organisation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Organisation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentOrganisationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "effectiveTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "createdBy": {
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedDate": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedBy": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "uuid",
+          "parentOrganisationId",
+          "effectiveTimestamp"
+        ]
+      },
+      "OrganisationCreate": {
+        "type": "object",
+        "properties": {
+          "parentOrganisationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "effectiveTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "parentOrganisationId",
+          "effectiveTimestamp"
+        ]
+      },
+      "OrganisationUpdate": {
+        "type": "object",
+        "properties": {
+          "parentOrganisationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "effectiveTimestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrganisationPage": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            }
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "number": {
+            "type": "integer"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "content",
+          "totalElements",
+          "totalPages",
+          "size",
+          "number",
+          "first",
+          "last",
+          "empty"
+        ]
+      }
+    }
+  }
+}

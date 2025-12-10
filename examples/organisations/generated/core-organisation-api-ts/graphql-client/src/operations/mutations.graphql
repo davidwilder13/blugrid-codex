@@ -1,0 +1,18 @@
+# Organisation GraphQL Mutations
+# Auto-generated from JDL entity definition.
+
+mutation CreateOrganisation($input: OrganisationCreateInput!) {
+  createOrganisation(input: $input) {
+    ...OrganisationFields
+  }
+}
+
+mutation UpdateOrganisation($id: Long!, $input: OrganisationUpdateInput!) {
+  updateOrganisation(id: $id, input: $input) {
+    ...OrganisationFields
+  }
+}
+
+mutation DeleteOrganisation($id: Long!) {
+  deleteOrganisation(id: $id)
+}

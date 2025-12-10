@@ -1,0 +1,29 @@
+# Organisation GraphQL Fragments
+# Auto-generated from JDL entity definition.
+
+fragment OrganisationFields on OrganisationType {
+  id
+  uuid
+  parentOrganisationId
+  effectiveTimestamp
+  createdDate
+  createdBy
+  updatedDate
+  updatedBy
+}
+
+fragment OrganisationConnection on OrganisationConnection {
+  edges {
+    node {
+      ...OrganisationFields
+    }
+    cursor
+  }
+  pageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
+  }
+  totalCount
+}
