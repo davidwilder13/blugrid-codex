@@ -1,0 +1,233 @@
+{# templates/kotlin/test_factory.kt.j2 #}
+{# Generates test factories for Create, Update, and Resource models #}
+package {{ packageName }}.factory
+
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.audit.ResourceAudit
+import net.blugrid.platform.testing.factory.base.BaseFactory
+import net.blugrid.platform.testing.factory.base.RandomizableFactory
+import net.blugrid.platform.testing.factory.base.ScenarioFactory
+import net.blugrid.platform.testing.generator.IdentityIDRandom
+import net.blugrid.platform.testing.generator.IdentityUUIDRandom
+import net.blugrid.platform.testing.generator.random
+{% for import in imports %}
+import {{ import }}
+{% endfor %}
+
+// =====================================================
+// SIMPLIFIED CREATE FACTORY (Your Primary Usage)
+// =====================================================
+object {{ entityName }}CreateFactory : BaseFactory<{{ entityName }}Create>,
+    RandomizableFactory<{{ entityName }}Create>,
+    ScenarioFactory<{{ entityName }}Create> {
+
+    override fun createDefault(): {{ entityName }}Create = create()
+
+    fun create(
+        uuid: IdentityUUID = IdentityUUIDRandom.generate(){% for field in fields %},
+        {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %} = {{ field.defaultValue }}{% endfor %}
+
+    ): {{ entityName }}Create = {{ entityName }}Create(
+        uuid = uuid{% for field in fields %},
+        {{ field.name }} = {{ field.name }}{% endfor %}
+
+    )
+
+{% if scenarioMethods %}
+    // Simple convenience methods for common scenarios
+{% for method in scenarioMethods %}
+    fun {{ method.name }}({{ method.params }}) = create({{ method.args }})
+{% endfor %}
+{% endif %}
+
+    override fun createRandom(): {{ entityName }}Create = create(
+        uuid = IdentityUUIDRandom.generate(){% for field in fields %},
+        {{ field.name }} = {{ field.randomValue }}{% endfor %}
+
+    )
+
+    override fun createForScenario(scenario: String): {{ entityName }}Create = when (scenario) {
+{% for scenario in scenarios %}
+        "{{ scenario.name }}" -> {{ scenario.factoryMethod }}
+{% endfor %}
+        else -> createDefault()
+    }
+
+    // Fix the 'up' method that's referenced in your test
+    fun up(block: {{ entityName }}Update.() -> Unit): {{ entityName }}Update {
+        val base = {{ entityName }}Update(
+            id = IdentityIDRandom.generate(),
+            uuid = IdentityUUIDRandom.generate(){% for field in fields %},
+            {{ field.name }} = {{ field.defaultValue }}{% endfor %}
+
+        )
+        return base.apply(block)
+    }
+
+    // Simple builder for when you need more control
+    override fun build(block: BaseFactory.Builder<{{ entityName }}Create>.() -> Unit): {{ entityName }}Create =
+        SimpleBuilder().apply(block).build()
+
+    private class SimpleBuilder : BaseFactory.Builder<{{ entityName }}Create> {
+        private var uuid: IdentityUUID? = null
+{% for field in fields %}
+        private var {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}? = null
+{% endfor %}
+
+        fun uuid(uuid: IdentityUUID) = apply { this.uuid = uuid }
+        fun uuid(uuid: String) = apply { this.uuid = IdentityUUID(java.util.UUID.fromString(uuid)) }
+{% for field in fields %}
+        fun {{ field.name }}({{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}) = apply { this.{{ field.name }} = {{ field.name }} }
+{% endfor %}
+
+        override fun build(): {{ entityName }}Create = {{ entityName }}Create(
+            uuid = uuid ?: IdentityUUIDRandom.generate(){% for field in fields %},
+            {{ field.name }} = {{ field.name }} ?: {{ field.defaultValue }}{% endfor %}
+
+        )
+    }
+}
+
+// =====================================================
+// MINIMAL UPDATE FACTORY
+// =====================================================
+object {{ entityName }}UpdateFactory : BaseFactory<{{ entityName }}Update> {
+
+    override fun createDefault(): {{ entityName }}Update = create()
+
+    fun create(
+        id: IdentityID = IdentityIDRandom.generate(),
+        uuid: IdentityUUID = IdentityUUIDRandom.generate(){% for field in fields %},
+        {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %} = {{ field.defaultValue }}{% endfor %}
+
+    ): {{ entityName }}Update = {{ entityName }}Update(
+        id = id,
+        uuid = uuid{% for field in fields %},
+        {{ field.name }} = {{ field.name }}{% endfor %}
+
+    )
+
+    // Convert from existing resource
+    fun from({{ entityNameLower }}: {{ entityName }}, changes: {{ entityName }}Update.() -> Unit = {}): {{ entityName }}Update =
+        {{ entityName }}Update(
+            id = {{ entityNameLower }}.id,
+            uuid = {{ entityNameLower }}.uuid{% for field in fields %},
+            {{ field.name }} = {{ entityNameLower }}.{{ field.name }}{% endfor %}
+
+        ).apply(changes)
+
+    override fun build(block: BaseFactory.Builder<{{ entityName }}Update>.() -> Unit): {{ entityName }}Update =
+        SimpleBuilder().apply(block).build()
+
+    private class SimpleBuilder : BaseFactory.Builder<{{ entityName }}Update> {
+        private var id: IdentityID? = null
+        private var uuid: IdentityUUID? = null
+{% for field in fields %}
+        private var {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}? = null
+{% endfor %}
+
+        fun id(id: IdentityID) = apply { this.id = id }
+        fun id(id: Long) = apply { this.id = IdentityID(id) }
+        fun uuid(uuid: IdentityUUID) = apply { this.uuid = uuid }
+{% for field in fields %}
+        fun {{ field.name }}({{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}) = apply { this.{{ field.name }} = {{ field.name }} }
+{% endfor %}
+
+        override fun build(): {{ entityName }}Update = {{ entityName }}Update(
+            id = id ?: IdentityIDRandom.generate(),
+            uuid = uuid ?: IdentityUUIDRandom.generate(){% for field in fields %},
+            {{ field.name }} = {{ field.name }} ?: {{ field.defaultValue }}{% endfor %}
+
+        )
+    }
+}
+
+// =====================================================
+// MINIMAL RESOURCE FACTORY (For Repository/Entity Tests)
+// =====================================================
+object {{ entityName }}Factory : BaseFactory<{{ entityName }}> {
+
+    override fun createDefault(): {{ entityName }} = create()
+
+    fun create(
+        id: IdentityID = IdentityIDRandom.generate(),
+        uuid: IdentityUUID = IdentityUUIDRandom.generate(){% for field in fields %},
+        {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %} = {{ field.defaultValue }}{% endfor %},
+        audit: ResourceAudit? = null
+    ): {{ entityName }} = {{ entityName }}(
+        id = id,
+        uuid = uuid{% for field in fields %},
+        {{ field.name }} = {{ field.name }}{% endfor %},
+        audit = audit
+    )
+
+    // Create from other models (primary use case)
+    fun from(createModel: {{ entityName }}Create, id: IdentityID = IdentityIDRandom.generate()): {{ entityName }} =
+        create(
+            id = id,
+            uuid = createModel.uuid{% for field in fields %},
+            {{ field.name }} = createModel.{{ field.name }}{% endfor %}
+
+        )
+
+    override fun build(block: BaseFactory.Builder<{{ entityName }}>.() -> Unit): {{ entityName }} =
+        SimpleBuilder().apply(block).build()
+
+    private class SimpleBuilder : BaseFactory.Builder<{{ entityName }}> {
+        private var id: IdentityID? = null
+        private var uuid: IdentityUUID? = null
+{% for field in fields %}
+        private var {{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}? = null
+{% endfor %}
+        private var audit: ResourceAudit? = null
+
+        fun id(id: IdentityID) = apply { this.id = id }
+        fun uuid(uuid: IdentityUUID) = apply { this.uuid = uuid }
+{% for field in fields %}
+        fun {{ field.name }}({{ field.name }}: {{ field.type }}{% if not field.required %}?{% endif %}) = apply { this.{{ field.name }} = {{ field.name }} }
+{% endfor %}
+        fun audit(audit: ResourceAudit?) = apply { this.audit = audit }
+
+        override fun build(): {{ entityName }} = {{ entityName }}(
+            id = id ?: IdentityIDRandom.generate(),
+            uuid = uuid ?: IdentityUUIDRandom.generate(){% for field in fields %},
+            {{ field.name }} = {{ field.name }} ?: {{ field.defaultValue }}{% endfor %},
+            audit = audit
+        )
+    }
+}
+
+// =====================================================
+// EXTENSION FUNCTIONS FOR EASY CHAINING
+// =====================================================
+
+/**
+ * Convert {{ entityName }}Create to {{ entityName }}Update with the given ID and UUID
+ */
+fun {{ entityName }}Create.toUpdate(id: IdentityID, uuid: IdentityUUID = this.uuid): {{ entityName }}Update =
+    {{ entityName }}Update(
+        id = id,
+        uuid = uuid{% for field in fields %},
+        {{ field.name }} = this.{{ field.name }}{% endfor %}
+
+    )
+
+/**
+ * Convert {{ entityName }} to {{ entityName }}Update for modification
+ */
+fun {{ entityName }}.toUpdate(): {{ entityName }}Update = {{ entityName }}Update(
+    id = this.id,
+    uuid = this.uuid{% for field in fields %},
+    {{ field.name }} = this.{{ field.name }}{% endfor %}
+
+)
+
+/**
+ * Apply changes to a {{ entityName }}Update
+ */
+fun {{ entityName }}Update.with(block: {{ entityName }}Update.() -> Unit): {{ entityName }}Update =
+    this.copy().apply(block)

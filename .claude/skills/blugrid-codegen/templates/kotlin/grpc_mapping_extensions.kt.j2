@@ -1,0 +1,62 @@
+{# templates/kotlin/grpc_mapping_extensions.kt.j2 #}
+{# Generates gRPC mapping extensions for domain <-> proto conversion #}
+package {{ packageName }}.grpc
+
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.pagination.Page
+import parseAsLocalDateTime
+import toIsoString
+import java.util.Optional
+import java.util.UUID
+
+fun {{ entityName }}.to{{ entityName }}Response(): {{ entityName }}Response =
+    {{ entityName }}Response.newBuilder()
+        .setId(id.value)
+        .setUuid(uuid.value.toString())
+{% for field in fields %}
+        .set{{ field.namePascal }}({{ field.toProtoExpression }})
+{% endfor %}
+        .build()
+
+fun {{ entityName }}CreateRequest.toDomain(): {{ entityName }}Create =
+    {{ entityName }}Create(
+        uuid = IdentityUUID(UUID.randomUUID()){% for field in fields %},
+        {{ field.name }} = {{ field.fromProtoExpression }}{% endfor %}
+
+    )
+
+fun {{ entityName }}UpdateRequest.toDomain(): {{ entityName }}Update =
+    {{ entityName }}Update(
+        id = IdentityID(id),
+        uuid = IdentityUUID(
+            uuid.takeIf { it.isNotBlank() }?.let(UUID::fromString) ?: UUID.randomUUID()
+        ){% for field in fields %},
+        {{ field.name }} = {{ field.fromProtoExpression }}{% endfor %}
+
+    )
+
+fun Optional<{{ entityName }}>.toGrpcOptional(): {{ entityName }}OptionalResponse =
+    {{ entityName }}OptionalResponse.newBuilder()
+        .setExists(isPresent)
+        .apply {
+            ifPresent { this.{{ entityNameLower }} = it.to{{ entityName }}Response() }
+        }
+        .build()
+
+fun List<{{ entityName }}>.toGrpcList(): {{ entityName }}ListResponse =
+    {{ entityName }}ListResponse.newBuilder()
+        .addAll{{ entityNamePlural }}(map { it.to{{ entityName }}Response() })
+        .build()
+
+fun Page<{{ entityName }}>.toGrpcPage(): {{ entityName }}PageResponse =
+    {{ entityName }}PageResponse.newBuilder()
+        .addAll{{ entityNamePlural }}(content.map { it.to{{ entityName }}Response() })
+        .setTotalElements(totalElements.toInt())
+        .setTotalPages(totalPages)
+        .setPage(number)
+        .setSize(size)
+        .build()

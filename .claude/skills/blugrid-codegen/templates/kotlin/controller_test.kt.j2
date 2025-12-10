@@ -1,0 +1,71 @@
+{# templates/kotlin/controller_test.kt.j2 #}
+{# Generates Kotlin Controller integration test #}
+package {{ packageName }}.controller
+
+import {{ packageName }}.factory.{{ entityName }}CreateFactory
+import {{ packageName }}.factory.{{ entityName }}UpdateFactory
+import {{ packageName }}.model.{{ entityName }}
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.common.model.pagination.Sort
+import net.blugrid.common.model.pagination.SortDirection
+import net.blugrid.common.model.pagination.SortOrder
+import net.blugrid.platform.testing.security.TestApplicationContext
+import net.blugrid.platform.testing.support.BaseControllerIntegTest
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+
+@DisplayName("{{ entityName }}Controller")
+class {{ entityName }}ControllerIntegTest : BaseControllerIntegTest("/{{ basePath }}") {
+
+    @BeforeEach
+    fun setup() {
+        TestApplicationContext.configureTenantApplicationContext()
+    }
+
+    @Test
+    fun `create {{ entityName }}`() {
+        assertCreate(
+            createPayload = {{ entityName }}CreateFactory.create(),
+            responseType = {{ entityName }}::class.java,
+        )
+    }
+
+    @Test
+    fun `update {{ entityName }}`() {
+        val created = assertCreate({{ entityName }}CreateFactory.create(), {{ entityName }}::class.java)
+        val updateModel = {{ entityName }}UpdateFactory.from(created) {
+{% if updateExampleField %}
+            {{ updateExampleField }} = {{ updateExampleValue }}
+{% endif %}
+        }
+
+        assertUpdate(updatePayload = updateModel, responseType = {{ entityName }}::class.java)
+    }
+
+    @Test
+    fun `get {{ entityName }} by Id`() {
+        assertGetById(
+            createPayload = {{ entityName }}CreateFactory.create(),
+            responseType = {{ entityName }}::class.java,
+        )
+    }
+
+    @Test
+    fun `get {{ entityName }} page`() {
+        val resources = List(3) { {{ entityName }}CreateFactory.create() }
+        assertGetPage(
+            resources = resources,
+            pageable = Pageable.from(0, 25, Sort.by(SortOrder("id", SortDirection.ASC, false))),
+            responseType = {{ entityName }}::class.java,
+        )
+    }
+
+    @Test
+    fun `delete {{ entityName }}`() {
+        assertDelete(
+            createPayload = {{ entityName }}CreateFactory.create(),
+            responseType = {{ entityName }}::class.java,
+        )
+    }
+}

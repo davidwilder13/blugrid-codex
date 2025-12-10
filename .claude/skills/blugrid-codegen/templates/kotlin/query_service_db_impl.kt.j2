@@ -1,0 +1,22 @@
+{# templates/kotlin/query_service_db_impl.kt.j2 #}
+{# Generates query service database implementation #}
+package {{ packageName }}.service
+
+import jakarta.inject.Singleton
+import {{ packageName }}.mapping.{{ entityName }}MappingService
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Filter
+import {{ packageName }}.repository.{{ entityName }}Repository
+import {{ packageName }}.repository.{{ entityName }}Specifications
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.data.persistence.service.GenericQueryServiceImpl
+
+@Singleton
+open class {{ entityName }}QueryServiceDbImpl(
+    repository: {{ entityName }}Repository,
+    private val mapper: {{ entityName }}MappingService
+) : GenericQueryServiceImpl<{{ entityName }}Filter, {{ entityName }}, {{ entityName }}Entity>(
+    repository = repository,
+    mapper = mapper::entityToResource,
+    specBuilder = {{ entityName }}Specifications::fromFilter
+), {{ entityName }}QueryService

@@ -9,4 +9,7 @@ import net.blugrid.data.persistence.repository.GenericEntityRepository
 interface OrganisationRepository : GenericEntityRepository<OrganisationEntity> {
     @Executable
     override fun update(update: OrganisationEntity): OrganisationEntity
+
+    @Executable
+    fun findByIdIn(ids: Collection<Long>): List<OrganisationEntity>
 }

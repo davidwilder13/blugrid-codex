@@ -1,0 +1,19 @@
+{# templates/kotlin/mapping_service.kt.j2 #}
+{# Generates mapping service for entity <-> resource conversion #}
+package {{ packageName }}.mapping
+
+import jakarta.inject.Singleton
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.data.persistence.mapping.ResourceEntityMapper
+
+@Singleton
+class {{ entityName }}MappingService : ResourceEntityMapper<{{ entityName }}, {{ entityName }}Create, {{ entityName }}Update, {{ entityName }}Entity>() {
+    override fun createToEntity(source: {{ entityName }}Create): {{ entityName }}Entity = source.toEntity()
+    override fun updateToEntity(source: {{ entityName }}Update): {{ entityName }}Entity = source.toEntity()
+    override fun entityToResource(source: {{ entityName }}Entity): {{ entityName }} = source.toResource()
+    override fun resourceToCreate(source: {{ entityName }}): {{ entityName }}Create = source.toCreate()
+    override fun resourceToUpdate(source: {{ entityName }}): {{ entityName }}Update = source.toUpdate()
+}

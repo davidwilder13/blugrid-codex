@@ -1,0 +1,24 @@
+micronaut:
+  application:
+    name: organisation-graphql
+  server:
+    port: 4001
+
+graphql:
+  enabled: true
+  path: /graphql
+  graphiql:
+    enabled: true
+    path: /graphiql
+
+# gRPC client configuration for Organisation service
+grpc:
+  client:
+    organisation:
+      address: ${ORGANISATION_GRPC_HOST:localhost}:${ORGANISATION_GRPC_PORT:50051}
+      plaintext: true
+
+logger:
+  levels:
+    net.blugrid: DEBUG
+    io.micronaut.graphql: DEBUG

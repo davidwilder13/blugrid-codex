@@ -64,12 +64,12 @@ def generate_entity(schema: dict, output_path: str) -> str:
     # Determine entity base class
     resource_type = schema.get("resourceType", schema.get("resource_type", "UnscopedResource"))
     extends_map = {
-        "UnscopedResource": "UnscopedResourceEntity",
-        "TenantResource": "TenantResourceEntity",
-        "BusinessUnitResource": "BusinessUnitResourceEntity",
-        "UserResource": "UserResourceEntity",
+        "UnscopedResource": "UnscopedPersistable",
+        "TenantResource": "TenantPersistable",
+        "BusinessUnitResource": "BusinessUnitPersistable",
+        "UserResource": "UserPersistable",
     }
-    extends = extends_map.get(resource_type, "UnscopedResourceEntity")
+    extends = extends_map.get(resource_type, "UnscopedPersistable")
 
     # Build context
     entity_name = schema["name"]
@@ -79,12 +79,9 @@ def generate_entity(schema: dict, output_path: str) -> str:
         "packageName": schema.get("packageName", schema.get("package_name", "")),
         "entityName": entity_name,
         "tableName": table_name,
-        "sequenceName": f"seq_{table_name}_id",
-        "generatorStrategy": "enhanced-sequence",
+        "viewName": f"vw_{table_name}",
+        "sequenceName": f"{table_name}-sequence",
         "extends": extends,
-        "hasAudit": schema.get("auditable", schema.get("hasAudit", False)),
-        "hasPermission": schema.get("hasPermission", False),
-        "permissionType": schema.get("permissionType", "Permission"),
         "fields": fields,
         "imports": sorted(imports),
     }

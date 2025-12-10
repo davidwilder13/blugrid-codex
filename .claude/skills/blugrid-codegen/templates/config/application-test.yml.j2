@@ -1,0 +1,12 @@
+{# templates/config/application-test.yml.j2 #}
+{# Generates Micronaut test configuration #}
+micronaut:
+  server:
+    port: -1
+
+logger:
+  levels:
+    net.blugrid: TRACE
+    testcontainers: INFO
+    com.github.dockerjava: WARN
+    io.micronaut.web.router: TRACE

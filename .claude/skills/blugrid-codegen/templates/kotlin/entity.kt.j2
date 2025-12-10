@@ -1,6 +1,5 @@
 {# templates/kotlin/entity.kt.j2 #}
 {# Generates JPA Entity classes from entity schema #}
-{# Based on: codegen/src/generators/kotlin/templates/db/repository/KotlinEntityTemplate.ts #}
 package {{ packageName }}.repository.model
 
 import jakarta.persistence.Column
@@ -12,47 +11,39 @@ import jakarta.persistence.Id
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-{%- if hasAudit %}
-import net.blugrid.api.common.repository.model.EmbeddedAuditEntity
-{%- endif %}
-import net.blugrid.api.common.repository.model.{{ extends }}
-import net.blugrid.api.util.kotlinEquals
+import net.blugrid.common.util.kotlinEquals
+import net.blugrid.data.persistence.audit.AuditEmbeddable
+import net.blugrid.data.persistence.model.resource.{{ extends }}
 import org.hibernate.annotations.GenericGenerator
-import java.time.LocalDateTime
+{%- for import in imports %}
+import {{ import }}
+{%- endfor %}
 import java.util.Objects
 import java.util.UUID
 
 @Entity
-@Table(name = "{{ tableName }}")
+@Table(name = "{{ viewName }}")
 class {{ entityName }}Entity(
 
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "{{ sequenceName }}")
-    @GenericGenerator(name = "{{ sequenceName }}", strategy = "{{ generatorStrategy }}")
+    @GenericGenerator(name = "{{ sequenceName }}", strategy = "net.blugrid.server.multitenancy.generators.GlobalTenantSequenceGenerator")
     @Column(name = "id", unique = true, nullable = false, updatable = false)
     override var id: Long? = null,
 
     @Column(name = "uuid", updatable = false)
     override var uuid: UUID,
 
-    {%- for field in fields %}
+{%- for field in fields %}
 
-    @Column(name = "{{ field.columnName }}"{% if field.nullable %}, nullable = true{% else %}, nullable = false{% endif %}{% if field.updatable is defined and not field.updatable %}, updatable = false{% endif %})
-    var {{ field.name }}: {{ field.type }}{% if field.nullable %}? = null{% endif %}{% if not loop.last %},{% endif %}
-    {%- endfor %}
+    @Column(name = "{{ field.columnName }}", nullable = {{ field.nullable | lower }}{% if not field.updatable %}, updatable = false{% endif %})
+    var {{ field.name }}: {{ field.type }}{% if field.nullable %}? = null{% endif %},
+{%- endfor %}
 
-) : {{ extends }}<{{ entityName }}Entity> {
-{%- if hasAudit %}
+    ) : {{ extends }}<{{ entityName }}Entity> {
 
     @Embedded
-    override var audit: EmbeddedAuditEntity = EmbeddedAuditEntity()
-{%- endif %}
-{%- if hasPermission %}
-
-    @Transient
-    override val permission: {{ permissionType }}? = null
-{%- endif %}
-{%- if hasAudit %}
+    override var audit: AuditEmbeddable = AuditEmbeddable()
 
     @PrePersist
     fun prePersist() {
@@ -63,7 +54,6 @@ class {{ entityName }}Entity(
     fun preUpdate() {
         audit.preUpdate()
     }
-{%- endif %}
 
     companion object {
         private val equalsProperties = arrayOf(

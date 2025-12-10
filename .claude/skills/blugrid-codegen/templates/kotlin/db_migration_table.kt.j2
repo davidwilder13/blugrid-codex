@@ -1,0 +1,64 @@
+{# templates/kotlin/db_migration_table.kt.j2 #}
+{# Generates Kotlin-based Flyway migration for table creation #}
+package {{ packageName }}.migration
+
+import net.blugrid.data.persistence.repository.migration.RepeatableDbMigration
+import org.flywaydb.core.api.migration.Context
+
+class R__{{ migrationNumber }}_table_{{ tableName }} : RepeatableDbMigration() {
+    override fun migrate(context: Context) {
+        runMigration(
+            context, """
+CREATE TABLE IF NOT EXISTS {{ tableName }}_columns (
+{%- for col in columns %}
+    {{ col.name }} {{ col.dataType }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+);
+
+
+CREATE TABLE IF NOT EXISTS {{ tableName | upper }} (
+type VARCHAR(255) NOT NULL DEFAULT '{{ tableName | upper }}',
+CONSTRAINT pk_{{ tableName }} PRIMARY KEY (id)
+)
+INHERITS (
+{%- if scope == 'unscoped' %}
+_common_unscoped_resource_columns,
+  _common_audit_columns,
+{%- elif scope == 'tenantScoped' %}
+_common_tenant_resource_columns,
+  _common_audit_columns,
+{%- elif scope == 'businessUnitScoped' %}
+_common_business_unit_resource_columns,
+  _common_audit_columns,
+{%- endif %}
+{{ tableName }}_columns
+)
+WITHOUT OIDS;
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS ak_{{ tableName }}_uuid ON {{ tableName }} USING btree (uuid);
+{%- for idx in indexes %}
+
+
+CREATE {% if idx.unique %}UNIQUE {% endif %}INDEX IF NOT EXISTS {{ idx.name }} ON {{ tableName }} USING btree ({% for col in idx.columns %}{{ col }}{% if not loop.last %}, {% endif %}{% endfor %});
+{%- endfor %}
+
+
+DROP TRIGGER IF EXISTS trig_{{ tableName }}_insert_audit ON {{ tableName }};
+
+CREATE TRIGGER trig_{{ tableName }}_insert_audit
+BEFORE INSERT ON {{ tableName }}
+FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_insert_audit_columns();
+
+
+DROP TRIGGER IF EXISTS trig_{{ tableName }}_update_audit ON {{ tableName }};
+
+CREATE TRIGGER trig_{{ tableName }}_update_audit
+BEFORE UPDATE ON {{ tableName }}
+FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_update_audit_columns();
+        """.trimIndent()
+        )
+    }
+}

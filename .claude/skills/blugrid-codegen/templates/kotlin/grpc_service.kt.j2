@@ -1,0 +1,73 @@
+{# templates/kotlin/grpc_service.kt.j2 #}
+{# Generates gRPC service implementation with CRUD operations #}
+package {{ packageName }}.grpc
+
+import com.google.protobuf.Empty
+import jakarta.inject.Singleton
+import {{ packageName }}.service.{{ entityName }}CommandService
+import {{ packageName }}.service.{{ entityName }}QueryService
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.integration.grpc.mapper.toCommonSort
+import net.blugrid.integration.grpc.service.GrpcService
+import net.blugrid.integration.grpc.service.GrpcServiceExecutor
+import net.blugrid.platform.logging.logger
+import java.util.UUID
+
+@Singleton
+class {{ entityName }}GrpcService(
+    private val {{ entityNameLower }}CommandService: {{ entityName }}CommandService,
+    private val {{ entityNameLower }}QueryService: {{ entityName }}QueryService,
+    override val grpcExecutor: GrpcServiceExecutor
+) : {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineImplBase(),
+    GrpcService {
+
+    val log = logger()
+
+    override suspend fun getById(request: {{ entityName }}RequestById): {{ entityName }}Response =
+        grpcCall("getById") {
+            {{ entityNameLower }}QueryService.getById(request.id).to{{ entityName }}Response()
+        }
+
+    override suspend fun getByIdOptional(request: {{ entityName }}RequestById): {{ entityName }}OptionalResponse =
+        grpcCall("getByIdOptional") {
+            {{ entityNameLower }}QueryService.getByIdOptional(request.id).toGrpcOptional()
+        }
+
+    override suspend fun getByUuid(request: {{ entityName }}RequestByUuid): {{ entityName }}Response =
+        grpcCall("getByUuid") {
+            {{ entityNameLower }}QueryService.getByUuid(UUID.fromString(request.uuid)).to{{ entityName }}Response()
+        }
+
+    override suspend fun getByUuidOptional(request: {{ entityName }}RequestByUuid): {{ entityName }}OptionalResponse =
+        grpcCall("getByUuidOptional") {
+            {{ entityNameLower }}QueryService.getByUuidOptional(UUID.fromString(request.uuid)).toGrpcOptional()
+        }
+
+    override suspend fun getAll(request: Empty): {{ entityName }}ListResponse =
+        grpcCall("getAll") {
+            {{ entityNameLower }}QueryService.getAll().toGrpcList()
+        }
+
+    override suspend fun getPage(request: {{ entityName }}PageRequest): {{ entityName }}PageResponse =
+        grpcCall("getPage") {
+            val pageable = Pageable.from(request.page, request.size, request.sort.toCommonSort())
+            {{ entityNameLower }}QueryService.getPage(pageable).toGrpcPage()
+        }
+
+    override suspend fun create(request: {{ entityName }}CreateRequest): {{ entityName }}Response =
+        grpcCall("create") {
+            val domainModel = request.toDomain()
+            {{ entityNameLower }}CommandService.create(domainModel).to{{ entityName }}Response()
+        }
+
+    override suspend fun update(request: {{ entityName }}UpdateRequest): {{ entityName }}Response =
+        grpcCall("update") {
+            {{ entityNameLower }}CommandService.update(request.id, request.toDomain()).to{{ entityName }}Response()
+        }
+
+    override suspend fun delete(request: {{ entityName }}DeleteRequest): Empty =
+        grpcCall("delete") {
+            {{ entityNameLower }}CommandService.delete(request.id)
+            Empty.getDefaultInstance()
+        }
+}

@@ -1,0 +1,99 @@
+{# templates/kotlin/controller.kt.j2 #}
+{# Generates Kotlin REST controller with full CRUD operations #}
+package {{ packageName }}.controller
+
+import io.micronaut.http.annotation.Body
+import io.micronaut.http.annotation.Controller
+import io.micronaut.http.annotation.Delete
+import io.micronaut.http.annotation.Get
+import io.micronaut.http.annotation.PathVariable
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Put
+import io.micronaut.http.annotation.QueryValue
+import io.micronaut.scheduling.TaskExecutors
+import io.micronaut.scheduling.annotation.ExecuteOn
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.parameters.RequestBody
+import io.swagger.v3.oas.annotations.tags.Tag
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Filter
+import {{ packageName }}.model.{{ entityName }}Update
+import {{ packageName }}.service.{{ entityName }}CommandService
+import {{ packageName }}.service.{{ entityName }}QueryService
+import net.blugrid.common.model.controller.GenericCommandResource
+import net.blugrid.common.model.controller.GenericQueryResource
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.common.model.pagination.PageableQuery
+import java.util.Optional
+import java.util.UUID
+
+@ExecuteOn(TaskExecutors.BLOCKING)
+@Controller("/{{ basePath }}")
+@Tag(name = "{{ tagName }}", description = "{{ tagDescription }}")
+open class {{ entityName }}Controller(
+    private val commandService: {{ entityName }}CommandService,
+    private val queryService: {{ entityName }}QueryService
+) : GenericCommandResource<{{ entityName }}, {{ entityName }}Create, {{ entityName }}Update>,
+    GenericQueryResource<{{ entityName }}Filter, {{ entityName }}> {
+
+    @Operation(summary = "Create a new {{ entityNameLower }}")
+    @Post("/")
+    override fun create(@Body created: {{ entityName }}Create): {{ entityName }} =
+        commandService.create(created)
+
+    @Operation(summary = "Update an existing {{ entityNameLower }} by ID")
+    @Put("/{id}")
+    override fun update(@PathVariable id: Long, @Body updated: {{ entityName }}Update): {{ entityName }} =
+        commandService.update(id, updated)
+
+    @Operation(summary = "Delete a {{ entityNameLower }} by ID")
+    @Delete("/{id}")
+    override fun delete(@PathVariable id: Long) =
+        commandService.delete(id)
+
+    @Operation(summary = "Get all {{ entityNamePlural | lower }}")
+    @Get("/")
+    override fun getAll(): List<{{ entityName }}> =
+        queryService.getAll()
+
+    @Operation(summary = "Get a paginated list of {{ entityNamePlural | lower }}")
+    @Get("/page")
+    override fun getPage(
+        @QueryValue(defaultValue = "0") number: Int,
+        @QueryValue(defaultValue = "20") size: Int,
+        @QueryValue(defaultValue = "") sort: List<String>
+    ): Page<{{ entityName }}> {
+        val pageable = Pageable.fromQueryParams(number, size, sort)
+        return queryService.getPage(pageable)
+    }
+
+    @Operation(summary = "Get {{ entityNameLower }} by ID")
+    @Get("/{id}")
+    override fun getById(@PathVariable id: Long): {{ entityName }} =
+        queryService.getById(id)
+
+    @Operation(summary = "Get {{ entityNameLower }} by ID (optional)")
+    @Get("/{id}/optional")
+    override fun getByIdOptional(@PathVariable id: Long): Optional<{{ entityName }}> =
+        queryService.getByIdOptional(id)
+
+    @Operation(summary = "Get {{ entityNameLower }} by UUID")
+    @Get("/uuid/{uuid}")
+    override fun getByUuid(@PathVariable uuid: UUID): {{ entityName }} =
+        queryService.getByUuid(uuid)
+
+    @Operation(summary = "Get {{ entityNameLower }} by UUID (optional)")
+    @Get("/uuid/{uuid}/optional")
+    override fun getByUuidOptional(@PathVariable uuid: UUID): Optional<{{ entityName }}> =
+        queryService.getByUuidOptional(uuid)
+
+    @Operation(summary = "Query {{ entityNamePlural | lower }} with filters and pagination")
+    @Post("/query")
+    override fun query(
+        @RequestBody(description = "Filter and pagination parameters")
+        @Body query: PageableQuery<{{ entityName }}Filter>
+    ): Page<{{ entityName }}> =
+        queryService.findByFilter(query.query, Pageable.from(query.number, query.size))
+}

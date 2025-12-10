@@ -1,0 +1,12 @@
+{# templates/config/application.yml.j2 #}
+{# Generates Micronaut application configuration #}
+micronaut:
+  application:
+    name: {{ serviceName }}
+
+env:
+  name: ${SERVICE_NAME:{{ serviceName }}}
+  server:
+    baseUri: ${SERVICE_BASE_URI:`http://localhost:{{ serverPort }}`}
+  web:
+    baseUri: ${WEB_BASE_URI:`http://localhost:{{ webPort }}`}

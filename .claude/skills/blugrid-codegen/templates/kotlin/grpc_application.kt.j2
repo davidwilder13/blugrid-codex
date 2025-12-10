@@ -1,0 +1,16 @@
+{# templates/kotlin/grpc_application.kt.j2 #}
+{# Generates gRPC server application entry point #}
+package {{ packageName }}.grpc
+
+import io.grpc.protobuf.services.ProtoReflectionService
+import io.micronaut.runtime.Micronaut
+
+object Application
+
+fun main(args: Array<String>) {
+    Micronaut.build()
+        .packages("net.blugrid.api")
+        .mainClass(Application.javaClass)
+        .singletons(ProtoReflectionService.newInstance())
+        .start()
+}

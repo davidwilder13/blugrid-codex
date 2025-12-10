@@ -1,0 +1,54 @@
+{# templates/kotlin/grpc_client_factory.kt.j2 #}
+{# Generates gRPC client factory with service discovery support #}
+package {{ packageName }}.grpc.client
+
+import io.grpc.ClientInterceptor
+import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
+import io.micronaut.context.annotation.Factory
+import io.micronaut.context.annotation.Primary
+import io.micronaut.grpc.annotation.GrpcChannel
+import jakarta.inject.Singleton
+import {{ packageName }}.grpc.{{ entityName }}StateServiceGrpcKt
+
+@Factory
+class {{ entityName }}GrpcClientFactory(
+    private val authInterceptor: ClientInterceptor
+) {
+
+    /**
+     * Manual override, for explicit use in dev or test bootstrap.
+     */
+    fun create(host: String, port: Int): {{ entityName }}GrpcClient {
+        val channel = ManagedChannelBuilder.forAddress(host, port)
+            .usePlaintext()
+            .intercept(authInterceptor)
+            .build()
+
+        val stub = {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineStub(channel)
+        return {{ entityName }}GrpcClient(stub)
+    }
+
+    /**
+     * Stub resolved via service discovery.
+     * Used by Micronaut @GrpcChannel injection.
+     */
+    @Singleton
+    @Primary
+    fun {{ entityNameLower }}Stub(
+        @GrpcChannel("{{ grpcServiceName }}") channel: ManagedChannel
+    ): {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineStub {
+        return {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineStub(channel)
+    }
+
+    /**
+     * gRPC client that uses discovery-injected stub.
+     */
+    @Singleton
+    @Primary
+    fun {{ entityNameLower }}GrpcClient(
+        stub: {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineStub
+    ): {{ entityName }}GrpcClient {
+        return {{ entityName }}GrpcClient(stub)
+    }
+}

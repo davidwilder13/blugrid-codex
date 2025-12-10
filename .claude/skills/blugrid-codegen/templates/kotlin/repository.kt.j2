@@ -1,0 +1,14 @@
+{# templates/kotlin/repository.kt.j2 #}
+{# Generates Micronaut Data repository interface #}
+package {{ packageName }}.repository
+
+import io.micronaut.context.annotation.Executable
+import io.micronaut.data.annotation.Repository
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.data.persistence.repository.GenericEntityRepository
+
+@Repository
+interface {{ entityName }}Repository : GenericEntityRepository<{{ entityName }}Entity> {
+    @Executable
+    override fun update(update: {{ entityName }}Entity): {{ entityName }}Entity
+}

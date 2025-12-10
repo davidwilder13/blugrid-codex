@@ -11,6 +11,7 @@ interface OrganisationQueryService {
     fun getPage(pageable: Pageable): Page<Organisation>
     fun getById(id: Long): Organisation
     fun getByIdOptional(id: Long): Optional<Organisation>
+    fun getByIds(ids: List<Long>): List<Organisation>
     fun getAll(): List<Organisation>
     fun getByUuid(uuid: UUID): Organisation
     fun getByUuidOptional(uuid: UUID): Optional<Organisation>

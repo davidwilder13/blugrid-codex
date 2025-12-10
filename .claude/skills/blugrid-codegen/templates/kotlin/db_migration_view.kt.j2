@@ -1,0 +1,69 @@
+{# templates/kotlin/db_migration_view.kt.j2 #}
+{# Generates Kotlin-based Flyway migration for view and triggers #}
+package {{ packageName }}.migration
+
+import net.blugrid.data.persistence.repository.migration.RepeatableDbMigration
+import org.flywaydb.core.api.migration.Context
+
+class R__{{ migrationNumber }}_vw_{{ tableName }} : RepeatableDbMigration() {
+    override fun migrate(context: Context) {
+        runMigration(
+            context, """
+
+CREATE OR REPLACE VIEW vw_{{ tableName }} WITH (security_barrier)
+AS
+SELECT *
+FROM {{ tableName }}
+WHERE expiry_timestamp > now()
+WITH CHECK OPTION;
+
+
+
+CREATE OR REPLACE FUNCTION proc_trig_{{ tableName }}_insert()
+RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    new.expiry_timestamp = 'infinity';
+    new.version = 0;
+    new.type = '{{ tableName | upper }}';
+
+    EXECUTE 'INSERT INTO {{ tableName | upper }} VALUES ($1.*)' USING new;
+    RETURN new;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+
+DROP TRIGGER IF EXISTS trig_{{ tableName }}_insert ON vw_{{ tableName }};
+
+
+
+CREATE TRIGGER trig_{{ tableName }}_insert
+    INSTEAD OF INSERT
+    ON vw_{{ tableName }}
+    FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_{{ tableName }}_insert();
+
+CREATE OR REPLACE FUNCTION proc_trig_{{ tableName }}_delete()
+RETURNS trigger AS $$
+BEGIN
+    UPDATE {{ tableName }}
+    SET expiry_timestamp = now()
+    WHERE id = OLD.id;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+DROP TRIGGER IF EXISTS trig_{{ tableName }}_delete ON vw_{{ tableName }};
+
+CREATE TRIGGER trig_{{ tableName }}_delete
+INSTEAD OF DELETE ON vw_{{ tableName }}
+FOR EACH ROW
+EXECUTE PROCEDURE proc_trig_{{ tableName }}_delete();
+
+        """.trimIndent()
+        )
+    }
+}

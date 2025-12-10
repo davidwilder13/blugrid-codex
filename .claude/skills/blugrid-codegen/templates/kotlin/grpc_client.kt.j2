@@ -1,0 +1,49 @@
+{# templates/kotlin/grpc_client.kt.j2 #}
+{# Generates gRPC client wrapper class #}
+package {{ packageName }}.grpc.client
+
+import com.google.protobuf.Empty
+import {{ packageName }}.grpc.{{ entityName }}CreateRequest
+import {{ packageName }}.grpc.{{ entityName }}ListResponse
+import {{ packageName }}.grpc.{{ entityName }}OptionalResponse
+import {{ packageName }}.grpc.{{ entityName }}PageRequest
+import {{ packageName }}.grpc.{{ entityName }}PageResponse
+import {{ packageName }}.grpc.{{ entityName }}Response
+import {{ packageName }}.grpc.{{ entityName }}StateServiceGrpcKt
+import {{ packageName }}.grpc.{{ entityName }}UpdateRequest
+import {{ packageName }}.grpc.{{ entityNameLower }}DeleteRequest
+import {{ packageName }}.grpc.{{ entityNameLower }}RequestById
+import {{ packageName }}.grpc.{{ entityNameLower }}RequestByUuid
+import java.util.UUID
+
+class {{ entityName }}GrpcClient(
+    private val stub: {{ entityName }}StateServiceGrpcKt.{{ entityName }}StateServiceCoroutineStub
+) {
+    suspend fun getById(id: Long): {{ entityName }}Response =
+        stub.getById({{ entityNameLower }}RequestById { this.id = id })
+
+    suspend fun getByUuid(uuid: UUID): {{ entityName }}Response =
+        stub.getByUuid({{ entityNameLower }}RequestByUuid { this.uuid = uuid.toString() })
+
+    suspend fun getByIdOptional(id: Long): {{ entityName }}OptionalResponse =
+        stub.getByIdOptional({{ entityNameLower }}RequestById { this.id = id })
+
+    suspend fun getByUuidOptional(uuid: UUID): {{ entityName }}OptionalResponse =
+        stub.getByUuidOptional({{ entityNameLower }}RequestByUuid { this.uuid = uuid.toString() })
+
+    suspend fun getPage(request: {{ entityName }}PageRequest): {{ entityName }}PageResponse =
+        stub.getPage(request)
+
+    suspend fun getAll(): {{ entityName }}ListResponse =
+        stub.getAll(Empty.getDefaultInstance())
+
+    suspend fun create(request: {{ entityName }}CreateRequest): {{ entityName }}Response =
+        stub.create(request)
+
+    suspend fun update(request: {{ entityName }}UpdateRequest): {{ entityName }}Response =
+        stub.update(request)
+
+    suspend fun delete(id: Long) {
+        stub.delete({{ entityNameLower }}DeleteRequest { this.id = id })
+    }
+}

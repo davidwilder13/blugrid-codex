@@ -1,0 +1,23 @@
+{# templates/kotlin/grpc_response_assertions.kt.j2 #}
+{# Generates assertion utilities for gRPC response testing #}
+package {{ packageName }}.grpc.assertion
+
+import {{ packageName }}.grpc.{{ entityName }}Response
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+{% for import in imports %}
+import {{ import }}
+{% endfor %}
+
+fun {{ entityName }}Response.assert(
+    id: Long? = null,
+    uuid: java.util.UUID? = null{% for field in fields %},
+    {{ field.name }}: {{ field.assertType }}? = null{% endfor %}
+
+): {{ entityName }}Response = apply {
+    id?.let { assertThat(this.id, equalTo(it)) }
+    uuid?.let { assertThat(java.util.UUID.fromString(this.uuid), equalTo(it)) }
+{% for field in fields %}
+    {{ field.name }}?.let { assertThat({{ field.assertExpression }}, equalTo(it)) }
+{% endfor %}
+}

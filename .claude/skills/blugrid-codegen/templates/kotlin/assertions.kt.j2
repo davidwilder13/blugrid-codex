@@ -1,0 +1,53 @@
+{# templates/kotlin/assertions.kt.j2 #}
+{# Generates assertion utilities for testing models #}
+package {{ packageName }}.assertion
+
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.MatcherAssert.assertThat
+{% for import in imports %}
+import {{ import }}
+{% endfor %}
+
+fun {{ entityName }}.assert(
+    id: Long? = null,
+    uuid: java.util.UUID? = null{% for field in fields %},
+    {{ field.name }}: {{ field.assertType }}? = null{% endfor %}
+
+): {{ entityName }} = apply {
+    id?.let { assertThat(this.id.value, equalTo(it)) }
+    uuid?.let { assertThat(this.uuid.value, equalTo(it)) }
+{% for field in fields %}
+    {{ field.name }}?.let { assertThat(this.{{ field.name }}, equalTo(it)) }
+{% endfor %}
+}
+
+fun {{ entityName }}.assertEqualTo(expected: {{ entityName }}): {{ entityName }} = apply {
+    assert(
+        id = expected.id.value,
+        uuid = expected.uuid.value{% for field in fields %},
+        {{ field.name }} = expected.{{ field.name }}{% endfor %}
+
+    )
+}
+
+fun {{ entityName }}Create.assertValid(): {{ entityName }}Create = apply {
+    requireNotNull(uuid) { "uuid must not be null" }
+{% for field in fields %}
+{% if field.required %}
+    requireNotNull({{ field.name }}) { "{{ field.name }} must not be null" }
+{% endif %}
+{% endfor %}
+}
+
+fun {{ entityName }}Update.assertValid(): {{ entityName }}Update = apply {
+    requireNotNull(id) { "id must not be null" }
+    requireNotNull(uuid) { "uuid must not be null" }
+{% for field in fields %}
+{% if field.required %}
+    requireNotNull({{ field.name }}) { "{{ field.name }} must not be null" }
+{% endif %}
+{% endfor %}
+}

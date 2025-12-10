@@ -1,0 +1,19 @@
+{# templates/kotlin/command_service_db_impl.kt.j2 #}
+{# Generates command service database implementation #}
+package {{ packageName }}.service
+
+import jakarta.inject.Singleton
+import {{ packageName }}.mapping.{{ entityName }}MappingService
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import {{ packageName }}.repository.{{ entityName }}Repository
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.data.persistence.service.GenericCommandServiceImpl
+
+@Singleton
+open class {{ entityName }}CommandServiceDbImpl(
+    repository: {{ entityName }}Repository,
+    mapper: {{ entityName }}MappingService
+) : GenericCommandServiceImpl<{{ entityName }}, {{ entityName }}Create, {{ entityName }}Update, {{ entityName }}Entity, {{ entityName }}MappingService>(repository, mapper),
+    {{ entityName }}CommandService

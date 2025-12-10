@@ -1,0 +1,78 @@
+{# templates/kotlin/grpc_service_impl.kt.j2 #}
+{# Generates gRPC client service implementation that bridges to domain services #}
+package {{ packageName }}.grpc.client
+
+import io.micronaut.context.annotation.Requires
+import jakarta.inject.Singleton
+import kotlinx.coroutines.runBlocking
+import {{ packageName }}.grpc.to{{ entityName }}
+import {{ packageName }}.grpc.to{{ entityName }}CreateRequest
+import {{ packageName }}.grpc.to{{ entityName }}PageRequest
+import {{ packageName }}.grpc.to{{ entityName }}UpdateRequest
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Filter
+import {{ packageName }}.model.{{ entityName }}Update
+import {{ packageName }}.service.{{ entityName }}CommandService
+import {{ packageName }}.service.{{ entityName }}QueryService
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.PageRequest
+import net.blugrid.common.model.pagination.Pageable
+import java.util.Optional
+import java.util.UUID
+
+@Singleton
+@Requires(classes = [{{ entityName }}GrpcClient::class])
+class {{ entityName }}CommandServiceGrpcClientImpl(
+    private val grpcClient: {{ entityName }}GrpcClient
+) : {{ entityName }}CommandService, {{ entityName }}QueryService {
+
+    override fun getPage(pageable: Pageable): Page<{{ entityName }}> = runBlocking {
+        val response = grpcClient.getPage(pageable.to{{ entityName }}PageRequest())
+        Page.of(
+            response.{{ entityNameLowerPlural }}List.map { it.to{{ entityName }}() },
+            PageRequest.of(pageable.number, pageable.size, pageable.sort),
+            response.totalElements.toLong()
+        )
+    }
+
+    override fun getById(id: Long): {{ entityName }} = runBlocking {
+        grpcClient.getById(id).to{{ entityName }}()
+    }
+
+    override fun getByIdOptional(id: Long): Optional<{{ entityName }}> = runBlocking {
+        val response = grpcClient.getByIdOptional(id)
+        if (response.exists) Optional.of(response.{{ entityNameLower }}.to{{ entityName }}())
+        else Optional.empty()
+    }
+
+    override fun getByUuid(uuid: UUID): {{ entityName }} = runBlocking {
+        grpcClient.getByUuid(uuid).to{{ entityName }}()
+    }
+
+    override fun getByUuidOptional(uuid: UUID): Optional<{{ entityName }}> = runBlocking {
+        val response = grpcClient.getByUuidOptional(uuid)
+        if (response.exists) Optional.of(response.{{ entityNameLower }}.to{{ entityName }}())
+        else Optional.empty()
+    }
+
+    override fun findByFilter(filter: {{ entityName }}Filter, pageable: Pageable): Page<{{ entityName }}> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAll(): List<{{ entityName }}> = runBlocking {
+        grpcClient.getAll().{{ entityNameLowerPlural }}List.map { it.to{{ entityName }}() }
+    }
+
+    override fun create(newResource: {{ entityName }}Create): {{ entityName }} = runBlocking {
+        grpcClient.create(newResource.to{{ entityName }}CreateRequest()).to{{ entityName }}()
+    }
+
+    override fun update(id: Long, update: {{ entityName }}Update): {{ entityName }} = runBlocking {
+        grpcClient.update(update.to{{ entityName }}UpdateRequest()).to{{ entityName }}()
+    }
+
+    override fun delete(id: Long) = runBlocking {
+        grpcClient.delete(id)
+    }
+}

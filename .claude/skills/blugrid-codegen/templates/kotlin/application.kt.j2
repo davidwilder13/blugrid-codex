@@ -1,0 +1,20 @@
+{# templates/kotlin/application.kt.j2 #}
+{# Generates Kotlin Micronaut Application entry point #}
+package {{ packageName }}
+
+import io.micronaut.runtime.Micronaut.run
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Info
+
+@OpenAPIDefinition(
+    info = Info(
+        title = "{{ apiTitle }}",
+        version = "{{ apiVersion }}",
+        description = "{{ apiDescription }}",
+    )
+)
+object Application
+
+fun main(args: Array<String>) {
+    run(*args)
+}

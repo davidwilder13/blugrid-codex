@@ -1,0 +1,54 @@
+{# templates/kotlin/mapping_extensions.kt.j2 #}
+{# Generates extension functions for entity <-> resource mapping #}
+package {{ packageName }}.mapping
+
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.data.persistence.mapping.toResourceAudit
+
+fun {{ entityName }}.toCreate(): {{ entityName }}Create =
+    {{ entityName }}Create(
+        uuid = this.uuid,
+{%- for field in fields %}
+        {{ field.name }} = this.{{ field.name }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+    )
+
+fun {{ entityName }}.toUpdate(): {{ entityName }}Update =
+    {{ entityName }}Update(
+        id = this.id,
+        uuid = this.uuid,
+{%- for field in fields %}
+        {{ field.name }} = this.{{ field.name }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+    )
+
+fun {{ entityName }}Create.toEntity(): {{ entityName }}Entity =
+    {{ entityName }}Entity(
+        uuid = this.uuid.value,
+{%- for field in fields %}
+        {{ field.name }} = this.{{ field.name }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+    )
+
+fun {{ entityName }}Update.toEntity(): {{ entityName }}Entity =
+    {{ entityName }}Entity(
+        uuid = this.uuid.value,
+{%- for field in fields %}
+        {{ field.name }} = this.{{ field.name }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+    )
+
+fun {{ entityName }}Entity.toResource(): {{ entityName }} =
+    {{ entityName }}(
+        id = IdentityID(this.id!!),
+        uuid = IdentityUUID(this.uuid),
+{%- for field in fields %}
+        {{ field.name }} = this.{{ field.name }},
+{%- endfor %}
+        audit = this.audit.toResourceAudit()
+    )

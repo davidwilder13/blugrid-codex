@@ -1,0 +1,82 @@
+{# templates/kotlin/grpc_proto_mappers.kt.j2 #}
+{# Generates proto mappers for gRPC client (domain <-> proto conversion) #}
+package {{ packageName }}.grpc
+
+import {{ packageName }}.model.{{ entityName }}
+import {{ packageName }}.model.{{ entityName }}Create
+import {{ packageName }}.model.{{ entityName }}Update
+import net.blugrid.common.domain.IdentityID
+import net.blugrid.common.domain.IdentityUUID
+import net.blugrid.common.model.pagination.Page
+import net.blugrid.common.model.pagination.Pageable
+import net.blugrid.integration.grpc.mapper.toProto
+import java.time.LocalDateTime
+import java.util.UUID
+
+fun {{ entityName }}Response.to{{ entityName }}(): {{ entityName }} =
+    {{ entityName }}(
+        id = IdentityID(this.id),
+        uuid = IdentityUUID(UUID.fromString(this.uuid)){% for field in fields %},
+        {{ field.name }} = {{ field.responseToKotlinExpression }}{% endfor %}
+
+    )
+
+fun {{ entityName }}CreateRequest.to{{ entityName }}Create(): {{ entityName }}Create =
+    {{ entityName }}Create(
+        uuid = IdentityUUID(UUID.randomUUID()){% for field in fields %},
+        {{ field.name }} = {{ field.requestToKotlinExpression }}{% endfor %}
+
+    )
+
+fun {{ entityName }}UpdateRequest.to{{ entityName }}Update(): {{ entityName }}Update =
+    {{ entityName }}Update(
+        id = IdentityID(this.id),
+        uuid = IdentityUUID(UUID.fromString(this.uuid)){% for field in fields %},
+        {{ field.name }} = {{ field.requestToKotlinExpression }}{% endfor %}
+
+    )
+
+// Model -> gRPC
+
+fun Pageable.to{{ entityName }}PageRequest(): {{ entityName }}PageRequest {
+    return {{ entityName }}PageRequest.newBuilder()
+        .setPage(this.number)
+        .setSize(this.size)
+        .setSort(this.sort.toProto())
+        .build()
+}
+
+fun {{ entityName }}.to{{ entityName }}Response(): {{ entityName }}Response =
+    {{ entityName }}Response.newBuilder()
+        .setId(this.id.value)
+        .setUuid(this.uuid.value.toString())
+{% for field in fields %}
+        .set{{ field.namePascal }}({{ field.kotlinToProtoExpression }})
+{% endfor %}
+        .build()
+
+fun {{ entityName }}Create.to{{ entityName }}CreateRequest(): {{ entityName }}CreateRequest =
+    {{ entityName }}CreateRequest.newBuilder()
+        .setUuid(this.uuid.toString())
+{% for field in fields %}
+        .set{{ field.namePascal }}({{ field.kotlinCreateToProtoExpression }})
+{% endfor %}
+        .build()
+
+fun {{ entityName }}Update.to{{ entityName }}UpdateRequest(): {{ entityName }}UpdateRequest =
+    {{ entityName }}UpdateRequest.newBuilder()
+        .setId(this.id.value)
+        .setUuid(this.uuid.value.toString())
+{% for field in fields %}
+        .set{{ field.namePascal }}({{ field.kotlinUpdateToProtoExpression }})
+{% endfor %}
+        .build()
+
+fun Page<{{ entityName }}>.toGrpcPage(): {{ entityName }}PageResponse =
+    {{ entityName }}PageResponse.newBuilder()
+        .addAll{{ entityNamePlural }}(content.map { it.to{{ entityName }}Response() })
+        .setTotalElements(totalElements.toInt())
+        .setTotalPages(totalPages)
+        .setPage(number)
+        .setSize(size)
+        .build()

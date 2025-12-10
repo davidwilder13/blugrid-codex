@@ -1,0 +1,44 @@
+{# templates/kotlin/grpc_context_config.kt.j2 #}
+{# Generates gRPC context configuration for coroutine dispatchers #}
+package {{ packageName }}.grpc.config
+
+import io.micronaut.context.annotation.Bean
+import io.micronaut.context.annotation.Factory
+import io.micronaut.scheduling.TaskExecutors
+import jakarta.inject.Named
+import jakarta.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.asCoroutineDispatcher
+import java.util.concurrent.ExecutorService
+
+/**
+ * Strategy 1: Use Micronaut's IO Executor
+ *
+ * Mental Model: Leverage Micronaut's built-in context-aware thread pool
+ *
+ * Benefits:
+ * - Micronaut manages the thread pool lifecycle
+ * - Automatic context propagation built-in
+ * - Integrates with existing TaskExecutors framework
+ * - No custom thread management needed
+ */
+@Factory
+class GrpcContextConfiguration {
+
+    /**
+     * Create a CoroutineDispatcher backed by Micronaut's IO executor
+     *
+     * The IO executor is specifically designed for:
+     * - Non-blocking I/O operations (perfect for gRPC)
+     * - Context propagation across async boundaries
+     * - Integration with Micronaut's security and transaction systems
+     */
+    @Bean
+    @Singleton
+    @Named("grpcDispatcher")
+    fun grpcContextAwareDispatcher(
+        @Named(TaskExecutors.IO) ioExecutor: ExecutorService
+    ): CoroutineDispatcher {
+        return ioExecutor.asCoroutineDispatcher()
+    }
+}

@@ -12,6 +12,7 @@ option java_outer_classname = "OrganisationStateServiceProto";
 service OrganisationStateService {
   rpc GetById (OrganisationRequestById) returns (OrganisationResponse);
   rpc GetByIdOptional (OrganisationRequestById) returns (OrganisationOptionalResponse);
+  rpc GetByIds (OrganisationRequestByIds) returns (OrganisationListResponse);
   rpc GetByUuid (OrganisationRequestByUuid) returns (OrganisationResponse);
   rpc GetByUuidOptional (OrganisationRequestByUuid) returns (OrganisationOptionalResponse);
   rpc GetAll (google.protobuf.Empty) returns (OrganisationListResponse);
@@ -29,6 +30,10 @@ message OrganisationRequestById {
 
 message OrganisationRequestByUuid {
   string uuid = 1;
+}
+
+message OrganisationRequestByIds {
+  repeated int64 ids = 1;
 }
 
 message OrganisationCreateRequest {

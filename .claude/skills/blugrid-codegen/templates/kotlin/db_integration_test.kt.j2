@@ -1,0 +1,94 @@
+{# templates/kotlin/db_integration_test.kt.j2 #}
+{# Generates integration tests for database service layer #}
+package {{ packageName }}.service
+
+import jakarta.inject.Inject
+import {{ packageName }}.assertion.assert
+import {{ packageName }}.assertion.assertEqualTo
+import {{ packageName }}.factory.{{ entityName }}CreateFactory
+import {{ packageName }}.factory.{{ entityName }}UpdateFactory
+import {{ packageName }}.repository.{{ entityName }}Repository
+import net.blugrid.platform.testing.security.TestApplicationContext
+import net.blugrid.platform.testing.support.BaseServiceIntegTest
+import net.blugrid.security.core.context.doInRequestContext
+import net.blugrid.security.core.service.SecurityContextService
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import java.util.Optional
+
+@DisplayName("{{ entityName }}StateServiceDbImpl")
+class {{ entityName }}StateServiceDbImplIntegTest : BaseServiceIntegTest() {
+
+    @Inject
+    lateinit var securityContextService: SecurityContextService
+
+    @Inject
+    lateinit var commandService: {{ entityName }}CommandService
+
+    @Inject
+    lateinit var queryService: {{ entityName }}QueryService
+
+    @Inject
+    lateinit var repository: {{ entityName }}Repository
+
+    @BeforeEach
+    fun setup() {
+        TestApplicationContext.configureTenantApplicationContext()
+    }
+
+    @Test
+    fun `create {{ entityNameLower }}`() {
+        doInRequestContext {
+            securityContextService.runWithTenantId(1L) {
+                val createModel = {{ entityName }}CreateFactory.create()
+                val result = commandService.create(createModel)
+                result.assert(id = result.id.value)
+            }
+        }
+    }
+
+    @Test
+    fun `update {{ entityNameLower }}`() {
+        doInRequestContext {
+            securityContextService.runWithTenantId(1L) {
+                val created = commandService.create({{ entityName }}CreateFactory.create())
+                val updateModel = {{ entityName }}UpdateFactory.from(created) {
+                    // Modify fields as needed
+                }
+
+                val updated = commandService.update(created.id.value, updateModel)
+
+                updated.assert(
+                    id = created.id.value,
+                    uuid = created.uuid.value
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `get {{ entityNameLower }} by id`() {
+        doInRequestContext {
+            securityContextService.runWithTenantId(1L) {
+                val created = commandService.create({{ entityName }}CreateFactory.create())
+                val found = queryService.getById(created.id.value)
+                found.assertEqualTo(created)
+            }
+        }
+    }
+
+    @Test
+    fun `delete {{ entityNameLower }}`() {
+        doInRequestContext {
+            securityContextService.runWithTenantId(1L) {
+                val created = commandService.create({{ entityName }}CreateFactory.create())
+                commandService.delete(created.id.value)
+                val found = repository.findById(created.id.value)
+                MatcherAssert.assertThat(found, CoreMatchers.equalTo(Optional.empty()))
+            }
+        }
+    }
+}

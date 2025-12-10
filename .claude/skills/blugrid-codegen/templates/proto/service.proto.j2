@@ -1,0 +1,96 @@
+{# templates/proto/service.proto.j2 #}
+{# Generates Protocol Buffer service definition with CRUD operations #}
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "common/PageRequest.proto";
+
+package {{ packageName }}.grpc;
+
+option java_multiple_files = true;
+option java_package = "{{ packageName }}.grpc";
+option java_outer_classname = "{{ entityName }}StateServiceProto";
+
+service {{ entityName }}StateService {
+  rpc GetById ({{ entityName }}RequestById) returns ({{ entityName }}Response);
+  rpc GetByIdOptional ({{ entityName }}RequestById) returns ({{ entityName }}OptionalResponse);
+  rpc GetByUuid ({{ entityName }}RequestByUuid) returns ({{ entityName }}Response);
+  rpc GetByUuidOptional ({{ entityName }}RequestByUuid) returns ({{ entityName }}OptionalResponse);
+  rpc GetAll (google.protobuf.Empty) returns ({{ entityName }}ListResponse);
+  rpc Create ({{ entityName }}CreateRequest) returns ({{ entityName }}Response);
+  rpc Update ({{ entityName }}UpdateRequest) returns ({{ entityName }}Response);
+  rpc Delete ({{ entityName }}DeleteRequest) returns (google.protobuf.Empty);
+  rpc GetPage ({{ entityName }}PageRequest) returns ({{ entityName }}PageResponse);
+  rpc Query ({{ entityName }}FilterRequest) returns ({{ entityName }}PageResponse);
+}
+
+
+message {{ entityName }}RequestById {
+  int64 id = 1;
+}
+
+message {{ entityName }}RequestByUuid {
+  string uuid = 1;
+}
+
+message {{ entityName }}CreateRequest {
+  string uuid = 1;
+{% for field in fields %}
+  {{ field.protoType }} {{ field.name }} = {{ field.fieldNumber }};
+{% endfor %}
+}
+
+message {{ entityName }}UpdateRequest {
+  int64 id = 1;
+  string uuid = 2;
+{% for field in fields %}
+  {{ field.protoType }} {{ field.name }} = {{ field.updateFieldNumber }};
+{% endfor %}
+}
+
+message {{ entityName }}DeleteRequest {
+  int64 id = 1;
+}
+
+message {{ entityName }}Response {
+  int64 id = 1;
+  string uuid = 2;
+{% for field in fields %}
+  {{ field.protoType }} {{ field.name }} = {{ field.responseFieldNumber }};
+{% endfor %}
+}
+
+message {{ entityName }}OptionalResponse {
+  bool exists = 1;
+  {{ entityName }}Response {{ entityNameLower }} = 2;
+}
+
+message {{ entityName }}ListResponse {
+  repeated {{ entityName }}Response {{ entityNameLowerPlural }} = 1;
+}
+
+message {{ entityName }}PageRequest {
+  int32 page = 1;
+  int32 size = 2;
+  net.blugrid.api.common.grpc.Sort sort = 3;
+}
+
+message {{ entityName }}FilterRequest {
+  repeated int64 ids = 1;
+  repeated string uuids = 2;
+{% for field in filterFields %}
+  {{ field.protoType }} {{ field.name }} = {{ field.filterFieldNumber }};
+{% endfor %}
+
+  int32 page = {{ filterPageFieldNumber }};
+  int32 size = {{ filterSizeFieldNumber }};
+  net.blugrid.api.common.grpc.Sort sort = {{ filterSortFieldNumber }};
+}
+
+message {{ entityName }}PageResponse {
+  repeated {{ entityName }}Response {{ entityNameLowerPlural }} = 1;
+  int32 totalElements = 2;
+  int32 totalPages = 3;
+  int32 page = 4;
+  int32 size = 5;
+}

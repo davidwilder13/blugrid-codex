@@ -11,6 +11,7 @@ import net.blugrid.api.core.organisation.grpc.OrganisationStateServiceGrpcKt
 import net.blugrid.api.core.organisation.grpc.OrganisationUpdateRequest
 import net.blugrid.api.core.organisation.grpc.organisationDeleteRequest
 import net.blugrid.api.core.organisation.grpc.organisationRequestById
+import net.blugrid.api.core.organisation.grpc.organisationRequestByIds
 import net.blugrid.api.core.organisation.grpc.organisationRequestByUuid
 import java.util.UUID
 
@@ -28,6 +29,11 @@ class OrganisationGrpcClient(
 
     suspend fun getByUuidOptional(uuid: UUID): OrganisationOptionalResponse =
         stub.getByUuidOptional(organisationRequestByUuid { this.uuid = uuid.toString() })
+
+    suspend fun getByIds(ids: List<Long>): List<OrganisationResponse> {
+        if (ids.isEmpty()) return emptyList()
+        return stub.getByIds(organisationRequestByIds { this.ids.addAll(ids) }).organisationsList
+    }
 
     suspend fun getPage(request: OrganisationPageRequest): OrganisationPageResponse =
         stub.getPage(request)

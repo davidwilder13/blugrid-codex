@@ -31,6 +31,11 @@ class OrganisationGrpcService(
             organisationQueryService.getByIdOptional(request.id).toGrpcOptional()
         }
 
+    override suspend fun getByIds(request: OrganisationRequestByIds): OrganisationListResponse =
+        grpcCall("getByIds") {
+            organisationQueryService.getByIds(request.idsList).toGrpcList()
+        }
+
     override suspend fun getByUuid(request: OrganisationRequestByUuid): OrganisationResponse =
         grpcCall("getByUuid") {
             organisationQueryService.getByUuid(UUID.fromString(request.uuid)).toOrganisationResponse()

@@ -62,6 +62,10 @@ class OrganisationCommandServiceGrpcClientImpl(
         grpcClient.getAll().organisationsList.map { it.toOrganisation() }
     }
 
+    override fun getByIds(ids: List<Long>): List<Organisation> = runBlocking {
+        grpcClient.getByIds(ids).map { it.toOrganisation() }
+    }
+
     override fun create(newResource: OrganisationCreate): Organisation = runBlocking {
         grpcClient.create(newResource.toOrganisationCreateRequest()).toOrganisation()
     }

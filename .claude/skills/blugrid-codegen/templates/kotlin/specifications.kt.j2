@@ -1,0 +1,36 @@
+{# templates/kotlin/specifications.kt.j2 #}
+{# Generates JPA Specification builders for filtering #}
+package {{ packageName }}.repository
+
+import io.micronaut.data.jpa.repository.criteria.Specification
+import {{ packageName }}.model.{{ entityName }}Filter
+import {{ packageName }}.repository.model.{{ entityName }}Entity
+import net.blugrid.data.persistence.repository.and
+import net.blugrid.data.persistence.repository.greaterThanOrEqualTo
+import net.blugrid.data.persistence.repository.`in`
+import net.blugrid.data.persistence.repository.lessThanOrEqualTo
+{%- for import in imports %}
+import {{ import }}
+{%- endfor %}
+
+object {{ entityName }}Specifications {
+
+    fun idsIn(ids: List<Long>?): Specification<{{ entityName }}Entity>? =
+        ids?.let { {{ entityName }}Entity::id.`in`(it) }
+
+    fun uuidsIn(uuids: List<java.util.UUID>?): Specification<{{ entityName }}Entity>? =
+        uuids?.let { {{ entityName }}Entity::uuid.`in`(it) }
+{%- for spec in specifications %}
+
+    fun {{ spec.name }}({{ spec.paramName }}: {{ spec.paramType }}?): Specification<{{ entityName }}Entity>? =
+        {{ spec.paramName }}?.let { {{ entityName }}Entity::{{ spec.fieldName }}.{{ spec.operation }}(it) }
+{%- endfor %}
+
+    fun fromFilter(filter: {{ entityName }}Filter): Specification<{{ entityName }}Entity> = and(
+        idsIn(filter.ids),
+        uuidsIn(filter.uuids),
+{%- for spec in specifications %}
+        {{ spec.name }}(filter.{{ spec.filterField }}){% if not loop.last %},{% endif %}
+{%- endfor %}
+    )
+}
